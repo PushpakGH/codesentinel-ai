@@ -2,7 +2,7 @@
   "name": "codesentinel-ai",
   "displayName": "CodeSentinel AI - Multi-Agent Code Review",
   "description": "Multi-agent AI code review with self-correction, security scanning, BYOK support, AI chat, and universal model compatibility",
-  "version": "1.0.0",
+  "version": "1.0.4",
   "publisher": "PushpakBadgujar1",
   "icon": "media/icon.png",
   "engines": {
@@ -31,10 +31,6 @@
   ],
   "activationEvents": [
     "onStartupFinished",
-    "onCommand:codeSentinel.reviewCode",
-    "onCommand:codeSentinel.openChat",
-    "onCommand:codeSentinel.reviewFolder",
-    "onCommand:codeSentinel.reviewWorkspace",
     "onView:codesentinel.reviewPanel"
   ],
   "main": "./src/extension.js",
@@ -184,6 +180,12 @@
         },
         {
           "command": "codeSentinel.openChat"
+        },
+        {
+          "command": "codeSentinel.configureApiKey"
+        },
+        {
+          "command": "codeSentinel.deleteApiKey"
         }
       ]
     },
@@ -193,8 +195,7 @@
        "codeSentinel.apiKey": {
   "type": "string",
   "default": "",
-  "markdownDescription": " API keys are  stored securely.\n\nTo set your API key:\n1. Open Command Palette (Ctrl+Shift+P)\n2. Run: `CodeSentinel: Configure API Key`\n\nYour key is encrypted and stored in your system's keychain.",
-  "deprecationMessage": "Use Command Palette → 'CodeSentinel: Configure API Key' instead",
+  "markdownDescription": "**⚠️ Recommended: Use Secure Command Instead**\n\nFor better security, use the Command Palette:\n1. Press `Ctrl+Shift+P` (or `Cmd+Shift+P` on Mac)\n2. Run: `CodeSentinel: Configure API Key`\n\nThis setting is kept for backward compatibility. Keys set here will be automatically migrated to secure storage.\n\n**Note:** Keys set via the command are encrypted and stored in your system's keychain.",
   "order": 1
 }
 ,
@@ -329,8 +330,9 @@
     "@google/generative-ai": "^0.21.0",
     "ollama": "^0.5.9",
     "axios": "^1.13.2",
-    "marked": "^12.0.2",
-    "dotenv": "^16.3.0"
+    "marked": "^12.0.2"
+    
+    
   },
   "repository": {
     "type": "git",

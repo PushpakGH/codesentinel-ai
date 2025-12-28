@@ -23,74 +23,135 @@ const configManager = require('./services/configManager');
  * @param {vscode.ExtensionContext} context
  */
 async function activate(context) {
+  // CRITICAL: Store context globally for webview access (do this first)
+  global.extensionContext = context;
+  
+  // Register commands FIRST - this ensures they're available even if other initialization fails
+  try {
+    registerCommands(context);
+    logger.info('✅ Commands registered');
+  } catch (error) {
+    logger.error('CRITICAL: Failed to register commands:', error);
+    vscode.window.showErrorMessage(`Failed to register commands: ${error.message}`);
+    // Still continue - some commands might have registered
+  }
+
   try {
     logger.info('🚀 CodeSentinel AI Extension Activating...');
 
-    // CRITICAL: Store context globally for webview access
-    global.extensionContext = context;
-
     // Initialize ConfigManager with SecretStorage
-    await configManager.initialize(context);
-    logger.info('✅ ConfigManager initialized with SecretStorage');
-
-    // Validate configuration
-    const validation = await configManager.validateConfig();
-    if (!validation.valid) {
-      const action = await vscode.window.showWarningMessage(
-        `⚠️ Configuration Issues: ${validation.errors.join(', ')}`,
-        'Fix Now',
-        'Later'
-      );
+    try {
+      await configManager.initialize(context);
+      logger.info('✅ ConfigManager initialized with SecretStorage');
       
-      if (action === 'Fix Now') {
-        vscode.commands.executeCommand('codeSentinel.openSettings');
+      // Auto-migrate API key from settings to secure storage if present
+      const settingsKey = vscode.workspace.getConfiguration('codeSentinel').get('apiKey', '');
+      if (settingsKey && settingsKey.trim()) {
+        try {
+          await configManager.migrateSettingsToSecretStorage();
+          logger.info('✅ Auto-migrated API key from settings to secure storage');
+        } catch (migrationError) {
+          logger.warn('Could not auto-migrate API key:', migrationError);
+        }
       }
+    } catch (error) {
+      logger.error('Failed to initialize ConfigManager:', error);
+      // Continue - user can configure later
     }
 
-    // Show warnings if any
-    if (validation.warnings && validation.warnings.length > 0) {
-      logger.warn('Configuration warnings:', validation.warnings);
+    // Watch for API key changes in settings and auto-migrate
+    try {
+      const configWatcher = vscode.workspace.onDidChangeConfiguration(async (e) => {
+        if (e.affectsConfiguration('codeSentinel.apiKey') && configManager.initialized) {
+          const settingsKey = vscode.workspace.getConfiguration('codeSentinel').get('apiKey', '');
+          if (settingsKey && settingsKey.trim()) {
+            try {
+              await configManager.migrateSettingsToSecretStorage();
+              logger.info('✅ Auto-migrated API key from settings to secure storage');
+              vscode.window.showInformationMessage('🔒 API Key automatically migrated to secure storage');
+            } catch (migrationError) {
+              logger.warn('Could not auto-migrate API key:', migrationError);
+            }
+          }
+        }
+      });
+      context.subscriptions.push(configWatcher);
+    } catch (error) {
+      logger.warn('Could not set up configuration watcher:', error);
+    }
+
+    // Validate configuration (only if configManager initialized successfully)
+    try {
+      const validation = await configManager.validateConfig();
+      if (!validation.valid) {
+        const action = await vscode.window.showWarningMessage(
+          `⚠️ Configuration Issues: ${validation.errors.join(', ')}`,
+          'Fix Now',
+          'Later'
+        );
+        
+        if (action === 'Fix Now') {
+          vscode.commands.executeCommand('codeSentinel.openSettings');
+        }
+      }
+
+      // Show warnings if any
+      if (validation.warnings && validation.warnings.length > 0) {
+        logger.warn('Configuration warnings:', validation.warnings);
+      }
+    } catch (error) {
+      logger.warn('Could not validate configuration:', error);
     }
 
     // Initialize Status Bar
-    const statusBarItem = createStatusBar(context);
+    try {
+      const statusBarItem = createStatusBar(context);
+    } catch (error) {
+      logger.error('Failed to create status bar:', error);
+    }
 
     // Register Tree Data Provider
-    const { registerTreeDataProvider } = require('./providers/treeDataProvider');
-    const treeProvider = registerTreeDataProvider(context);
-    
-    // Store globally for access from reviewCode command
-    global.treeDataProvider = treeProvider;
-    logger.info('✅ Tree data provider registered');
-
-    // Register all commands
-    registerCommands(context);
+    try {
+      const { registerTreeDataProvider } = require('./providers/treeDataProvider');
+      const treeProvider = registerTreeDataProvider(context);
+      
+      // Store globally for access from reviewCode command
+      global.treeDataProvider = treeProvider;
+      logger.info('✅ Tree data provider registered');
+    } catch (error) {
+      logger.error('Failed to register tree data provider:', error);
+      // Continue activation even if tree provider fails
+    }
 
     // Check debug mode and update logger
-    const debugMode = configManager.isDebugMode();
-    logger.setDebugMode(debugMode);
+    try {
+      const debugMode = configManager.isDebugMode();
+      logger.setDebugMode(debugMode);
+      logger.info(`Debug Mode: ${debugMode ? 'ON' : 'OFF'}`);
+      
+      const provider = configManager.getModelProvider();
+      logger.info(`Provider: ${provider}`);
+    } catch (error) {
+      logger.warn('Could not get configuration:', error);
+    }
 
     // Show welcome message on first install
-    const hasShownWelcome = context.globalState.get('codeSentinel.hasShownWelcome');
-    if (!hasShownWelcome) {
-      await showWelcomeMessage(context);
-      context.globalState.update('codeSentinel.hasShownWelcome', true);
+    try {
+      const hasShownWelcome = context.globalState.get('codeSentinel.hasShownWelcome');
+      if (!hasShownWelcome) {
+        await showWelcomeMessage(context);
+        context.globalState.update('codeSentinel.hasShownWelcome', true);
+      }
+    } catch (error) {
+      logger.warn('Could not show welcome message:', error);
     }
 
     logger.info('✅ CodeSentinel AI Extension Activated Successfully');
-    logger.info(`Debug Mode: ${debugMode ? 'ON' : 'OFF'}`);
-    logger.info(`Provider: ${configManager.getModelProvider()}`);
 
   } catch (error) {
-    logger.error('Failed to activate extension:', error);
-    vscode.window.showErrorMessage(
-      `CodeSentinel activation failed: ${error.message}`,
-      'View Logs'
-    ).then(action => {
-      if (action === 'View Logs') {
-        logger.show();
-      }
-    });
+    logger.error('Error during extension activation:', error);
+    // Don't show error to user - commands are already registered, extension is functional
+    // Only log for debugging
   }
 }
 
@@ -179,7 +240,11 @@ function registerCommands(context) {
     },
     {
       name: 'codeSentinel.openChat',
-      callback: () => chatPanelManager.createOrShow(context),
+      callback: () => {
+        // Use global context if available, otherwise get from extension
+        const ctx = global.extensionContext || context;
+        chatPanelManager.createOrShow(ctx);
+      },
       description: 'Open AI chat assistant'
     },
     {
@@ -288,6 +353,8 @@ function registerCommands(context) {
       logger.debug(`✅ Registered command: ${cmd.name}`);
     } catch (error) {
       logger.error(`Failed to register command ${cmd.name}:`, error);
+      // Show error but don't throw - allow other commands to register
+      vscode.window.showErrorMessage(`Failed to register command ${cmd.name}: ${error.message}`);
     }
   });
 

@@ -11,7 +11,7 @@
  */
 
 const vscode = require('vscode');
-require('dotenv').config();
+
 
 class ConfigManager {
   constructor() {
@@ -164,6 +164,13 @@ class ConfigManager {
     await this.secretStorage.delete('codeSentinel.apiKey');
     this.log('🗑️ API key cleared from SecretStorage', 'info');
     vscode.window.showInformationMessage('🗑️ API Key removed');
+  }
+
+  /**
+   * Delete stored API key (alias for clearApiKey for consistency)
+   */
+  async deleteApiKey() {
+    return this.clearApiKey();
   }
 
   /**

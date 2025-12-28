@@ -148,13 +148,12 @@ class CodeSentinelTreeDataProvider {
 function registerTreeDataProvider(context) {
   const provider = new CodeSentinelTreeDataProvider();
 
-  const treeView = vscode.window.createTreeView('codesentinel.reviewPanel', {
-    treeDataProvider: provider,
-    showCollapseAll: true
-  });
-
-  context.subscriptions.push(treeView);
-  logger.info('✅ Tree data provider registered');
+  // Register the tree data provider for the view defined in package.json
+  // VS Code will automatically create the tree view when the view is shown
+  const disposable = vscode.window.registerTreeDataProvider('codesentinel.reviewPanel', provider);
+  
+  context.subscriptions.push(disposable);
+  logger.info('✅ Tree data provider registered for codesentinel.reviewPanel');
 
   return provider;
 }

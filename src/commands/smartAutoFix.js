@@ -118,9 +118,66 @@ async function smartAutoFixCommand() {
       );
 
       if (action === 'Apply All Fixes') {
-        await editor.edit(editBuilder => {
+        // Re-acquire editor reference - it might have changed or been closed
+        const currentEditor = vscode.window.activeTextEditor;
+        
+        // Try to find the original document if editor changed
+        let targetEditor = currentEditor;
+        if (!currentEditor || currentEditor.document.uri.toString() !== editor.document.uri.toString()) {
+          // Try to find the document in open editors
+          const allEditors = vscode.window.visibleTextEditors;
+          targetEditor = allEditors.find(e => e.document.uri.toString() === editor.document.uri.toString());
+          
+          if (!targetEditor) {
+            // Document is closed, try to reopen it
+            try {
+              const doc = await vscode.workspace.openTextDocument(editor.document.uri);
+              await vscode.window.showTextDocument(doc);
+              targetEditor = vscode.window.activeTextEditor;
+            } catch (reopenError) {
+              throw new Error('The file was closed. Please reopen it and try again.');
+            }
+          }
+        }
+
+        if (!targetEditor) {
+          throw new Error('Cannot apply fix: Editor is not available');
+        }
+
+        // Verify the document is still valid
+        if (targetEditor.document.isClosed) {
+          throw new Error('Cannot apply fix: Document is closed');
+        }
+
+        // Re-validate selection is still valid
+        const doc = targetEditor.document;
+        const selectionStart = doc.offsetAt(selection.start);
+        const selectionEnd = doc.offsetAt(selection.end);
+        const currentText = doc.getText(selection);
+        
+        // If selection changed significantly, warn user
+        if (currentText !== selectedText) {
+          const proceed = await vscode.window.showWarningMessage(
+            '⚠️ The selected code has changed. Apply fix anyway?',
+            { modal: true },
+            'Apply',
+            'Cancel'
+          );
+          
+          if (proceed !== 'Apply') {
+            logger.info('User cancelled due to code change');
+            return;
+          }
+        }
+
+        // Apply the fix
+        const success = await targetEditor.edit(editBuilder => {
           editBuilder.replace(selection, fixedCode);
         });
+
+        if (!success) {
+          throw new Error('Failed to apply edit. The document may have been modified.');
+        }
 
         const latency = Date.now() - startTime;
         

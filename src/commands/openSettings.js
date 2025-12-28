@@ -12,9 +12,10 @@ const { logger } = require('../utils/logger');
 async function openSettingsCommand() {
   try {
     // Open settings filtered to CodeSentinel
+    // Extension ID format: publisher.name
     await vscode.commands.executeCommand(
       'workbench.action.openSettings',
-      '@ext:codesentinel.codesentinel-ai'
+      '@ext:PushpakBadgujar1.codesentinel-ai'
     );
 
     logger.debug('Settings panel opened');
@@ -22,10 +23,15 @@ async function openSettingsCommand() {
     logger.error('Failed to open settings:', error);
     
     // Fallback: Open general settings search
-    vscode.commands.executeCommand(
-      'workbench.action.openSettings',
-      'codeSentinel'
-    );
+    try {
+      await vscode.commands.executeCommand(
+        'workbench.action.openSettings',
+        'codeSentinel'
+      );
+    } catch (fallbackError) {
+      logger.error('Fallback settings open also failed:', fallbackError);
+      vscode.window.showErrorMessage('Failed to open settings. Please use Command Palette → Preferences: Open Settings (UI) and search for "codeSentinel"');
+    }
   }
 }
 

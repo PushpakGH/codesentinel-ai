@@ -79,11 +79,44 @@ Format: Return code in a markdown code block.`;
       // ========== DIRECT FIX (as user requested) ==========
       const applyDirectly = vscode.workspace.getConfiguration('codeSentinel').get('applyFixesDirectly', false);
 
+      // Helper function to safely apply edit
+      const applyEdit = async (targetEditor, targetSelection, code) => {
+        // Verify editor is still valid
+        if (!targetEditor || targetEditor.document.isClosed) {
+          // Try to find the document in open editors
+          const allEditors = vscode.window.visibleTextEditors;
+          const foundEditor = allEditors.find(e => e.document.uri.toString() === editor.document.uri.toString());
+          
+          if (!foundEditor) {
+            // Document is closed, try to reopen it
+            try {
+              const doc = await vscode.workspace.openTextDocument(editor.document.uri);
+              const reopenedEditor = await vscode.window.showTextDocument(doc);
+              return reopenedEditor.edit(editBuilder => {
+                editBuilder.replace(targetSelection, code);
+              });
+            } catch (reopenError) {
+              throw new Error('The file was closed. Please reopen it and try again.');
+            }
+          }
+          
+          return foundEditor.edit(editBuilder => {
+            editBuilder.replace(targetSelection, code);
+          });
+        }
+        
+        return targetEditor.edit(editBuilder => {
+          editBuilder.replace(targetSelection, code);
+        });
+      };
+
       if (applyDirectly) {
         // Apply immediately without confirmation
-        await editor.edit(editBuilder => {
-          editBuilder.replace(selection, fixedCode);
-        });
+        const success = await applyEdit(editor, selection, fixedCode);
+        
+        if (!success) {
+          throw new Error('Failed to apply edit. The document may have been modified.');
+        }
         
         vscode.window.showInformationMessage('✅ Fix applied!', 'Undo').then(action => {
           if (action === 'Undo') {
@@ -126,17 +159,22 @@ Format: Return code in a markdown code block.`;
           );
 
           if (applyAfterDiff === 'Yes') {
-            await editor.edit(editBuilder => {
-              editBuilder.replace(selection, fixedCode);
-            });
+            const success = await applyEdit(editor, selection, fixedCode);
+            
+            if (!success) {
+              throw new Error('Failed to apply edit. The document may have been modified.');
+            }
+            
             vscode.window.showInformationMessage('✅ Fix applied!');
             logger.info('Auto-fix applied after diff review');
           }
 
         } else if (action === 'Apply Now') {
-          await editor.edit(editBuilder => {
-            editBuilder.replace(selection, fixedCode);
-          });
+          const success = await applyEdit(editor, selection, fixedCode);
+          
+          if (!success) {
+            throw new Error('Failed to apply edit. The document may have been modified.');
+          }
           
           vscode.window.showInformationMessage('✅ Fix applied!', 'Undo').then(undoAction => {
             if (undoAction === 'Undo') {

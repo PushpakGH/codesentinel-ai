@@ -1,9 +1,13 @@
 .vscode/**
 .git/**
-node_modules/**
-src/**/*.map
-*.vsix
 .gitignore
 .eslintrc.json
 tsconfig.json
+*.vsix
+**/*.map
+**/node_modules/.bin/**
+**/node_modules/**/test/**
+**/node_modules/**/tests/**
+**/node_modules/**/*.md
+**/node_modules/**/.npmignore
 .env
