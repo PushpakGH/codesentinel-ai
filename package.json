@@ -1,9 +1,9 @@
 {
   "name": "codesentinel-ai",
-  "displayName": "CodeSentinel AI - Production Code Review",
-  "description": "Multi-agent AI code review with self-correction, security scanning, BYOK support, and universal model compatibility (Gemini, Ollama, OpenAI, DeepSeek-R1)",
+  "displayName": "CodeSentinel AI - Multi-Agent Code Review",
+  "description": "Multi-agent AI code review with self-correction, security scanning, BYOK support, AI chat, and universal model compatibility",
   "version": "1.0.0",
-  "publisher": "codesentinel",
+  "publisher": "PushpakBadgujar1",
   "icon": "media/icon.png",
   "engines": {
     "vscode": "^1.85.0",
@@ -26,10 +26,16 @@
     "linting",
     "code quality",
     "owasp",
-    "vulnerability scanner"
+    "vulnerability scanner",
+    "chat assistant"
   ],
   "activationEvents": [
-    "onStartupFinished"
+    "onStartupFinished",
+    "onCommand:codeSentinel.reviewCode",
+    "onCommand:codeSentinel.openChat",
+    "onCommand:codeSentinel.reviewFolder",
+    "onCommand:codeSentinel.reviewWorkspace",
+    "onView:codesentinel.reviewPanel"
   ],
   "main": "./src/extension.js",
   "contributes": {
@@ -45,6 +51,12 @@
         "title": "CodeSentinel: Apply AI Fix",
         "category": "CodeSentinel",
         "icon": "$(wand)"
+      },
+      {
+        "command": "codeSentinel.smartAutoFix",
+        "title": "CodeSentinel: Apply Smart Fix (Analyze + Fix All)",
+        "category": "CodeSentinel",
+        "icon": "$(sparkle)"
       },
       {
         "command": "codeSentinel.explainIssue",
@@ -65,6 +77,24 @@
         "icon": "$(settings-gear)"
       },
       {
+        "command": "codeSentinel.reviewFolder",
+        "title": "CodeSentinel: Review Folder",
+        "category": "CodeSentinel",
+        "icon": "$(folder)"
+      },
+      {
+        "command": "codeSentinel.reviewWorkspace",
+        "title": "CodeSentinel: Review Entire Workspace",
+        "category": "CodeSentinel",
+        "icon": "$(root-folder)"
+      },
+      {
+        "command": "codeSentinel.openChat",
+        "title": "CodeSentinel: Open AI Chat",
+        "category": "CodeSentinel",
+        "icon": "$(comment-discussion)"
+      },
+      {
         "command": "codeSentinel.migrateSettings",
         "title": "CodeSentinel: Migrate Settings to Secure Storage",
         "category": "CodeSentinel"
@@ -78,7 +108,20 @@
         "command": "codeSentinel.clearCache",
         "title": "CodeSentinel: Clear Analysis Cache",
         "category": "CodeSentinel"
-      }
+      },
+      {
+  "command": "codeSentinel.configureApiKey",
+  "title": "CodeSentinel: Configure API Key (Secure)",
+  "category": "CodeSentinel",
+  "icon": "$(key)"
+},
+{
+  "command": "codeSentinel.deleteApiKey",
+  "title": "CodeSentinel: Delete API Key",
+  "category": "CodeSentinel",
+  "icon": "$(trash)"
+}
+
     ],
     "menus": {
       "editor/context": [
@@ -89,13 +132,25 @@
         },
         {
           "when": "editorHasSelection",
-          "command": "codeSentinel.explainIssue",
+          "command": "codeSentinel.smartAutoFix",
           "group": "codesentinel@2"
         },
         {
           "when": "editorHasSelection",
-          "command": "codeSentinel.autoFix",
+          "command": "codeSentinel.explainIssue",
           "group": "codesentinel@3"
+        },
+        {
+          "when": "editorHasSelection",
+          "command": "codeSentinel.autoFix",
+          "group": "codesentinel@4"
+        }
+      ],
+      "explorer/context": [
+        {
+          "when": "explorerResourceIsFolder",
+          "command": "codeSentinel.reviewFolder",
+          "group": "codesentinel@1"
         }
       ],
       "editor/title": [
@@ -105,22 +160,44 @@
           "group": "navigation"
         }
       ],
+      "view/title": [
+        {
+          "when": "view == codesentinel.reviewPanel",
+          "command": "codeSentinel.openChat",
+          "group": "navigation"
+        }
+      ],
       "commandPalette": [
         {
           "command": "codeSentinel.reviewCode",
           "when": "editorIsOpen"
+        },
+        {
+          "command": "codeSentinel.smartAutoFix",
+          "when": "editorIsOpen"
+        },
+        {
+          "command": "codeSentinel.reviewFolder"
+        },
+        {
+          "command": "codeSentinel.reviewWorkspace"
+        },
+        {
+          "command": "codeSentinel.openChat"
         }
       ]
     },
     "configuration": {
       "title": "CodeSentinel AI",
       "properties": {
-        "codeSentinel.apiKey": {
-          "type": "string",
-          "default": "",
-          "markdownDescription": "**[Optional]** Your personal Gemini API Key. Get yours at [Google AI Studio](https://aistudio.google.com/app/apikey).\n\n**Security:** Keys are stored in VS Code's encrypted SecretStorage.",
-          "order": 1
-        },
+       "codeSentinel.apiKey": {
+  "type": "string",
+  "default": "",
+  "markdownDescription": " API keys are  stored securely.\n\nTo set your API key:\n1. Open Command Palette (Ctrl+Shift+P)\n2. Run: `CodeSentinel: Configure API Key`\n\nYour key is encrypted and stored in your system's keychain.",
+  "deprecationMessage": "Use Command Palette → 'CodeSentinel: Configure API Key' instead",
+  "order": 1
+}
+,
         "codeSentinel.modelProvider": {
           "type": "string",
           "enum": [
@@ -135,7 +212,7 @@
         "codeSentinel.geminiModel": {
           "type": "string",
           "default": "gemini-2.0-flash-exp",
-          "markdownDescription": "**Gemini Model Name** (Free-form entry)\n\nPopular models:\n- `gemini-2.0-flash-exp` ⚡ Latest experimental\n- `gemini-1.5-flash` 🚀 Stable & fast\n- `gemini-1.5-pro` 🧠 Deep analysis\n- `gemini-2.5-flash` 🆕 Custom model\n\nYou can enter ANY Gemini model name.",
+          "markdownDescription": "**Gemini Model Name** (Free-form entry)\n\nPopular models:\n- `gemini-2.0-flash-exp` ⚡ Latest experimental\n- `gemini-1.5-flash` 🚀 Stable & fast\n- `gemini-1.5-pro` 🧠 Deep analysis\n- `gemini-2.5-flash` 🆕 Custom model",
           "order": 3
         },
         "codeSentinel.ollamaBaseUrl": {
@@ -147,7 +224,7 @@
         "codeSentinel.ollamaModel": {
           "type": "string",
           "default": "deepseek-r1:7b",
-          "markdownDescription": "**Ollama Model Name** (Free-form entry)\n\nRecommended models:\n- `deepseek-r1:7b` ⭐ Best for code review\n- `qwen2.5:7b` 🎯 Excellent analysis\n- `gemma3:4b` ⚡ Fast & lightweight\n- `gemma2:2b` 🏃 Ultra-fast\n\nEnter any model from `ollama list`",
+          "markdownDescription": "**Ollama Model Name** (Free-form entry)\n\nRecommended models:\n- `deepseek-r1:7b` ⭐ Best for code review\n- `qwen2.5:7b` 🎯 Excellent analysis\n- `gemma3:4b` ⚡ Fast & lightweight\n- `gemma2:2b` 🏃 Ultra-fast",
           "order": 5
         },
         "codeSentinel.enableStreaming": {
@@ -163,24 +240,23 @@
           "order": 7
         },
         "codeSentinel.applyFixesDirectly": {
-  "type": "boolean",
-  "default": false,
-  "markdownDescription": "**Apply Fixes Immediately**\n\nWhen enabled:\n- ✅ Fixes are applied instantly without confirmation\n- ⚡ Faster workflow\n- ⚠️ Can be undone with Ctrl+Z\n\nWhen disabled:\n- Shows diff preview first\n- Requires manual confirmation",
-  "order": 7.5
-}
-    ,
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "**Apply Fixes Immediately**\n\nWhen enabled:\n- ✅ Fixes are applied instantly without confirmation\n- ⚡ Faster workflow\n- ⚠️ Can be undone with Ctrl+Z",
+          "order": 7.5
+        },
         "codeSentinel.confidenceThreshold": {
           "type": "number",
           "default": 85,
           "minimum": 0,
           "maximum": 100,
-          "markdownDescription": "**Self-Correction Trigger** (0-100)\n\nIf AI confidence is below this value, automatically trigger Validator Agent for second-pass review.\n\n- **60-70**: Aggressive re-analysis\n- **80-90**: Balanced (recommended)\n- **95+**: Only very uncertain cases",
+          "markdownDescription": "**Self-Correction Trigger** (0-100)\n\nIf AI confidence is below this value, automatically trigger Validator Agent for second-pass review.",
           "order": 8
         },
         "codeSentinel.enableSecurityAgent": {
           "type": "boolean",
           "default": true,
-          "markdownDescription": "**Enable Security Agent**\n\nScans for OWASP Top 10 vulnerabilities:\n- SQL Injection, XSS, CSRF\n- Hardcoded secrets\n- Authentication flaws\n- Insecure crypto",
+          "markdownDescription": "**Enable Security Agent**\n\nScans for OWASP Top 10 vulnerabilities",
           "order": 9
         },
         "codeSentinel.enableValidatorAgent": {
@@ -200,7 +276,7 @@
         "codeSentinel.debugMode": {
           "type": "boolean",
           "default": false,
-          "markdownDescription": "**Debug Mode** (Perfect for demos & judging)\n\nShows:\n- Model provider used\n- Latency metrics\n- Token usage\n- Agent iterations\n- Confidence scores",
+          "markdownDescription": "**Debug Mode** (Perfect for demos & judging)",
           "order": 12
         },
         "codeSentinel.displayMode": {
@@ -210,20 +286,8 @@
             "markdown"
           ],
           "default": "webview",
-          "description": "How to display review results (webview = rich UI, markdown = simple)",
+          "description": "How to display review results",
           "order": 13
-        },
-        "codeSentinel.enableCompletions": {
-          "type": "boolean",
-          "default": false,
-          "description": "Enable AI-powered code completions (experimental)",
-          "order": 14
-        },
-        "codeSentinel.enableDiagnostics": {
-          "type": "boolean",
-          "default": false,
-          "description": "Enable real-time diagnostics (may impact performance)",
-          "order": 15
         }
       }
     },
@@ -270,13 +334,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/codesentinel-ai"
+    "url": "https://github.com/PushpakGH/codesentinel-ai"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/codesentinel-ai/issues"
+    "url": "https://github.com/PushpakGH/codesentinel-ai/issues"
   },
-  "homepage": "https://github.com/yourusername/codesentinel-ai#readme",
-  "author": "Your Name <your.email@example.com>",
+  "homepage": "https://github.com/PushpakGH/codesentinel-ai#readme",
+  "author": "Pushpak Badgujar <pushpakf15@gmail.com>",
   "license": "MIT",
   "type": "commonjs"
 }

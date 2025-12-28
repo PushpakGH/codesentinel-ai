@@ -1,13 +1,17 @@
 /**
  * CodeSentinel AI - Main Extension Entry Point
  * Production-grade VS Code extension for AI-powered code review
- * * Features:
+ * 
+ * Features:
  * - Multi-agent analysis (Primary, Security, Validator)
  * - BYOK (Bring Your Own Key) support
  * - Universal model support (Gemini, Ollama, OpenAI, Anthropic)
  * - Self-correction loop with confidence thresholds
  * - Real-time streaming responses
  * - Debug mode for demonstrations
+ * - AI Chat Assistant
+ * - Folder/Workspace review
+ * - Smart Auto-Fix
  */
 
 const vscode = require('vscode');
@@ -51,14 +55,13 @@ async function activate(context) {
     // Initialize Status Bar
     const statusBarItem = createStatusBar(context);
 
-    // ========== ADDED: Register Tree Data Provider ==========
+    // Register Tree Data Provider
     const { registerTreeDataProvider } = require('./providers/treeDataProvider');
     const treeProvider = registerTreeDataProvider(context);
     
     // Store globally for access from reviewCode command
     global.treeDataProvider = treeProvider;
     logger.info('✅ Tree data provider registered');
-    // ========================================================
 
     // Register all commands
     registerCommands(context);
@@ -120,9 +123,12 @@ function registerCommands(context) {
   // Import command handlers
   const { reviewCodeCommand } = require('./commands/reviewCode');
   const { autoFixCommand } = require('./commands/autoFix');
+  const { smartAutoFixCommand } = require('./commands/smartAutoFix');
   const { explainIssueCommand } = require('./commands/explainIssue');
   const { toggleDebugCommand, exportDebugInfo } = require('./commands/debugMode');
   const { openSettingsCommand } = require('./commands/openSettings');
+  const { reviewFolderCommand, reviewWorkspaceCommand } = require('./commands/reviewFolder');
+  const { chatPanelManager } = require('./webview/chatPanel');
 
   // Define all commands
   const commands = [
@@ -134,7 +140,12 @@ function registerCommands(context) {
     {
       name: 'codeSentinel.autoFix',
       callback: autoFixCommand,
-      description: 'Apply AI-suggested fixes'
+      description: 'Apply simple AI fix'
+    },
+    {
+      name: 'codeSentinel.smartAutoFix',
+      callback: smartAutoFixCommand,
+      description: 'Smart auto-fix: Analyze first, then fix all issues'
     },
     {
       name: 'codeSentinel.explainIssue',
@@ -155,6 +166,21 @@ function registerCommands(context) {
       name: 'codeSentinel.exportDebugInfo',
       callback: exportDebugInfo,
       description: 'Export debug information for bug reports'
+    },
+    {
+      name: 'codeSentinel.reviewFolder',
+      callback: reviewFolderCommand,
+      description: 'Review all code files in a folder'
+    },
+    {
+      name: 'codeSentinel.reviewWorkspace',
+      callback: reviewWorkspaceCommand,
+      description: 'Review entire workspace'
+    },
+    {
+      name: 'codeSentinel.openChat',
+      callback: () => chatPanelManager.createOrShow(context),
+      description: 'Open AI chat assistant'
     },
     {
       name: 'codeSentinel.migrateSettings',
@@ -181,6 +207,61 @@ function registerCommands(context) {
       },
       description: 'Clear analysis cache'
     }
+    ,
+    {
+  name: 'codeSentinel.configureApiKey',
+  callback: async () => {
+    const apiKey = await vscode.window.showInputBox({
+      prompt: '🔒 Enter your Gemini API Key (stored securely)',
+      placeHolder: 'AIza...',
+      password: true,
+      ignoreFocusOut: true,
+      validateInput: (value) => {
+        if (!value || value.trim().length === 0) {
+          return 'API key cannot be empty';
+        }
+        if (!value.startsWith('AIza')) {
+          return 'Gemini API keys typically start with "AIza"';
+        }
+        return null;
+      }
+    });
+
+    if (apiKey) {
+      try {
+        await configManager.saveApiKey(apiKey);
+        vscode.window.showInformationMessage('✅ API key saved securely!');
+      } catch (error) {
+        logger.error('Failed to save API key:', error);
+        vscode.window.showErrorMessage(`Failed to save API key: ${error.message}`);
+      }
+    }
+  },
+  description: 'Configure API key securely'
+},
+{
+  name: 'codeSentinel.deleteApiKey',
+  callback: async () => {
+    const confirm = await vscode.window.showWarningMessage(
+      '⚠️ Delete stored API key?',
+      { modal: true },
+      'Delete',
+      'Cancel'
+    );
+
+    if (confirm === 'Delete') {
+      try {
+        await configManager.deleteApiKey();
+        vscode.window.showInformationMessage('✅ API key deleted');
+      } catch (error) {
+        logger.error('Failed to delete API key:', error);
+        vscode.window.showErrorMessage(`Failed to delete API key: ${error.message}`);
+      }
+    }
+  },
+  description: 'Delete stored API key'
+}
+
   ];
 
   // Register each command with error handling
@@ -224,7 +305,7 @@ async function showWelcomeMessage(context) {
     message,
     'Configure API Key',
     'Use Ollama (Local)',
-    'View Documentation',
+    'Open Chat',
     'Later'
   );
   
@@ -270,8 +351,8 @@ async function showWelcomeMessage(context) {
       });
       break;
 
-    case 'View Documentation':
-      vscode.env.openExternal(vscode.Uri.parse('https://github.com/yourusername/codesentinel-ai#readme'));
+    case 'Open Chat':
+      vscode.commands.executeCommand('codeSentinel.openChat');
       break;
   }
 }

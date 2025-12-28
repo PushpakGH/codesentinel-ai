@@ -159,6 +159,64 @@ async function reviewCodeCommand() {
 }
 
 /**
+ * Review code for chat (returns data instead of showing UI)
+ * @param {string} code 
+ * @param {string} language 
+ * @param {string} fileName 
+ * @returns {Promise<object>}
+ */
+async function reviewCodeForChat(code, language, fileName) {
+  const startTime = Date.now();
+  
+  logger.info(`Chat-initiated review: ${fileName}`);
+
+  try {
+    // Initialize
+    await aiClient.initialize();
+
+    // Run agents
+    const primaryResults = await primaryAgent.analyze(code, language);
+    const securityResults = await securityAgent.analyze(code, language);
+    const validatedResults = await validatorAgent.validate(
+      primaryResults,
+      securityResults,
+      code,
+      language
+    );
+
+    // Generate report
+    const totalLatency = Date.now() - startTime;
+    const report = await generateReport(
+      validatedResults,
+      code,
+      language,
+      totalLatency
+    );
+
+    // Update tree view (if available)
+    if (global.treeDataProvider) {
+      global.treeDataProvider.addResult(fileName, report);
+    }
+
+    // Show in webview
+    const webviewManager = require('../services/webviewManager');
+    const context = global.extensionContext;
+    if (context) {
+      const panel = webviewManager.getPanel(context);
+      webviewManager.updateContent(report);
+    }
+
+    logger.info(`Chat review complete: ${fileName}`);
+
+    return report;
+
+  } catch (error) {
+    logger.error('Chat review failed:', error);
+    throw error;
+  }
+}
+
+/**
  * Generate comprehensive review report
  * @private
  */
@@ -380,4 +438,7 @@ function getSeverityEmoji(severity) {
   return emojis[severity] || '⚪';
 }
 
-module.exports = { reviewCodeCommand };
+module.exports = { 
+  reviewCodeCommand,
+  reviewCodeForChat
+};

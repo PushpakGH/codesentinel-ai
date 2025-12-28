@@ -1,6 +1,22 @@
-node_modules/
+# Environment files
 .env
-*.vsix
-out/
+.env.local
+.env.*.local
+
+# VS Code settings (may contain keys)
+.vscode/settings.json
+
+# Build
 dist/
-.vscode-test/
+out/
+*.vsix
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node
+node_modules/
