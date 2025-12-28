@@ -1,0 +1,282 @@
+{
+  "name": "codesentinel-ai",
+  "displayName": "CodeSentinel AI - Production Code Review",
+  "description": "Multi-agent AI code review with self-correction, security scanning, BYOK support, and universal model compatibility (Gemini, Ollama, OpenAI, DeepSeek-R1)",
+  "version": "1.0.0",
+  "publisher": "codesentinel",
+  "icon": "media/icon.png",
+  "engines": {
+    "vscode": "^1.85.0",
+    "node": ">=18.0.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Linters",
+    "Machine Learning",
+    "Testing",
+    "Formatters"
+  ],
+  "keywords": [
+    "ai",
+    "code review",
+    "gemini",
+    "ollama",
+    "deepseek",
+    "security",
+    "linting",
+    "code quality",
+    "owasp",
+    "vulnerability scanner"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./src/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "codeSentinel.reviewCode",
+        "title": "CodeSentinel: Review Selected Code",
+        "category": "CodeSentinel",
+        "icon": "$(shield)"
+      },
+      {
+        "command": "codeSentinel.autoFix",
+        "title": "CodeSentinel: Apply AI Fix",
+        "category": "CodeSentinel",
+        "icon": "$(wand)"
+      },
+      {
+        "command": "codeSentinel.explainIssue",
+        "title": "CodeSentinel: Explain Issue",
+        "category": "CodeSentinel",
+        "icon": "$(question)"
+      },
+      {
+        "command": "codeSentinel.toggleDebug",
+        "title": "CodeSentinel: Toggle Debug Mode",
+        "category": "CodeSentinel",
+        "icon": "$(bug)"
+      },
+      {
+        "command": "codeSentinel.openSettings",
+        "title": "CodeSentinel: Open Settings",
+        "category": "CodeSentinel",
+        "icon": "$(settings-gear)"
+      },
+      {
+        "command": "codeSentinel.migrateSettings",
+        "title": "CodeSentinel: Migrate Settings to Secure Storage",
+        "category": "CodeSentinel"
+      },
+      {
+        "command": "codeSentinel.exportDebugInfo",
+        "title": "CodeSentinel: Export Debug Info",
+        "category": "CodeSentinel"
+      },
+      {
+        "command": "codeSentinel.clearCache",
+        "title": "CodeSentinel: Clear Analysis Cache",
+        "category": "CodeSentinel"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "when": "editorHasSelection",
+          "command": "codeSentinel.reviewCode",
+          "group": "codesentinel@1"
+        },
+        {
+          "when": "editorHasSelection",
+          "command": "codeSentinel.explainIssue",
+          "group": "codesentinel@2"
+        },
+        {
+          "when": "editorHasSelection",
+          "command": "codeSentinel.autoFix",
+          "group": "codesentinel@3"
+        }
+      ],
+      "editor/title": [
+        {
+          "when": "editorLangId",
+          "command": "codeSentinel.reviewCode",
+          "group": "navigation"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "codeSentinel.reviewCode",
+          "when": "editorIsOpen"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "CodeSentinel AI",
+      "properties": {
+        "codeSentinel.apiKey": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "**[Optional]** Your personal Gemini API Key. Get yours at [Google AI Studio](https://aistudio.google.com/app/apikey).\n\n**Security:** Keys are stored in VS Code's encrypted SecretStorage.",
+          "order": 1
+        },
+        "codeSentinel.modelProvider": {
+          "type": "string",
+          "enum": [
+            "gemini",
+            "ollama",
+            "auto"
+          ],
+          "default": "auto",
+          "markdownDescription": "**AI Model Provider**\n\n- `gemini`: Always use Google Gemini (requires API key)\n- `ollama`: Always use local Ollama (offline, free)\n- `auto`: Try Gemini first, fallback to Ollama on failure\n\n**Recommended:** `auto` for best experience",
+          "order": 2
+        },
+        "codeSentinel.geminiModel": {
+          "type": "string",
+          "default": "gemini-2.0-flash-exp",
+          "markdownDescription": "**Gemini Model Name** (Free-form entry)\n\nPopular models:\n- `gemini-2.0-flash-exp` ⚡ Latest experimental\n- `gemini-1.5-flash` 🚀 Stable & fast\n- `gemini-1.5-pro` 🧠 Deep analysis\n- `gemini-2.5-flash` 🆕 Custom model\n\nYou can enter ANY Gemini model name.",
+          "order": 3
+        },
+        "codeSentinel.ollamaBaseUrl": {
+          "type": "string",
+          "default": "http://localhost:11434",
+          "description": "Ollama API Base URL (change if using remote instance)",
+          "order": 4
+        },
+        "codeSentinel.ollamaModel": {
+          "type": "string",
+          "default": "deepseek-r1:7b",
+          "markdownDescription": "**Ollama Model Name** (Free-form entry)\n\nRecommended models:\n- `deepseek-r1:7b` ⭐ Best for code review\n- `qwen2.5:7b` 🎯 Excellent analysis\n- `gemma3:4b` ⚡ Fast & lightweight\n- `gemma2:2b` 🏃 Ultra-fast\n\nEnter any model from `ollama list`",
+          "order": 5
+        },
+        "codeSentinel.enableStreaming": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable real-time streaming responses for better UX",
+          "order": 6
+        },
+        "codeSentinel.enableAutoFix": {
+          "type": "boolean",
+          "default": true,
+          "description": "Allow automatic code fix suggestions",
+          "order": 7
+        },
+        "codeSentinel.applyFixesDirectly": {
+  "type": "boolean",
+  "default": false,
+  "markdownDescription": "**Apply Fixes Immediately**\n\nWhen enabled:\n- ✅ Fixes are applied instantly without confirmation\n- ⚡ Faster workflow\n- ⚠️ Can be undone with Ctrl+Z\n\nWhen disabled:\n- Shows diff preview first\n- Requires manual confirmation",
+  "order": 7.5
+}
+    ,
+        "codeSentinel.confidenceThreshold": {
+          "type": "number",
+          "default": 85,
+          "minimum": 0,
+          "maximum": 100,
+          "markdownDescription": "**Self-Correction Trigger** (0-100)\n\nIf AI confidence is below this value, automatically trigger Validator Agent for second-pass review.\n\n- **60-70**: Aggressive re-analysis\n- **80-90**: Balanced (recommended)\n- **95+**: Only very uncertain cases",
+          "order": 8
+        },
+        "codeSentinel.enableSecurityAgent": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "**Enable Security Agent**\n\nScans for OWASP Top 10 vulnerabilities:\n- SQL Injection, XSS, CSRF\n- Hardcoded secrets\n- Authentication flaws\n- Insecure crypto",
+          "order": 9
+        },
+        "codeSentinel.enableValidatorAgent": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable Validator Agent for self-correction loops",
+          "order": 10
+        },
+        "codeSentinel.maxRetries": {
+          "type": "number",
+          "default": 3,
+          "minimum": 0,
+          "maximum": 10,
+          "description": "Maximum API retry attempts on failure",
+          "order": 11
+        },
+        "codeSentinel.debugMode": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "**Debug Mode** (Perfect for demos & judging)\n\nShows:\n- Model provider used\n- Latency metrics\n- Token usage\n- Agent iterations\n- Confidence scores",
+          "order": 12
+        },
+        "codeSentinel.displayMode": {
+          "type": "string",
+          "enum": [
+            "webview",
+            "markdown"
+          ],
+          "default": "webview",
+          "description": "How to display review results (webview = rich UI, markdown = simple)",
+          "order": 13
+        },
+        "codeSentinel.enableCompletions": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable AI-powered code completions (experimental)",
+          "order": 14
+        },
+        "codeSentinel.enableDiagnostics": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable real-time diagnostics (may impact performance)",
+          "order": 15
+        }
+      }
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "codesentinel",
+          "title": "CodeSentinel AI",
+          "icon": "media/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "codesentinel": [
+        {
+          "id": "codesentinel.reviewPanel",
+          "name": "Review Results",
+          "icon": "media/icon.svg"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "echo 'No compilation needed for JS'",
+    "watch": "echo 'Watching for changes...'",
+    "lint": "eslint src --ext js",
+    "test": "echo 'Tests not yet implemented'",
+    "package": "vsce package",
+    "publish": "vsce publish"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.27",
+    "@types/vscode": "^1.85.0",
+    "eslint": "^8.57.0",
+    "@vscode/vsce": "^2.22.0"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0",
+    "ollama": "^0.5.9",
+    "axios": "^1.13.2",
+    "marked": "^12.0.2",
+    "dotenv": "^16.3.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/codesentinel-ai"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/codesentinel-ai/issues"
+  },
+  "homepage": "https://github.com/yourusername/codesentinel-ai#readme",
+  "author": "Your Name <your.email@example.com>",
+  "license": "MIT",
+  "type": "commonjs"
+}
