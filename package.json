@@ -2,7 +2,7 @@
   "name": "codesentinel-ai",
   "displayName": "CodeSentinel AI - Multi-Agent Code Review",
   "description": "Multi-agent AI code review with self-correction, security scanning, BYOK support, AI chat, and universal model compatibility",
-  "version": "1.0.5",
+  "version": "1.0.7",
   "publisher": "PushpakBadgujar1",
   "icon": "media/icon.png",
   "engines": {
@@ -110,7 +110,14 @@
         "command": "codeSentinel.clearCache",
         "title": "CodeSentinel: Clear Analysis Cache",
         "category": "CodeSentinel"
-      },
+      }
+      ,
+{
+  "command": "codeSentinel.generateCommitMessage",
+  "title": "CodeSentinel: Generate Commit Message",
+  "category": "CodeSentinel",
+  "icon": "$(git-commit)"
+},
       {
   "command": "codeSentinel.configureApiKey",
   "title": "CodeSentinel: Configure API Key (Secure)",
@@ -122,10 +129,23 @@
   "title": "CodeSentinel: Delete API Key",
   "category": "CodeSentinel",
   "icon": "$(trash)"
+},
+{
+  "command": "codeSentinel.generateCommitMessage",
+  "title": "CodeSentinel: Generate Commit Message",
+  "category": "CodeSentinel",
+  "icon": "$(git-commit)"
 }
 
     ],
     "menus": {
+       "scm/title": [
+    {
+      "command": "codeSentinel.generateCommitMessage",
+      "group": "navigation",
+      "when": "scmProvider == git"
+    }
+  ],
       "editor/context": [
         {
           "when": "editorHasSelection",
@@ -291,6 +311,14 @@
           "markdownDescription": "**Debug Mode** (Perfect for demos & judging)",
           "order": 12
         },
+        "codeSentinel.chatHistoryLimit": {
+          "type": "number",
+          "default": 50,
+          "minimum": 10,
+          "maximum": 200,
+          "markdownDescription": "**Chat Context Memory**\n\nNumber of recent messages to remember for AI context.\n\n- **Low (10-30)**: Faster responses, less memory\n- **Medium (50-100)**: Balanced ⭐ Recommended\n- **High (100-200)**: More context, slower/costlier\n\n**Note:** Higher values = more API tokens = higher cost",
+          "order": 14
+},
         "codeSentinel.displayMode": {
           "type": "string",
           "enum": [
@@ -312,15 +340,22 @@
         }
       ]
     },
-    "views": {
-      "codesentinel": [
-        {
-          "id": "codesentinel.reviewPanel",
-          "name": "Review Results",
-          "icon": "media/icon.svg"
-        }
-      ]
+   "views": {
+  "codesentinel": [
+    {"icon": "media/icon2.svg",
+      "id": "codesentinel.chatView",
+      "name": "AI Chat",
+      "type": "webview",
+      "contextualTitle": "CodeSentinel AI Chat"
+    },
+    {
+      "id": "codesentinel.reviewPanel",
+      "name": "Review Results",
+      "icon": "media/icon.svg"
     }
+  ]
+}
+
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",

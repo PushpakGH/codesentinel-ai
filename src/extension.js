@@ -112,16 +112,40 @@ async function activate(context) {
 
     // Register Tree Data Provider
     try {
-      const { registerTreeDataProvider } = require('./providers/treeDataProvider');
-      const treeProvider = registerTreeDataProvider(context);
-      
-      // Store globally for access from reviewCode command
-      global.treeDataProvider = treeProvider;
-      logger.info('✅ Tree data provider registered');
-    } catch (error) {
-      logger.error('Failed to register tree data provider:', error);
-      // Continue activation even if tree provider fails
-    }
+  const { registerTreeDataProvider } = require('./providers/treeDataProvider');
+  const treeProvider = registerTreeDataProvider(context);
+  
+  global.treeDataProvider = treeProvider;
+  logger.info('✅ Tree data provider registered');
+} catch (error) {
+  logger.error('Failed to register tree data provider:', error);
+}
+
+ 
+// Register Chat Side Panel Provider
+try {
+  const ChatViewProvider = require('./providers/chatViewProvider');
+  const chatViewProvider = new ChatViewProvider(context);
+  
+  context.subscriptions.push(
+    vscode.window.registerWebviewViewProvider(
+      'codesentinel.chatView',
+      chatViewProvider,
+      {
+        webviewOptions: {
+          retainContextWhenHidden: true
+        }
+      }
+    )
+  );
+  
+  logger.info('✅ Chat side panel registered');
+} catch (error) {
+  logger.error('Failed to register chat side panel:', error);
+  // Continue - fallback to command-based chat
+}
+// =========================================
+
 
     // Check debug mode and update logger
     try {
@@ -252,6 +276,14 @@ function registerCommands(context) {
       },
       description: 'Open AI chat assistant'
     },
+     {
+    name: 'codeSentinel.generateCommitMessage',
+    callback: async () => {
+      const { generateCommitMessageCommand } = require('./commands/gitCommitGenerator');
+      await generateCommitMessageCommand();
+    },
+    description: 'Generate Git commit message from staged changes'
+  },
     {
       name: 'codeSentinel.migrateSettings',
       callback: async () => {

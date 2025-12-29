@@ -223,8 +223,12 @@ class ChatPanelManager {
   /**
    * Handle general questions with AI (UNIVERSAL - Works with all models)
    */
-  async handleGeneralQuestion(question) {
+ /**
+ * Handle general questions with AI (UNIVERSAL - Works with all models)
+ */
+async handleGeneralQuestion(question) {
     const aiClient = require('../services/aiClient');
+    const configManager = require('../services/configManager');
     
     try {
         // Initialize AI client (auto-detects Gemini/Ollama based on settings)
@@ -233,8 +237,12 @@ class ChatPanelManager {
         // Build conversation context from chat history
         let contextPrompt = `You are CodeSentinel AI, a helpful code review assistant. Remember the conversation context.\n\n`;
 
-        // Add recent chat history for context (last 20 messages)
-        const recentHistory = this.chatHistory.slice(-20);
+        // GET HISTORY LIMIT FIRST (before using it!)
+        const historyLimit = configManager.getChatHistoryLimit();
+        
+        // NOW use it to slice history
+        const recentHistory = this.chatHistory.slice(-historyLimit);
+        
         if (recentHistory.length > 0) {
             contextPrompt += `Recent conversation:\n`;
             recentHistory.forEach(msg => {
@@ -248,7 +256,7 @@ class ChatPanelManager {
         // Generate response using your universal AI client
         const response = await aiClient.generate(contextPrompt, { 
             systemPrompt: 'You are CodeSentinel AI. Be concise and helpful. Remember conversation context.',
-            maxTokens: 500 
+            maxTokens: 2000 
         });
 
         logger.info('Chat response generated. History length:', this.chatHistory.length);
@@ -270,7 +278,7 @@ class ChatPanelManager {
         
         return `❌ Error: ${error.message}`;
     }
-  }
+}
 
   /**
    * Fallback to Ollama when Gemini fails
@@ -278,7 +286,7 @@ class ChatPanelManager {
   async tryOllamaFallback(question) {
     const { Ollama } = require('ollama');
     const vscode = require('vscode');
-    
+    const configManager = require('../services/configManager');
     const config = vscode.workspace.getConfiguration('codeSentinel');
     const ollamaUrl = config.get('ollamaBaseUrl', 'http://localhost:11434');
     const ollamaModel = config.get('ollamaModel', 'deepseek-r1:7b');
@@ -286,7 +294,7 @@ class ChatPanelManager {
     const ollama = new Ollama({ host: ollamaUrl });
     
     // Build context from history
-    const messages = this.chatHistory.slice(-20).map(msg => ({
+    const messages = this.chatHistory.slice(-historyLimit).map(msg => ({
         role: msg.role === 'assistant' ? 'assistant' : 'user',
         content: msg.content
     }));
