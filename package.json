@@ -2,7 +2,7 @@
   "name": "codesentinel-ai",
   "displayName": "CodeSentinel AI - Multi-Agent Code Review",
   "description": "Multi-agent AI code review with self-correction, security scanning, BYOK support, AI chat, and universal model compatibility",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "publisher": "PushpakBadgujar1",
   "icon": "media/icon.png",
   "engines": {
@@ -297,7 +297,7 @@
         {
           "id": "codesentinel",
           "title": "CodeSentinel AI",
-          "icon": "media/icon.svg"
+          "icon": "media/icon2.svg"
         }
       ]
     },

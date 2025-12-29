@@ -1,37 +1,21 @@
-<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="64" cy="64" r="60" fill="#0f172a"/>
-  <circle cx="64" cy="64" r="50" fill="none" stroke="#334155" stroke-width="2" stroke-dasharray="10 5"/>
-  <circle cx="64" cy="64" r="40" fill="none" stroke="#4facfe" stroke-width="4" stroke-dasharray="30 10"/>
-  <text x="50%%" y="54%%" dominant-baseline="middle" text-anchor="middle" font-family="Inter, sans-serif" font-weight="900" font-size="45" fill="white">CS</text>
-  <circle cx="64" cy="64" r="5" fill="#00f2fe">
-    <animate attributeName="r" values="4;7;4" dur="1.5s" repeatCount="indefinite" />
-    <animate attributeName="opacity" values="1;0.5;1" dur="1.5s" repeatCount="indefinite" />
-  </circle>
-</svg>
-
-<!-- <svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Shield with gradient effect -->
   <defs>
-    <linearGradient id="shieldGrad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%%" stop-color="#4facfe"/>
-      <stop offset="100%%" stop-color="#00f2fe"/>
+    <linearGradient id="shieldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00D4FF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0080FF;stop-opacity:1" />
     </linearGradient>
   </defs>
-  <rect width="128" height="128" rx="30" fill="#121212"/>
-  <path d="M64 20 L34 32 V56 C34 78 46 98 64 108 C82 98 94 78 94 56 V32 L64 20Z" fill="none" stroke="url(#shieldGrad)" stroke-width="3" opacity="0.6"/>
-  <path d="M100 25 L102 31 L108 33 L102 35 L100 41 L98 35 L92 33 L98 31 Z" fill="#00f2fe">
-     <animate attributeName="opacity" values="1;0.4;1" dur="2s" repeatCount="indefinite" />
-  </path>
-  <text x="50%%" y="54%%" dominant-baseline="middle" text-anchor="middle" font-family="Arial, sans-serif" font-weight="900" font-size="48" fill="white" style="text-shadow: 0px 0px 10px rgba(79, 172, 254, 0.8);">CS</text>
-  <text x="50%%" y="85" dominant-baseline="middle" text-anchor="middle" font-family="Verdana" font-weight="bold" font-size="10" fill="url(#shieldGrad)" letter-spacing="1">SENTINEL</text>
+  
+  <path d="M12 2L4 6V11C4 16.55 7.84 21.74 13 23C18.16 21.74 22 16.55 22 11V6L12 2Z" 
+        fill="url(#shieldGradient)" 
+        opacity="0.2"/>
+  <path d="M12 2L4 6V11C4 16.55 7.84 21.74 13 23C18.16 21.74 22 16.55 22 11V6L12 2Z" 
+        stroke="#0080FF" 
+        stroke-width="2" 
+        fill="none"/>
+  
+  <!-- AI Brain symbol -->
+  <circle cx="12" cy="11" r="3" stroke="#0080FF" stroke-width="1.5" fill="none"/>
+  <path d="M12 8V11M12 11H15M12 11L14.5 13.5" stroke="#0080FF" stroke-width="1.5" stroke-linecap="round"/>
 </svg>
-
-<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
-  <rect width="128" height="128" rx="28" fill="#1a1a1a"/>
-  <path d="M30 40 L15 64 L30 88" stroke="#4facfe" stroke-width="6" fill="none" stroke-linecap="round"/>
-  <path d="M98 40 L113 64 L98 88" stroke="#4facfe" stroke-width="6" fill="none" stroke-linecap="round"/>
-  <rect x="20" y="40" width="88" height="2" fill="#00f2fe" opacity="0.5">
-    <animate attributeName="y" values="40;88;40" dur="3s" repeatCount="indefinite" />
-  </rect>
-  <text x="90%%" y="52%%" dominant-baseline="middle" text-anchor="middle" font-family="monospace" font-weight="bold" font-size="50" fill="#ffffff">CS</text>
-  <text x="50%%" y="110" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-weight="bold" font-size="12" fill="#4facfe">CODE SENTINEL</text>
-</svg> -->

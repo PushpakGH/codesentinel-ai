@@ -1,6 +1,21 @@
 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <path d="M12 2C6.48 2 2 6.48 2 12C2 13.85 2.63 15.55 3.69 16.92L2.08 21.57C1.99 21.82 2.05 22.1 2.24 22.29C2.36 22.41 2.52 22.47 2.68 22.47C2.76 22.47 2.84 22.45 2.92 22.42L7.89 20.62C9.19 21.5 10.77 22 12.5 22C18.02 22 22.5 17.52 22.5 12C22.5 6.48 18.02 2 12.5 2ZM12.5 20C10.92 20 9.45 19.53 8.2 18.72L7.85 18.5L4.55 19.65L5.85 16.54L5.62 16.17C4.68 14.87 4.13 13.29 4.13 11.58C4.13 7.3 7.8 3.83 12.38 3.83C16.96 3.83 20.63 7.3 20.63 11.58C20.63 15.86 16.96 20 12.5 20Z" fill="currentColor"/>
-  <circle cx="8" cy="12" r="1.5" fill="currentColor"/>
-  <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
-  <circle cx="16" cy="12" r="1.5" fill="currentColor"/>
+  <!-- Shield with gradient effect -->
+  <defs>
+    <linearGradient id="shieldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00D4FF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0080FF;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <path d="M12 2L4 6V11C4 16.55 7.84 21.74 13 23C18.16 21.74 22 16.55 22 11V6L12 2Z" 
+        fill="url(#shieldGradient)" 
+        opacity="0.2"/>
+  <path d="M12 2L4 6V11C4 16.55 7.84 21.74 13 23C18.16 21.74 22 16.55 22 11V6L12 2Z" 
+        stroke="#0080FF" 
+        stroke-width="2" 
+        fill="none"/>
+  
+  <!-- AI Brain symbol -->
+  <circle cx="12" cy="11" r="3" stroke="#0080FF" stroke-width="1.5" fill="none"/>
+  <path d="M12 8V11M12 11H15M12 11L14.5 13.5" stroke="#0080FF" stroke-width="1.5" stroke-linecap="round"/>
 </svg>

@@ -11,6 +11,10 @@ class ChatPanelManager {
   constructor() {
     this.panel = null;
     this.chatHistory = [];
+    this.genAI = null;           // Add this
+    this.model = null;            // Add this
+    this.chatSession = null;      // Add this
+    this.geminiHistory = [];      // Add this
   }
 
   /**
@@ -44,7 +48,10 @@ class ChatPanelManager {
             break;
           case 'clearChat':
             this.chatHistory = [];
+            this.geminiHistory = [];       // Add this
+            this.chatSession = null;       // Add this
             this.panel.webview.postMessage({ command: 'chatCleared' });
+            logger.info('Chat and AI memory cleared');
             break;
         }
       },
@@ -214,16 +221,85 @@ class ChatPanelManager {
   }
 
   /**
-   * Handle general questions with AI
+   * Handle general questions with AI (UNIVERSAL - Works with all models)
    */
   async handleGeneralQuestion(question) {
     const aiClient = require('../services/aiClient');
-    await aiClient.initialize();
-
-    const systemPrompt = `You are CodeSentinel AI, a helpful code review assistant. Answer questions about code quality, security, and best practices. Be concise and helpful.`;
     
-    const response = await aiClient.generate(question, { systemPrompt, maxTokens: 500 });
-    return response;
+    try {
+        // Initialize AI client (auto-detects Gemini/Ollama based on settings)
+        await aiClient.initialize();
+
+        // Build conversation context from chat history
+        let contextPrompt = `You are CodeSentinel AI, a helpful code review assistant. Remember the conversation context.\n\n`;
+
+        // Add recent chat history for context (last 20 messages)
+        const recentHistory = this.chatHistory.slice(-20);
+        if (recentHistory.length > 0) {
+            contextPrompt += `Recent conversation:\n`;
+            recentHistory.forEach(msg => {
+                contextPrompt += `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.content}\n`;
+            });
+            contextPrompt += `\nNow respond to: ${question}`;
+        } else {
+            contextPrompt = question;
+        }
+
+        // Generate response using your universal AI client
+        const response = await aiClient.generate(contextPrompt, { 
+            systemPrompt: 'You are CodeSentinel AI. Be concise and helpful. Remember conversation context.',
+            maxTokens: 500 
+        });
+
+        logger.info('Chat response generated. History length:', this.chatHistory.length);
+        return response;
+
+    } catch (error) {
+        logger.error('AI chat error:', error);
+        
+        // Fallback to Ollama if Gemini fails
+        if (error.message.includes('API key') || error.message.includes('401')) {
+            try {
+                logger.info('Gemini failed, trying Ollama...');
+                const ollamaResponse = await this.tryOllamaFallback(question);
+                return ollamaResponse;
+            } catch (ollamaError) {
+                return `❌ Both Gemini and Ollama failed. Please check your configuration.\n\nGemini Error: ${error.message}\nOllama Error: ${ollamaError.message}`;
+            }
+        }
+        
+        return `❌ Error: ${error.message}`;
+    }
+  }
+
+  /**
+   * Fallback to Ollama when Gemini fails
+   */
+  async tryOllamaFallback(question) {
+    const { Ollama } = require('ollama');
+    const vscode = require('vscode');
+    
+    const config = vscode.workspace.getConfiguration('codeSentinel');
+    const ollamaUrl = config.get('ollamaBaseUrl', 'http://localhost:11434');
+    const ollamaModel = config.get('ollamaModel', 'deepseek-r1:7b');
+    
+    const ollama = new Ollama({ host: ollamaUrl });
+    
+    // Build context from history
+    const messages = this.chatHistory.slice(-20).map(msg => ({
+        role: msg.role === 'assistant' ? 'assistant' : 'user',
+        content: msg.content
+    }));
+    
+    messages.push({ role: 'user', content: question });
+    
+    const response = await ollama.chat({
+        model: ollamaModel,
+        messages: messages,
+        stream: false
+    });
+    
+    return response.message.content;
   }
 
   /**
