@@ -85,6 +85,12 @@
         "icon": "$(root-folder)"
       },
       {
+        "command": "codeSentinel.smartFixFolder",
+        "title": "CodeSentinel: Smart Fix Entire Folder",
+        "category": "CodeSentinel",
+        "icon": "$(wand)"
+      },
+      {
         "command": "codeSentinel.openChat",
         "title": "CodeSentinel: Open AI Chat",
         "category": "CodeSentinel",
@@ -147,6 +153,11 @@
           "when": "explorerResourceIsFolder",
           "command": "codeSentinel.reviewFolder",
           "group": "codesentinel@1"
+        },
+        {
+          "when": "explorerResourceIsFolder",
+          "command": "codeSentinel.smartFixFolder",
+          "group": "codesentinel@2"
         }
       ],
       "editor/title": [

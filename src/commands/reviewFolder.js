@@ -204,18 +204,18 @@ async function findCodeFiles(dirPath) {
 }
 
 /**
- * Review single file
+ * Review single file (enhanced version)
  */
 async function reviewSingleFile(filePath) {
   try {
     const content = await fs.readFile(filePath, 'utf-8');
     
-    // Skip empty files
     if (!content || content.trim().length === 0) {
       return {
         issues: [],
         linesOfCode: 0,
-        confidence: 100
+        confidence: 100,
+        language: 'plaintext'
       };
     }
 
@@ -234,10 +234,19 @@ async function reviewSingleFile(filePath) {
 
     const allIssues = [...primaryResults.issues, ...securityResults.issues];
 
+    // Add line numbers and context to issues
+    const issuesWithContext = allIssues.map(issue => ({
+      ...issue,
+      file: path.basename(filePath),
+      filePath: filePath,
+      language: language
+    }));
+
     return {
-      issues: allIssues,
+      issues: issuesWithContext,
       linesOfCode: content.split('\n').length,
-      confidence: Math.round((primaryResults.confidence + securityResults.confidence) / 2)
+      confidence: Math.round((primaryResults.confidence + securityResults.confidence) / 2),
+      language: language
     };
   } catch (error) {
     logger.error(`Failed to review file ${filePath}:`, error);
@@ -284,23 +293,173 @@ function generateAggregateReport(results, folderPath, latency) {
 }
 
 /**
- * Show folder review report
+ * Show folder review report in webview
  */
 async function showFolderReviewReport(report) {
   try {
-    // Create markdown report
-    const markdown = formatFolderReportAsMarkdown(report);
+    const webviewManager = require('../services/webviewManager');
+    const aiClient = require('../services/aiClient');
+    const context = global.extensionContext;
+    
+    if (!context) {
+      throw new Error('Extension context not available');
+    }
+    
+    // Calculate risk score
+    const riskScore = calculateFolderRiskScore(report);
+    
+    // Aggregate all issues
+    const allIssues = aggregateIssuesFromFiles(report);
+    
+    // Convert folder report to webview format (matching file review format)
+    const webviewData = {
+      metadata: {
+        timestamp: new Date().toISOString(),
+        language: 'multiple', // Folder contains multiple languages
+        provider: aiClient.getCurrentProvider ? aiClient.getCurrentProvider() : 'AI',
+        latency: report.summary.latency,
+        codeLines: report.summary.totalLOC,
+        codeLength: 0, // Not applicable for folders
+        confidence: 85, // Default confidence for folder reviews
+        selfCorrectionApplied: false,
+        iterations: 1
+      },
+      summary: {
+        totalIssues: report.summary.totalIssues,
+        critical: report.summary.critical,
+        high: report.summary.high,
+        medium: report.summary.medium,
+        low: report.summary.low,
+        riskScore: riskScore
+      },
+      issues: allIssues,
+      folderInfo: {
+        folderPath: report.summary.folderPath,
+        totalFiles: report.summary.totalFiles,
+        filesByRisk: report.filesByRisk,
+        recommendations: generateFolderRecommendations(report)
+      }
+    };
 
+    // Show in webview (same as file review)
+    const panel = webviewManager.getPanel(context);
+    webviewManager.updateContent(webviewData);
+    
+    logger.info('Folder review displayed in webview');
+  } catch (error) {
+    logger.error('Failed to show folder report:', error);
+    
+    // Fallback to markdown
+    const markdown = formatFolderReportAsMarkdown(report);
     const doc = await vscode.workspace.openTextDocument({
       content: markdown,
       language: 'markdown'
     });
-
     await vscode.window.showTextDocument(doc, vscode.ViewColumn.Beside);
-  } catch (error) {
-    logger.error('Failed to show folder report:', error);
-    throw error;
   }
+}
+
+/**
+ * Calculate folder risk score (0-100)
+ */
+function calculateFolderRiskScore(report) {
+  const { summary } = report;
+  
+  if (summary.totalIssues === 0) return 0;
+  
+  const weights = {
+    critical: 10,
+    high: 5,
+    medium: 2,
+    low: 1
+  };
+  
+  const weightedScore = 
+    summary.critical * weights.critical +
+    summary.high * weights.high +
+    summary.medium * weights.medium +
+    summary.low * weights.low;
+  
+  const maxPossible = summary.totalFiles * 50; // Assume max 50 points per file
+  const riskScore = Math.min(100, Math.round((weightedScore / maxPossible) * 100));
+  
+  return riskScore;
+}
+
+/**
+ * Aggregate all issues from all files
+ */
+function aggregateIssuesFromFiles(report) {
+  const allIssues = [];
+  
+  report.allResults.forEach(fileResult => {
+    if (fileResult.issues && fileResult.issues.length > 0) {
+      fileResult.issues.forEach(issue => {
+        allIssues.push({
+          ...issue,
+          file: fileResult.file, // Add file info to issue
+          filePath: fileResult.fullPath
+        });
+      });
+    }
+  });
+  
+  // Sort by severity
+  const severityOrder = { critical: 0, high: 1, medium: 2, low: 3 };
+  allIssues.sort((a, b) => {
+    const severityDiff = severityOrder[a.severity] - severityOrder[b.severity];
+    if (severityDiff !== 0) return severityDiff;
+    return (b.line || 0) - (a.line || 0);
+  });
+  
+  return allIssues;
+}
+
+/**
+ * Generate folder-level recommendations
+ */
+function generateFolderRecommendations(report) {
+  const recommendations = [];
+  const { summary } = report;
+  
+  if (summary.critical > 0) {
+    recommendations.push({
+      severity: 'critical',
+      title: `Fix ${summary.critical} Critical Security Issues`,
+      description: 'Critical vulnerabilities found across multiple files. These should be addressed immediately.',
+      action: 'Review files marked with 🔴 in the report'
+    });
+  }
+  
+  if (summary.high > 5) {
+    recommendations.push({
+      severity: 'high',
+      title: 'High Priority Issues Detected',
+      description: `${summary.high} high-severity issues found. Consider refactoring affected files.`,
+      action: 'Sort files by risk and prioritize top files'
+    });
+  }
+  
+  const avgIssuesPerFile = summary.totalIssues / summary.totalFiles;
+  if (avgIssuesPerFile > 5) {
+    recommendations.push({
+      severity: 'medium',
+      title: 'Code Quality Concerns',
+      description: `Average ${avgIssuesPerFile.toFixed(1)} issues per file. Consider adopting stricter linting rules.`,
+      action: 'Add ESLint/Prettier configuration'
+    });
+  }
+  
+  if (summary.totalIssues === 0) {
+    recommendations.push({
+      severity: 'info',
+      title: '✨ Excellent Code Quality',
+      description: 'No issues detected in this folder. Keep up the good work!',
+      action: 'Maintain current practices'
+    });
+  }
+  
+  return recommendations;
 }
 
 /**
@@ -390,7 +549,112 @@ async function reviewWorkspaceCommand(fromChat = false) {
   }
 }
 
+/**
+ * Smart Fix for entire folder
+ */
+async function smartFixFolderCommand(folderPath = null) {
+  try {
+    const workspaceFolders = vscode.workspace.workspaceFolders;
+    if (!workspaceFolders) {
+      vscode.window.showErrorMessage('❌ No workspace folder open');
+      return;
+    }
+
+    // Get folder path
+    if (!folderPath || typeof folderPath !== 'string') {
+      const folderUri = await vscode.window.showOpenDialog({
+        canSelectFiles: false,
+        canSelectFolders: true,
+        canSelectMany: false,
+        openLabel: 'Select Folder to Fix',
+        defaultUri: workspaceFolders[0].uri
+      });
+
+      if (!folderUri || folderUri.length === 0) {
+        return;
+      }
+
+      folderPath = folderUri[0].fsPath;
+    }
+
+    // Review folder first to find issues
+    const reviewResult = await reviewFolderCommand(folderPath, true);
+    
+    if (!reviewResult || reviewResult.summary.totalIssues === 0) {
+      vscode.window.showInformationMessage('✅ No issues found to fix!');
+      return;
+    }
+
+    // Show confirmation
+    const proceed = await vscode.window.showWarningMessage(
+      `Found ${reviewResult.summary.totalIssues} issues across ${reviewResult.summary.totalFiles} files. Apply fixes?`,
+      { modal: true },
+      'Fix All',
+      'Cancel'
+    );
+
+    if (proceed !== 'Fix All') {
+      return;
+    }
+
+    // Import smart fix module
+    const { smartAutoFixCommand } = require('./smartAutoFix');
+
+    await vscode.window.withProgress({
+      location: vscode.ProgressLocation.Notification,
+      title: 'Applying fixes to folder...',
+      cancellable: true
+    }, async (progress, token) => {
+      let fixed = 0;
+      const filesToFix = reviewResult.filesByRisk.filter(f => f.issues > 0);
+
+      for (const fileInfo of filesToFix) {
+        if (token.isCancellationRequested) break;
+
+        progress.report({ 
+          message: `Fixing ${fileInfo.file}...`,
+          increment: (1 / filesToFix.length) * 100
+        });
+
+        try {
+          // Open file
+          const doc = await vscode.workspace.openTextDocument(fileInfo.fullPath);
+          await vscode.window.showTextDocument(doc, { preview: false, preserveFocus: true });
+
+          // Apply smart fix to entire file
+          const editor = vscode.window.activeTextEditor;
+          if (editor) {
+            // Select all text
+            const fullRange = new vscode.Range(
+              doc.lineAt(0).range.start,
+              doc.lineAt(doc.lineCount - 1).range.end
+            );
+            editor.selection = new vscode.Selection(fullRange.start, fullRange.end);
+
+            // Apply fix
+            await smartAutoFixCommand();
+            fixed++;
+          }
+        } catch (error) {
+          logger.error(`Failed to fix ${fileInfo.file}:`, error);
+        }
+
+        await new Promise(resolve => setTimeout(resolve, 500)); // Rate limit
+      }
+
+      vscode.window.showInformationMessage(
+        `✅ Applied fixes to ${fixed}/${filesToFix.length} files`
+      );
+    });
+
+  } catch (error) {
+    logger.error('smartFixFolderCommand failed:', error);
+    vscode.window.showErrorMessage(`❌ Folder fix failed: ${error.message}`);
+  }
+}
+
 module.exports = { 
   reviewFolderCommand,
-  reviewWorkspaceCommand
+  reviewWorkspaceCommand,
+  smartFixFolderCommand
 };

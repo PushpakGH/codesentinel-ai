@@ -188,7 +188,7 @@ function registerCommands(context) {
   const { explainIssueCommand } = require('./commands/explainIssue');
   const { toggleDebugCommand, exportDebugInfo } = require('./commands/debugMode');
   const { openSettingsCommand } = require('./commands/openSettings');
-  const { reviewFolderCommand, reviewWorkspaceCommand } = require('./commands/reviewFolder');
+  const { reviewFolderCommand, reviewWorkspaceCommand, smartFixFolderCommand } = require('./commands/reviewFolder');
   const { chatPanelManager } = require('./webview/chatPanel');
 
   // Define all commands
@@ -237,6 +237,11 @@ function registerCommands(context) {
       name: 'codeSentinel.reviewWorkspace',
       callback: reviewWorkspaceCommand,
       description: 'Review entire workspace'
+    },
+    {
+      name: 'codeSentinel.smartFixFolder',
+      callback: smartFixFolderCommand,
+      description: 'Smart fix entire folder'
     },
     {
       name: 'codeSentinel.openChat',
