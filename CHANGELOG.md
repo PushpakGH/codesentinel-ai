@@ -3,6 +3,35 @@
 All notable changes to the CodeSentinel AI extension will be documented in this file.
 
 ---
+ 
+
+### Added
+## [1.0.8] - 2025-12-30
+
+### Added
+- **🎨 Code Snippet Generator**: Generate boilerplate code instantly
+- **📚 Documentation Generator**: Auto-generate code documentation
+- **🧪 Test Case Generator**: Auto-generate unit tests ⭐ NEW
+  - Supports Jest, Vitest, Mocha, Pytest, JUnit
+  - Generates edge cases and error tests
+  - Auto-detects test framework from project
+  - Creates test files with proper naming conventions
+  - Command: `CodeSentinel: Generate Unit Tests`
+
+
+- **🎨 Code Snippet Generator**: Generate boilerplate code instantly
+  - 14 pre-built templates (React, Express, Python, etc.)
+  - Custom snippets via natural language descriptions
+  - Inserts at cursor position with proper formatting
+  - Right-click context menu integration
+  - Command: `CodeSentinel: Generate Code Snippet`
+
+  
+- **📚 Documentation Generator**: Auto-generate code documentation
+  - Supports JSDoc, Python docstrings, JavaDoc, and more
+  - Analyzes code structure for accurate docs
+  - Adds parameter types, return values, and examples
+  - Command: `CodeSentinel: Generate Documentation`
 
 ## [1.0.7] - 2025-12-29
 

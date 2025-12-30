@@ -118,6 +118,24 @@
   "category": "CodeSentinel",
   "icon": "$(git-commit)"
 },
+{
+  "command": "codeSentinel.generateSnippet",
+  "title": "CodeSentinel: Generate Code Snippet",
+  "category": "CodeSentinel",
+  "icon": "$(code)"
+},
+{
+  "command": "codeSentinel.generateDocumentation",
+  "title": "CodeSentinel: Generate Documentation",
+  "category": "CodeSentinel",
+  "icon": "$(book)"
+},
+{
+  "command": "codeSentinel.generateTests",
+  "title": "CodeSentinel: Generate Unit Tests",
+  "category": "CodeSentinel",
+  "icon": "$(beaker)"
+},
       {
   "command": "codeSentinel.configureApiKey",
   "title": "CodeSentinel: Configure API Key (Secure)",
@@ -167,6 +185,20 @@
           "command": "codeSentinel.autoFix",
           "group": "codesentinel@4"
         }
+        ,{
+    "when": "editorTextFocus",
+    "command": "codeSentinel.generateSnippet",
+    "group": "codesentinel@5"
+  },{
+    "when": "editorHasSelection",
+    "command": "codeSentinel.generateDocumentation",
+    "group": "codesentinel@6"
+  },
+   {
+    "when": "editorHasSelection",
+    "command": "codeSentinel.generateTests",
+    "group": "codesentinel@7"
+  }
       ],
       "explorer/context": [
         {

@@ -284,6 +284,30 @@ function registerCommands(context) {
     },
     description: 'Generate Git commit message from staged changes'
   },
+  {
+  name: 'codeSentinel.generateSnippet',
+  callback: async () => {
+    const { generateSnippetCommand } = require('./commands/snippetGenerator');
+    await generateSnippetCommand();
+  },
+  description: 'Generate code snippet from template or description'
+},
+{
+  name: 'codeSentinel.generateDocumentation',
+  callback: async () => {
+    const { generateDocumentationCommand } = require('./commands/docGenerator');
+    await generateDocumentationCommand();
+  },
+  description: 'Generate documentation for selected code'
+},
+{
+  name: 'codeSentinel.generateTests',
+  callback: async () => {
+    const { generateTestsCommand } = require('./commands/testGenerator');
+    await generateTestsCommand();
+  },
+  description: 'Generate unit tests for selected code'
+},
     {
       name: 'codeSentinel.migrateSettings',
       callback: async () => {
