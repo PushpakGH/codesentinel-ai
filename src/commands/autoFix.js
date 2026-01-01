@@ -62,7 +62,7 @@ Format: Return code in a markdown code block.`;
 
       const response = await aiClient.generate(prompt, { 
         systemPrompt,
-        maxTokens: 1000
+        maxTokens: 5000
       });
 
       // Extract code from response

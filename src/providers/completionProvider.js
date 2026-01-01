@@ -49,7 +49,7 @@ class CodeSentinelCompletionProvider {
       await aiClient.initialize();
       const completion = await aiClient.generate(prompt, { 
         systemPrompt,
-        maxTokens: 100 
+        maxTokens: 1000
       });
 
       // Extract code from response

@@ -7,7 +7,7 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const { Ollama } = require('ollama');
 const configManager = require('./configManager');
-const ErrorHandler = require('../utils/errorHandler');
+const ErrorHandler = require('./utils/errorHandler');
 
 class AIClient {
   constructor() {

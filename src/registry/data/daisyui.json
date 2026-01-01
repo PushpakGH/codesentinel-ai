@@ -1,0 +1,1172 @@
+{
+  "id": "daisyui",
+  "name": "daisyUI",
+  "description": "The most popular component library for Tailwind CSS",
+  "type": "utility-first",
+  "namespace": null,
+  "website": "https://daisyui.com",
+  "installMethod": "className-based",
+  "note": "daisyUI uses Tailwind classes, not CLI installation",
+  "categories": [
+    "actions",
+    "data-display",
+    "data-input",
+    "layout",
+    "navigation",
+    "feedback",
+    "mockup"
+  ],
+  "components": [
+    {
+      "name": "button",
+      "category": "actions",
+      "description": "Buttons allow the user to take actions",
+      "classes": [
+        "btn",
+        "btn-primary",
+        "btn-secondary",
+        "btn-accent",
+        "btn-info",
+        "btn-success",
+        "btn-warning",
+        "btn-error",
+        "btn-ghost",
+        "btn-link",
+        "btn-outline",
+        "btn-active",
+        "btn-disabled",
+        "btn-xs",
+        "btn-sm",
+        "btn-md",
+        "btn-lg",
+        "btn-wide",
+        "btn-block",
+        "btn-circle",
+        "btn-square",
+        "glass"
+      ],
+      "usage": "Apply btn class with modifiers",
+      "examples": [
+        {
+          "title": "Primary Button",
+          "code": "<button className='btn btn-primary'>Button</button>"
+        },
+        {
+          "title": "Button Sizes",
+          "code": "<button className='btn btn-xs'>Tiny</button>\n<button className='btn btn-sm'>Small</button>\n<button className='btn btn-md'>Normal</button>\n<button className='btn btn-lg'>Large</button>"
+        }
+      ]
+    },
+    {
+      "name": "dropdown",
+      "category": "actions",
+      "description": "Dropdown can open a menu or any other element",
+      "classes": [
+        "dropdown",
+        "dropdown-content",
+        "dropdown-end",
+        "dropdown-top",
+        "dropdown-bottom",
+        "dropdown-left",
+        "dropdown-right",
+        "dropdown-hover",
+        "dropdown-open"
+      ],
+      "usage": "Use dropdown with dropdown-content",
+      "examples": [
+        {
+          "title": "Basic Dropdown",
+          "code": "<div className='dropdown'>\n  <label tabIndex={0} className='btn'>Click</label>\n  <ul tabIndex={0} className='dropdown-content menu'>\n    <li><a>Item 1</a></li>\n    <li><a>Item 2</a></li>\n  </ul>\n</div>"
+        }
+      ]
+    },
+    {
+      "name": "modal",
+      "category": "actions",
+      "description": "Modal shows content on top of everything",
+      "classes": [
+        "modal",
+        "modal-box",
+        "modal-action",
+        "modal-backdrop",
+        "modal-toggle",
+        "modal-open",
+        "modal-top",
+        "modal-middle",
+        "modal-bottom"
+      ],
+      "usage": "Use checkbox to control modal",
+      "examples": [
+        {
+          "title": "Basic Modal",
+          "code": "<input type='checkbox' id='my-modal' className='modal-toggle' />\n<div className='modal'>\n  <div className='modal-box'>\n    <h3>Modal Title</h3>\n    <p>Modal content</p>\n    <div className='modal-action'>\n      <label htmlFor='my-modal' className='btn'>Close</label>\n    </div>\n  </div>\n</div>"
+        }
+      ]
+    },
+    {
+      "name": "swap",
+      "category": "actions",
+      "description": "Swap allows you to toggle the visibility of two elements",
+      "classes": [
+        "swap",
+        "swap-active",
+        "swap-rotate",
+        "swap-flip",
+        "swap-on",
+        "swap-off"
+      ],
+      "usage": "Use swap with swap-on and swap-off",
+      "examples": [
+        {
+          "title": "Icon Swap",
+          "code": "<label className='swap'>\n  <input type='checkbox' />\n  <div className='swap-on'>ON</div>\n  <div className='swap-off'>OFF</div>\n</label>"
+        }
+      ]
+    },
+    {
+      "name": "theme-controller",
+      "category": "actions",
+      "description": "Toggle between themes",
+      "classes": [
+        "theme-controller"
+      ],
+      "usage": "Use with data-theme attribute",
+      "examples": [
+        {
+          "title": "Theme Toggle",
+          "code": "<input type='checkbox' className='theme-controller' />"
+        }
+      ]
+    },
+    {
+      "name": "accordion",
+      "category": "data-display",
+      "description": "Accordion with collapse",
+      "classes": [
+        "collapse",
+        "collapse-title",
+        "collapse-content",
+        "collapse-arrow",
+        "collapse-plus",
+        "collapse-open",
+        "collapse-close"
+      ],
+      "usage": "Use collapse with checkbox",
+      "examples": [
+        {
+          "title": "Basic Accordion",
+          "code": "<div className='collapse collapse-arrow'>\n  <input type='checkbox' />\n  <div className='collapse-title'>Click me</div>\n  <div className='collapse-content'>\n    <p>Content</p>\n  </div>\n</div>"
+        }
+      ]
+    },
+    {
+      "name": "avatar",
+      "category": "data-display",
+      "description": "Avatar shows a thumbnail of user",
+      "classes": [
+        "avatar",
+        "avatar-group",
+        "online",
+        "offline",
+        "placeholder",
+        "ring",
+        "ring-primary",
+        "ring-offset-base-100"
+      ],
+      "usage": "Wrap image in avatar div",
+      "examples": [
+        {
+          "title": "Basic Avatar",
+          "code": "<div className='avatar'>\n  <div className='w-24 rounded'>\n    <img src='avatar.jpg' />\n  </div>\n</div>"
+        },
+        {
+          "title": "Avatar Group",
+          "code": "<div className='avatar-group -space-x-6'>\n  <div className='avatar'><div className='w-12'><img src='avatar1.jpg' /></div></div>\n  <div className='avatar'><div className='w-12'><img src='avatar2.jpg' /></div></div>\n</div>"
+        }
+      ]
+    },
+    {
+      "name": "badge",
+      "category": "data-display",
+      "description": "Badge shows a small badge for status",
+      "classes": [
+        "badge",
+        "badge-primary",
+        "badge-secondary",
+        "badge-accent",
+        "badge-ghost",
+        "badge-info",
+        "badge-success",
+        "badge-warning",
+        "badge-error",
+        "badge-lg",
+        "badge-md",
+        "badge-sm",
+        "badge-xs",
+        "badge-outline"
+      ],
+      "usage": "Apply badge class",
+      "examples": [
+        {
+          "title": "Status Badge",
+          "code": "<span className='badge badge-primary'>New</span>"
+        }
+      ]
+    },
+    {
+      "name": "card",
+      "category": "data-display",
+      "description": "Card is a container for content",
+      "classes": [
+        "card",
+        "card-body",
+        "card-title",
+        "card-actions",
+        "card-bordered",
+        "card-compact",
+        "card-normal",
+        "card-side",
+        "image-full"
+      ],
+      "usage": "Use card with card-body",
+      "examples": [
+        {
+          "title": "Basic Card",
+          "code": "<div className='card bg-base-100 shadow-xl'>\n  <div className='card-body'>\n    <h2 className='card-title'>Card Title</h2>\n    <p>Card content</p>\n    <div className='card-actions'>\n      <button className='btn btn-primary'>Action</button>\n    </div>\n  </div>\n</div>"
+        }
+      ]
+    },
+    {
+      "name": "carousel",
+      "category": "data-display",
+      "description": "Carousel shows items in a scrollable container",
+      "classes": [
+        "carousel",
+        "carousel-item",
+        "carousel-center",
+        "carousel-end",
+        "carousel-vertical"
+      ],
+      "usage": "Use carousel with carousel-item",
+      "examples": [
+        {
+          "title": "Image Carousel",
+          "code": "<div className='carousel'>\n  <div className='carousel-item'><img src='img1.jpg' /></div>\n  <div className='carousel-item'><img src='img2.jpg' /></div>\n</div>"
+        }
+      ]
+    },
+    {
+      "name": "chat",
+      "category": "data-display",
+      "description": "Chat bubble for messaging",
+      "classes": [
+        "chat",
+        "chat-start",
+        "chat-end",
+        "chat-image",
+        "chat-header",
+        "chat-footer",
+        "chat-bubble",
+        "chat-bubble-primary",
+        "chat-bubble-secondary"
+      ],
+      "usage": "Use chat with chat-bubble",
+      "examples": [
+        {
+          "title": "Chat Message",
+          "code": "<div className='chat chat-start'>\n  <div className='chat-bubble'>Hello!</div>\n</div>"
+        }
+      ]
+    },
+    {
+      "name": "collapse",
+      "category": "data-display",
+      "description": "Collapse shows and hides content",
+      "classes": [
+        "collapse",
+        "collapse-title",
+        "collapse-content",
+        "collapse-arrow",
+        "collapse-plus",
+        "collapse-open"
+      ],
+      "usage": "Use with checkbox or radio",
+      "examples": [
+        {
+          "title": "Collapsible Section",
+          "code": "<div className='collapse'>\n  <input type='checkbox' />\n  <div className='collapse-title'>Title</div>\n  <div className='collapse-content'><p>Content</p></div>\n</div>"
+        }
+      ]
+    },
+    {
+      "name": "countdown",
+      "category": "data-display",
+      "description": "Countdown shows remaining time",
+      "classes": [
+        "countdown"
+      ],
+      "usage": "Use with CSS variables for values",
+      "examples": [
+        {
+          "title": "Timer Countdown",
+          "code": "<span className='countdown'>\n  <span style={{'--value': 15}}></span>\n</span>"
+        }
+      ]
+    },
+    {
+      "name": "diff",
+      "category": "data-display",
+      "description": "Diff shows comparison between two items",
+      "classes": [
+        "diff",
+        "diff-item-1",
+        "diff-item-2",
+        "diff-resizer"
+      ],
+      "usage": "Use diff with two diff-items",
+      "examples": [
+        {
+          "title": "Image Comparison",
+          "code": "<div className='diff'>\n  <div className='diff-item-1'><img src='before.jpg' /></div>\n  <div className='diff-item-2'><img src='after.jpg' /></div>\n  <div className='diff-resizer'></div>\n</div>"
+        }
+      ]
+    },
+    {
+      "name": "kbd",
+      "category": "data-display",
+      "description": "Kbd shows keyboard key",
+      "classes": [
+        "kbd",
+        "kbd-xs",
+        "kbd-sm",
+        "kbd-md",
+        "kbd-lg"
+      ],
+      "usage": "Wrap text in kbd",
+      "examples": [
+        {
+          "title": "Keyboard Shortcut",
+          "code": "<kbd className='kbd'>ctrl</kbd> + <kbd className='kbd'>c</kbd>"
+        }
+      ]
+    },
+    {
+      "name": "stat",
+      "category": "data-display",
+      "description": "Stat shows statistics",
+      "classes": [
+        "stats",
+        "stat",
+        "stat-title",
+        "stat-value",
+        "stat-desc",
+        "stat-figure",
+        "stat-actions",
+        "stats-horizontal",
+        "stats-vertical"
+      ],
+      "usage": "Use stats container with stat items",
+      "examples": [
+        {
+          "title": "Statistics Card",
+          "code": "<div className='stats shadow'>\n  <div className='stat'>\n    <div className='stat-title'>Total Views</div>\n    <div className='stat-value'>89,400</div>\n    <div className='stat-desc'>21% more than last month</div>\n  </div>\n</div>"
+        }
+      ]
+    },
+    {
+      "name": "table",
+      "category": "data-display",
+      "description": "Table shows data in rows and columns",
+      "classes": [
+        "table",
+        "table-zebra",
+        "table-pin-rows",
+        "table-pin-cols",
+        "table-xs",
+        "table-sm",
+        "table-md",
+        "table-lg"
+      ],
+      "usage": "Use table class on table element",
+      "examples": [
+        {
+          "title": "Data Table",
+          "code": "<table className='table'>\n  <thead><tr><th>Name</th><th>Job</th></tr></thead>\n  <tbody>\n    <tr><td>Cy</td><td>Developer</td></tr>\n    <tr><td>Hart</td><td>Designer</td></tr>\n  </tbody>\n</table>"
+        }
+      ]
+    },
+    {
+      "name": "timeline",
+      "category": "data-display",
+      "description": "Timeline shows list of events in chronological order",
+      "classes": [
+        "timeline",
+        "timeline-start",
+        "timeline-middle",
+        "timeline-end",
+        "timeline-box",
+        "timeline-vertical",
+        "timeline-horizontal",
+        "timeline-snap-icon",
+        "timeline-compact"
+      ],
+      "usage": "Use timeline with timeline items",
+      "examples": [
+        {
+          "title": "Event Timeline",
+          "code": "<ul className='timeline'>\n  <li>\n    <div className='timeline-start'>1984</div>\n    <div className='timeline-middle'><svg className='w-5 h-5' /></div>\n    <div className='timeline-end timeline-box'>First Event</div>\n  </li>\n</ul>"
+        }
+      ]
+    },
+    {
+      "name": "checkbox",
+      "category": "data-input",
+      "description": "Checkbox allows selection",
+      "classes": [
+        "checkbox",
+        "checkbox-primary",
+        "checkbox-secondary",
+        "checkbox-accent",
+        "checkbox-xs",
+        "checkbox-sm",
+        "checkbox-md",
+        "checkbox-lg"
+      ],
+      "usage": "Apply checkbox class to input",
+      "examples": [
+        {
+          "title": "Basic Checkbox",
+          "code": "<input type='checkbox' className='checkbox' />"
+        }
+      ]
+    },
+    {
+      "name": "file-input",
+      "category": "data-input",
+      "description": "File input for uploading files",
+      "classes": [
+        "file-input",
+        "file-input-bordered",
+        "file-input-ghost",
+        "file-input-primary",
+        "file-input-xs",
+        "file-input-sm",
+        "file-input-md",
+        "file-input-lg"
+      ],
+      "usage": "Apply to file input element",
+      "examples": [
+        {
+          "title": "File Upload",
+          "code": "<input type='file' className='file-input file-input-bordered' />"
+        }
+      ]
+    },
+    {
+      "name": "input",
+      "category": "data-input",
+      "description": "Input field for text",
+      "classes": [
+        "input",
+        "input-bordered",
+        "input-ghost",
+        "input-primary",
+        "input-secondary",
+        "input-accent",
+        "input-info",
+        "input-success",
+        "input-warning",
+        "input-error",
+        "input-xs",
+        "input-sm",
+        "input-md",
+        "input-lg"
+      ],
+      "usage": "Apply input class",
+      "examples": [
+        {
+          "title": "Text Input",
+          "code": "<input type='text' placeholder='Type here' className='input input-bordered' />"
+        }
+      ]
+    },
+    {
+      "name": "radio",
+      "category": "data-input",
+      "description": "Radio button for single selection",
+      "classes": [
+        "radio",
+        "radio-primary",
+        "radio-secondary",
+        "radio-accent",
+        "radio-xs",
+        "radio-sm",
+        "radio-md",
+        "radio-lg"
+      ],
+      "usage": "Apply radio class to input",
+      "examples": [
+        {
+          "title": "Radio Group",
+          "code": "<input type='radio' name='radio' className='radio' />\n<input type='radio' name='radio' className='radio' checked />"
+        }
+      ]
+    },
+    {
+      "name": "range",
+      "category": "data-input",
+      "description": "Range slider for selecting value",
+      "classes": [
+        "range",
+        "range-primary",
+        "range-secondary",
+        "range-accent",
+        "range-xs",
+        "range-sm",
+        "range-md",
+        "range-lg"
+      ],
+      "usage": "Apply range class",
+      "examples": [
+        {
+          "title": "Slider",
+          "code": "<input type='range' min='0' max='100' className='range' />"
+        }
+      ]
+    },
+    {
+      "name": "rating",
+      "category": "data-input",
+      "description": "Rating shows user rating",
+      "classes": [
+        "rating",
+        "rating-half",
+        "rating-hidden",
+        "rating-xs",
+        "rating-sm",
+        "rating-md",
+        "rating-lg"
+      ],
+      "usage": "Use with radio inputs shaped as stars",
+      "examples": [
+        {
+          "title": "Star Rating",
+          "code": "<div className='rating'>\n  <input type='radio' name='rating' className='mask mask-star' />\n  <input type='radio' name='rating' className='mask mask-star' checked />\n</div>"
+        }
+      ]
+    },
+    {
+      "name": "select",
+      "category": "data-input",
+      "description": "Select dropdown for choosing option",
+      "classes": [
+        "select",
+        "select-bordered",
+        "select-ghost",
+        "select-primary",
+        "select-xs",
+        "select-sm",
+        "select-md",
+        "select-lg"
+      ],
+      "usage": "Apply select class",
+      "examples": [
+        {
+          "title": "Dropdown Select",
+          "code": "<select className='select select-bordered'>\n  <option>Option 1</option>\n  <option>Option 2</option>\n</select>"
+        }
+      ]
+    },
+    {
+      "name": "textarea",
+      "category": "data-input",
+      "description": "Textarea for multiline text",
+      "classes": [
+        "textarea",
+        "textarea-bordered",
+        "textarea-ghost",
+        "textarea-primary",
+        "textarea-xs",
+        "textarea-sm",
+        "textarea-md",
+        "textarea-lg"
+      ],
+      "usage": "Apply textarea class",
+      "examples": [
+        {
+          "title": "Text Area",
+          "code": "<textarea className='textarea textarea-bordered' placeholder='Bio'></textarea>"
+        }
+      ]
+    },
+    {
+      "name": "toggle",
+      "category": "data-input",
+      "description": "Toggle switch for on/off",
+      "classes": [
+        "toggle",
+        "toggle-primary",
+        "toggle-secondary",
+        "toggle-accent",
+        "toggle-xs",
+        "toggle-sm",
+        "toggle-md",
+        "toggle-lg"
+      ],
+      "usage": "Apply toggle class to checkbox",
+      "examples": [
+        {
+          "title": "Toggle Switch",
+          "code": "<input type='checkbox' className='toggle' checked />"
+        }
+      ]
+    },
+    {
+      "name": "artboard",
+      "category": "layout",
+      "description": "Artboard provides width container",
+      "classes": [
+        "artboard",
+        "artboard-demo",
+        "phone-1",
+        "phone-2",
+        "phone-3",
+        "phone-4",
+        "phone-5",
+        "phone-6"
+      ],
+      "usage": "Use for showcasing mobile screens",
+      "examples": [
+        {
+          "title": "Phone Mockup",
+          "code": "<div className='artboard phone-1'>320×568</div>"
+        }
+      ]
+    },
+    {
+      "name": "divider",
+      "category": "layout",
+      "description": "Divider separates content",
+      "classes": [
+        "divider",
+        "divider-vertical",
+        "divider-horizontal",
+        "divider-start",
+        "divider-end",
+        "divider-primary"
+      ],
+      "usage": "Add between elements",
+      "examples": [
+        {
+          "title": "Section Divider",
+          "code": "<div className='divider'>OR</div>"
+        }
+      ]
+    },
+    {
+      "name": "drawer",
+      "category": "layout",
+      "description": "Drawer can be used for sidebar",
+      "classes": [
+        "drawer",
+        "drawer-toggle",
+        "drawer-content",
+        "drawer-side",
+        "drawer-overlay",
+        "drawer-open",
+        "drawer-end"
+      ],
+      "usage": "Use with checkbox for toggle",
+      "examples": [
+        {
+          "title": "Sidebar Drawer",
+          "code": "<div className='drawer'>\n  <input id='my-drawer' type='checkbox' className='drawer-toggle' />\n  <div className='drawer-content'>\n    <label htmlFor='my-drawer' className='btn'>Open</label>\n  </div>\n  <div className='drawer-side'>\n    <label htmlFor='my-drawer' className='drawer-overlay'></label>\n    <ul className='menu p-4 w-80 bg-base-200'>Sidebar</ul>\n  </div>\n</div>"
+        }
+      ]
+    },
+    {
+      "name": "footer",
+      "category": "layout",
+      "description": "Footer shows at bottom",
+      "classes": [
+        "footer",
+        "footer-title",
+        "footer-center"
+      ],
+      "usage": "Use footer element",
+      "examples": [
+        {
+          "title": "Page Footer",
+          "code": "<footer className='footer p-10 bg-base-200'>\n  <div>\n    <span className='footer-title'>Services</span>\n    <a className='link link-hover'>Branding</a>\n  </div>\n</footer>"
+        }
+      ]
+    },
+    {
+      "name": "hero",
+      "category": "layout",
+      "description": "Hero section for landing page",
+      "classes": [
+        "hero",
+        "hero-content",
+        "hero-overlay"
+      ],
+      "usage": "Use hero with hero-content",
+      "examples": [
+        {
+          "title": "Landing Hero",
+          "code": "<div className='hero min-h-screen'>\n  <div className='hero-content text-center'>\n    <h1 className='text-5xl font-bold'>Hello there</h1>\n  </div>\n</div>"
+        }
+      ]
+    },
+    {
+      "name": "indicator",
+      "category": "layout",
+      "description": "Indicator shows notification badge",
+      "classes": [
+        "indicator",
+        "indicator-item",
+        "indicator-start",
+        "indicator-center",
+        "indicator-end",
+        "indicator-top",
+        "indicator-middle",
+        "indicator-bottom"
+      ],
+      "usage": "Wrap target with indicator",
+      "examples": [
+        {
+          "title": "Badge Indicator",
+          "code": "<div className='indicator'>\n  <span className='indicator-item badge badge-secondary'>new</span>\n  <button className='btn'>Inbox</button>\n</div>"
+        }
+      ]
+    },
+    {
+      "name": "join",
+      "category": "layout",
+      "description": "Join groups elements together",
+      "classes": [
+        "join",
+        "join-item",
+        "join-vertical",
+        "join-horizontal"
+      ],
+      "usage": "Wrap elements in join",
+      "examples": [
+        {
+          "title": "Button Group",
+          "code": "<div className='join'>\n  <button className='btn join-item'>Button</button>\n  <button className='btn join-item'>Button</button>\n</div>"
+        }
+      ]
+    },
+    {
+      "name": "mask",
+      "category": "layout",
+      "description": "Mask crops content to shape",
+      "classes": [
+        "mask",
+        "mask-squircle",
+        "mask-heart",
+        "mask-hexagon",
+        "mask-hexagon-2",
+        "mask-decagon",
+        "mask-pentagon",
+        "mask-diamond",
+        "mask-square",
+        "mask-circle",
+        "mask-parallelogram",
+        "mask-star",
+        "mask-star-2",
+        "mask-triangle",
+        "mask-triangle-2",
+        "mask-triangle-3",
+        "mask-triangle-4"
+      ],
+      "usage": "Apply mask class",
+      "examples": [
+        {
+          "title": "Masked Image",
+          "code": "<img src='photo.jpg' className='mask mask-hexagon' />"
+        }
+      ]
+    },
+    {
+      "name": "stack",
+      "category": "layout",
+      "description": "Stack shows elements on top of each other",
+      "classes": [
+        "stack"
+      ],
+      "usage": "Use stack container",
+      "examples": [
+        {
+          "title": "Stacked Cards",
+          "code": "<div className='stack'>\n  <div className='card shadow-md bg-primary'>1</div>\n  <div className='card shadow bg-primary'>2</div>\n</div>"
+        }
+      ]
+    },
+    {
+      "name": "breadcrumbs",
+      "category": "navigation",
+      "description": "Breadcrumbs helps users navigate",
+      "classes": [
+        "breadcrumbs"
+      ],
+      "usage": "Use ul with breadcrumbs class",
+      "examples": [
+        {
+          "title": "Page Breadcrumbs",
+          "code": "<div className='breadcrumbs'>\n  <ul>\n    <li><a>Home</a></li>\n    <li><a>Documents</a></li>\n    <li>Add Document</li>\n  </ul>\n</div>"
+        }
+      ]
+    },
+    {
+      "name": "bottom-navigation",
+      "category": "navigation",
+      "description": "Bottom navigation bar for mobile",
+      "classes": [
+        "btm-nav",
+        "btm-nav-xs",
+        "btm-nav-sm",
+        "btm-nav-md",
+        "btm-nav-lg",
+        "active"
+      ],
+      "usage": "Use btm-nav with buttons",
+      "examples": [
+        {
+          "title": "Mobile Nav",
+          "code": "<div className='btm-nav'>\n  <button className='active'><svg /><span>Home</span></button>\n  <button><svg /><span>Search</span></button>\n</div>"
+        }
+      ]
+    },
+    {
+      "name": "link",
+      "category": "navigation",
+      "description": "Link styled text",
+      "classes": [
+        "link",
+        "link-primary",
+        "link-secondary",
+        "link-accent",
+        "link-hover",
+        "link-neutral"
+      ],
+      "usage": "Apply link class to anchor",
+      "examples": [
+        {
+          "title": "Styled Link",
+          "code": "<a className='link link-primary'>I'm a link</a>"
+        }
+      ]
+    },
+    {
+      "name": "menu",
+      "category": "navigation",
+      "description": "Menu is used for navigation",
+      "classes": [
+        "menu",
+        "menu-title",
+        "menu-dropdown",
+        "menu-dropdown-show",
+        "menu-xs",
+        "menu-sm",
+        "menu-md",
+        "menu-lg",
+        "menu-vertical",
+        "menu-horizontal"
+      ],
+      "usage": "Use ul with menu class",
+      "examples": [
+        {
+          "title": "Navigation Menu",
+          "code": "<ul className='menu bg-base-200'>\n  <li><a>Item 1</a></li>\n  <li><a>Item 2</a></li>\n</ul>"
+        }
+      ]
+    },
+    {
+      "name": "navbar",
+      "category": "navigation",
+      "description": "Navbar is used for navigation bar",
+      "classes": [
+        "navbar",
+        "navbar-start",
+        "navbar-center",
+        "navbar-end"
+      ],
+      "usage": "Use navbar with sections",
+      "examples": [
+        {
+          "title": "Header Navbar",
+          "code": "<div className='navbar bg-base-100'>\n  <div className='navbar-start'>\n    <a className='btn btn-ghost text-xl'>daisyUI</a>\n  </div>\n  <div className='navbar-end'>\n    <button className='btn'>Button</button>\n  </div>\n</div>"
+        }
+      ]
+    },
+    {
+      "name": "pagination",
+      "category": "navigation",
+      "description": "Pagination shows page numbers",
+      "classes": [
+        "join",
+        "btn",
+        "btn-active"
+      ],
+      "usage": "Use join with buttons",
+      "examples": [
+        {
+          "title": "Page Numbers",
+          "code": "<div className='join'>\n  <button className='join-item btn'>1</button>\n  <button className='join-item btn btn-active'>2</button>\n  <button className='join-item btn'>3</button>\n</div>"
+        }
+      ]
+    },
+    {
+      "name": "steps",
+      "category": "navigation",
+      "description": "Steps shows progression",
+      "classes": [
+        "steps",
+        "step",
+        "step-primary",
+        "step-secondary",
+        "step-accent",
+        "step-info",
+        "step-success",
+        "step-warning",
+        "step-error"
+      ],
+      "usage": "Use ul with steps class",
+      "examples": [
+        {
+          "title": "Progress Steps",
+          "code": "<ul className='steps'>\n  <li className='step step-primary'>Register</li>\n  <li className='step step-primary'>Choose plan</li>\n  <li className='step'>Purchase</li>\n</ul>"
+        }
+      ]
+    },
+    {
+      "name": "tab",
+      "category": "navigation",
+      "description": "Tabs show different content",
+      "classes": [
+        "tabs",
+        "tab",
+        "tab-active",
+        "tab-disabled",
+        "tab-bordered",
+        "tab-lifted",
+        "tab-boxed",
+        "tabs-xs",
+        "tabs-sm",
+        "tabs-md",
+        "tabs-lg"
+      ],
+      "usage": "Use tabs container",
+      "examples": [
+        {
+          "title": "Content Tabs",
+          "code": "<div className='tabs'>\n  <a className='tab'>Tab 1</a>\n  <a className='tab tab-active'>Tab 2</a>\n  <a className='tab'>Tab 3</a>\n</div>"
+        }
+      ]
+    },
+    {
+      "name": "alert",
+      "category": "feedback",
+      "description": "Alert shows important message",
+      "classes": [
+        "alert",
+        "alert-info",
+        "alert-success",
+        "alert-warning",
+        "alert-error"
+      ],
+      "usage": "Use alert div",
+      "examples": [
+        {
+          "title": "Info Alert",
+          "code": "<div className='alert alert-info'>\n  <svg />\n  <span>Info message</span>\n</div>"
+        }
+      ]
+    },
+    {
+      "name": "loading",
+      "category": "feedback",
+      "description": "Loading shows loading state",
+      "classes": [
+        "loading",
+        "loading-spinner",
+        "loading-dots",
+        "loading-ring",
+        "loading-ball",
+        "loading-bars",
+        "loading-infinity",
+        "loading-xs",
+        "loading-sm",
+        "loading-md",
+        "loading-lg"
+      ],
+      "usage": "Use span with loading class",
+      "examples": [
+        {
+          "title": "Spinner",
+          "code": "<span className='loading loading-spinner loading-lg'></span>"
+        }
+      ]
+    },
+    {
+      "name": "progress",
+      "category": "feedback",
+      "description": "Progress shows completion",
+      "classes": [
+        "progress",
+        "progress-primary",
+        "progress-secondary",
+        "progress-accent",
+        "progress-info",
+        "progress-success",
+        "progress-warning",
+        "progress-error"
+      ],
+      "usage": "Use progress element",
+      "examples": [
+        {
+          "title": "Progress Bar",
+          "code": "<progress className='progress progress-primary' value='70' max='100'></progress>"
+        }
+      ]
+    },
+    {
+      "name": "radial-progress",
+      "category": "feedback",
+      "description": "Radial progress circular indicator",
+      "classes": [
+        "radial-progress"
+      ],
+      "usage": "Use div with CSS variable",
+      "examples": [
+        {
+          "title": "Circular Progress",
+          "code": "<div className='radial-progress' style={{'--value': 70}}>70%</div>"
+        }
+      ]
+    },
+    {
+      "name": "skeleton",
+      "category": "feedback",
+      "description": "Skeleton shows loading placeholder",
+      "classes": [
+        "skeleton"
+      ],
+      "usage": "Apply skeleton class",
+      "examples": [
+        {
+          "title": "Loading Skeleton",
+          "code": "<div className='skeleton h-32 w-full'></div>"
+        }
+      ]
+    },
+    {
+      "name": "toast",
+      "category": "feedback",
+      "description": "Toast shows temporary message",
+      "classes": [
+        "toast",
+        "toast-start",
+        "toast-center",
+        "toast-end",
+        "toast-top",
+        "toast-middle",
+        "toast-bottom"
+      ],
+      "usage": "Use toast container with alert",
+      "examples": [
+        {
+          "title": "Notification Toast",
+          "code": "<div className='toast'>\n  <div className='alert alert-info'>\n    <span>New message arrived.</span>\n  </div>\n</div>"
+        }
+      ]
+    },
+    {
+      "name": "tooltip",
+      "category": "feedback",
+      "description": "Tooltip shows on hover",
+      "classes": [
+        "tooltip",
+        "tooltip-open",
+        "tooltip-top",
+        "tooltip-bottom",
+        "tooltip-left",
+        "tooltip-right",
+        "tooltip-primary",
+        "tooltip-secondary",
+        "tooltip-accent"
+      ],
+      "usage": "Wrap element with tooltip",
+      "examples": [
+        {
+          "title": "Hover Tooltip",
+          "code": "<div className='tooltip' data-tip='hello'>\n  <button className='btn'>Hover me</button>\n</div>"
+        }
+      ]
+    },
+    {
+      "name": "mockup-browser",
+      "category": "mockup",
+      "description": "Browser mockup window",
+      "classes": [
+        "mockup-browser",
+        "mockup-browser-toolbar"
+      ],
+      "usage": "Use mockup-browser container",
+      "examples": [
+        {
+          "title": "Browser Window",
+          "code": "<div className='mockup-browser border border-base-300'>\n  <div className='mockup-browser-toolbar'>\n    <div className='input'>https://daisyui.com</div>\n  </div>\n  <div className='px-4 py-16'>Content</div>\n</div>"
+        }
+      ]
+    },
+    {
+      "name": "mockup-code",
+      "category": "mockup",
+      "description": "Code editor mockup",
+      "classes": [
+        "mockup-code"
+      ],
+      "usage": "Use mockup-code with pre",
+      "examples": [
+        {
+          "title": "Code Block",
+          "code": "<div className='mockup-code'>\n  <pre data-prefix='$'><code>npm install daisyui</code></pre>\n</div>"
+        }
+      ]
+    },
+    {
+      "name": "mockup-phone",
+      "category": "mockup",
+      "description": "Phone device mockup",
+      "classes": [
+        "mockup-phone"
+      ],
+      "usage": "Use mockup-phone container",
+      "examples": [
+        {
+          "title": "Mobile Preview",
+          "code": "<div className='mockup-phone'>\n  <div className='camera'></div>\n  <div className='display'>\n    <div className='artboard'>Content</div>\n  </div>\n</div>"
+        }
+      ]
+    },
+    {
+      "name": "mockup-window",
+      "category": "mockup",
+      "description": "Window mockup",
+      "classes": [
+        "mockup-window",
+        "border"
+      ],
+      "usage": "Use mockup-window with content",
+      "examples": [
+        {
+          "title": "Desktop Window",
+          "code": "<div className='mockup-window border border-base-300'>\n  <div className='px-4 py-16'>Content</div>\n</div>"
+        }
+      ]
+    }
+  ]
+}

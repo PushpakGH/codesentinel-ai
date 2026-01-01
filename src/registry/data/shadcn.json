@@ -1,0 +1,1762 @@
+{
+  "id": "shadcn",
+  "name": "shadcn/ui",
+  "description": "Beautifully designed components built with Radix UI and Tailwind CSS",
+  "type": "shadcn-compatible",
+  "namespace": null,
+  "website": "https://ui.shadcn.com",
+  "installCommand": "npx shadcn@latest add",
+  "categories": [
+    "forms",
+    "navigation",
+    "data-display",
+    "feedback",
+    "overlay",
+    "layout"
+  ],
+  "components": [
+    {
+      "name": "accordion",
+      "category": "data-display",
+      "description": "Vertically stacked set of interactive headings that each reveal content",
+      "dependencies": [
+        "@radix-ui/react-accordion"
+      ],
+      "files": [
+        "components/ui/accordion.tsx"
+      ],
+      "props": {
+        "type": {
+          "type": "string",
+          "values": [
+            "single",
+            "multiple"
+          ],
+          "default": "single",
+          "description": "Whether one or multiple items can be opened at once"
+        },
+        "collapsible": {
+          "type": "boolean",
+          "default": true,
+          "description": "Allow closing the open item"
+        },
+        "disabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Disable all accordion items"
+        }
+      },
+      "subComponents": {
+        "AccordionItem": {
+          "value": {
+            "type": "string",
+            "required": true
+          }
+        },
+        "AccordionTrigger": {},
+        "AccordionContent": {}
+      },
+      "usage": "import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'",
+      "examples": [
+        {
+          "title": "Single Accordion",
+          "code": "<Accordion type='single' collapsible>\n  <AccordionItem value='item-1'>\n    <AccordionTrigger>Is it accessible?</AccordionTrigger>\n    <AccordionContent>Yes. It adheres to the WAI-ARIA design pattern.</AccordionContent>\n  </AccordionItem>\n</Accordion>"
+        },
+        {
+          "title": "Multiple Items Open",
+          "code": "<Accordion type='multiple'>\n  <AccordionItem value='item-1'>\n    <AccordionTrigger>Section 1</AccordionTrigger>\n    <AccordionContent>Content 1</AccordionContent>\n  </AccordionItem>\n  <AccordionItem value='item-2'>\n    <AccordionTrigger>Section 2</AccordionTrigger>\n    <AccordionContent>Content 2</AccordionContent>\n  </AccordionItem>\n</Accordion>"
+        }
+      ]
+    },
+    {
+      "name": "alert",
+      "category": "feedback",
+      "description": "Displays a callout for user attention",
+      "dependencies": [],
+      "files": [
+        "components/ui/alert.tsx"
+      ],
+      "props": {
+        "variant": {
+          "type": "string",
+          "values": [
+            "default",
+            "destructive"
+          ],
+          "default": "default",
+          "description": "Visual style of the alert"
+        }
+      },
+      "subComponents": {
+        "AlertTitle": {},
+        "AlertDescription": {}
+      },
+      "usage": "import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'",
+      "examples": [
+        {
+          "title": "Default Alert",
+          "code": "<Alert>\n  <AlertTitle>Heads up!</AlertTitle>\n  <AlertDescription>You can add components to your app.</AlertDescription>\n</Alert>"
+        },
+        {
+          "title": "Destructive Alert",
+          "code": "<Alert variant='destructive'>\n  <AlertTitle>Error</AlertTitle>\n  <AlertDescription>Your session has expired.</AlertDescription>\n</Alert>"
+        }
+      ]
+    },
+    {
+      "name": "alert-dialog",
+      "category": "overlay",
+      "description": "Modal dialog that interrupts the user with important content",
+      "dependencies": [
+        "@radix-ui/react-alert-dialog"
+      ],
+      "files": [
+        "components/ui/alert-dialog.tsx"
+      ],
+      "props": {
+        "open": {
+          "type": "boolean",
+          "description": "Controlled open state"
+        },
+        "onOpenChange": {
+          "type": "function",
+          "description": "Callback when open state changes"
+        }
+      },
+      "subComponents": {
+        "AlertDialogTrigger": {},
+        "AlertDialogContent": {},
+        "AlertDialogHeader": {},
+        "AlertDialogFooter": {},
+        "AlertDialogTitle": {},
+        "AlertDialogDescription": {},
+        "AlertDialogAction": {},
+        "AlertDialogCancel": {}
+      },
+      "usage": "import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'",
+      "examples": [
+        {
+          "title": "Confirmation Dialog",
+          "code": "<AlertDialog>\n  <AlertDialogTrigger asChild>\n    <Button variant='outline'>Delete Account</Button>\n  </AlertDialogTrigger>\n  <AlertDialogContent>\n    <AlertDialogHeader>\n      <AlertDialogTitle>Are you sure?</AlertDialogTitle>\n      <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>\n    </AlertDialogHeader>\n    <AlertDialogFooter>\n      <AlertDialogCancel>Cancel</AlertDialogCancel>\n      <AlertDialogAction>Continue</AlertDialogAction>\n    </AlertDialogFooter>\n  </AlertDialogContent>\n</AlertDialog>"
+        }
+      ]
+    },
+    {
+      "name": "aspect-ratio",
+      "category": "layout",
+      "description": "Displays content within a desired aspect ratio",
+      "dependencies": [
+        "@radix-ui/react-aspect-ratio"
+      ],
+      "files": [
+        "components/ui/aspect-ratio.tsx"
+      ],
+      "props": {
+        "ratio": {
+          "type": "number",
+          "default": 1,
+          "description": "Aspect ratio (width / height)"
+        }
+      },
+      "usage": "import { AspectRatio } from '@/components/ui/aspect-ratio'",
+      "examples": [
+        {
+          "title": "16:9 Image",
+          "code": "<AspectRatio ratio={16 / 9}>\n  <img src='photo.jpg' alt='Photo' className='object-cover' />\n</AspectRatio>"
+        }
+      ]
+    },
+    {
+      "name": "avatar",
+      "category": "data-display",
+      "description": "Image element with fallback for representing user",
+      "dependencies": [
+        "@radix-ui/react-avatar"
+      ],
+      "files": [
+        "components/ui/avatar.tsx"
+      ],
+      "subComponents": {
+        "Avatar": {},
+        "AvatarImage": {
+          "src": {
+            "type": "string",
+            "required": true
+          },
+          "alt": {
+            "type": "string"
+          }
+        },
+        "AvatarFallback": {}
+      },
+      "usage": "import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'",
+      "examples": [
+        {
+          "title": "With Image",
+          "code": "<Avatar>\n  <AvatarImage src='avatar.jpg' alt='@username' />\n  <AvatarFallback>CN</AvatarFallback>\n</Avatar>"
+        }
+      ]
+    },
+    {
+      "name": "badge",
+      "category": "data-display",
+      "description": "Displays a badge or label",
+      "dependencies": [],
+      "files": [
+        "components/ui/badge.tsx"
+      ],
+      "props": {
+        "variant": {
+          "type": "string",
+          "values": [
+            "default",
+            "secondary",
+            "destructive",
+            "outline"
+          ],
+          "default": "default",
+          "description": "Visual style of the badge"
+        }
+      },
+      "usage": "import { Badge } from '@/components/ui/badge'",
+      "examples": [
+        {
+          "title": "Default Badge",
+          "code": "<Badge>New</Badge>"
+        },
+        {
+          "title": "Destructive Badge",
+          "code": "<Badge variant='destructive'>Error</Badge>"
+        },
+        {
+          "title": "Outline Badge",
+          "code": "<Badge variant='outline'>Draft</Badge>"
+        }
+      ]
+    },
+    {
+      "name": "breadcrumb",
+      "category": "navigation",
+      "description": "Displays the path to the current resource",
+      "dependencies": [],
+      "files": [
+        "components/ui/breadcrumb.tsx"
+      ],
+      "subComponents": {
+        "Breadcrumb": {},
+        "BreadcrumbList": {},
+        "BreadcrumbItem": {},
+        "BreadcrumbLink": {},
+        "BreadcrumbPage": {},
+        "BreadcrumbSeparator": {},
+        "BreadcrumbEllipsis": {}
+      },
+      "usage": "import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb'",
+      "examples": [
+        {
+          "title": "Simple Breadcrumb",
+          "code": "<Breadcrumb>\n  <BreadcrumbList>\n    <BreadcrumbItem>\n      <BreadcrumbLink href='/'>Home</BreadcrumbLink>\n    </BreadcrumbItem>\n    <BreadcrumbSeparator />\n    <BreadcrumbItem>\n      <BreadcrumbLink href='/docs'>Docs</BreadcrumbLink>\n    </BreadcrumbItem>\n    <BreadcrumbSeparator />\n    <BreadcrumbItem>\n      <BreadcrumbPage>Breadcrumb</BreadcrumbPage>\n    </BreadcrumbItem>\n  </BreadcrumbList>\n</Breadcrumb>"
+        }
+      ]
+    },
+    {
+      "name": "button",
+      "category": "forms",
+      "description": "Displays a button or component that looks like a button",
+      "dependencies": [
+        "@radix-ui/react-slot"
+      ],
+      "files": [
+        "components/ui/button.tsx"
+      ],
+      "props": {
+        "variant": {
+          "type": "string",
+          "values": [
+            "default",
+            "destructive",
+            "outline",
+            "secondary",
+            "ghost",
+            "link"
+          ],
+          "default": "default",
+          "description": "Visual style of the button"
+        },
+        "size": {
+          "type": "string",
+          "values": [
+            "default",
+            "sm",
+            "lg",
+            "icon"
+          ],
+          "default": "default",
+          "description": "Size of the button"
+        },
+        "asChild": {
+          "type": "boolean",
+          "default": false,
+          "description": "Render as child component"
+        },
+        "disabled": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "usage": "import { Button } from '@/components/ui/button'",
+      "examples": [
+        {
+          "title": "Default Button",
+          "code": "<Button>Click me</Button>"
+        },
+        {
+          "title": "Destructive Button",
+          "code": "<Button variant='destructive'>Delete</Button>"
+        },
+        {
+          "title": "Outline Button",
+          "code": "<Button variant='outline'>Cancel</Button>"
+        },
+        {
+          "title": "Icon Button",
+          "code": "<Button size='icon'>\n  <ChevronRight className='h-4 w-4' />\n</Button>"
+        },
+        {
+          "title": "As Link",
+          "code": "<Button asChild>\n  <Link href='/login'>Login</Link>\n</Button>"
+        }
+      ]
+    },
+    {
+      "name": "calendar",
+      "category": "forms",
+      "description": "Date picker component with calendar view",
+      "dependencies": [
+        "react-day-picker"
+      ],
+      "files": [
+        "components/ui/calendar.tsx"
+      ],
+      "props": {
+        "mode": {
+          "type": "string",
+          "values": [
+            "single",
+            "multiple",
+            "range"
+          ],
+          "default": "single",
+          "description": "Selection mode"
+        },
+        "selected": {
+          "type": "Date | Date[]",
+          "description": "Selected date(s)"
+        },
+        "onSelect": {
+          "type": "function",
+          "description": "Callback when date is selected"
+        },
+        "disabled": {
+          "type": "boolean | Date[]",
+          "description": "Disable dates"
+        }
+      },
+      "usage": "import { Calendar } from '@/components/ui/calendar'",
+      "examples": [
+        {
+          "title": "Single Date Picker",
+          "code": "const [date, setDate] = React.useState<Date | undefined>(new Date())\n\n<Calendar\n  mode='single'\n  selected={date}\n  onSelect={setDate}\n  className='rounded-md border'\n/>"
+        },
+        {
+          "title": "Date Range Picker",
+          "code": "const [dateRange, setDateRange] = React.useState<DateRange | undefined>()\n\n<Calendar\n  mode='range'\n  selected={dateRange}\n  onSelect={setDateRange}\n/>"
+        }
+      ]
+    },
+    {
+      "name": "card",
+      "category": "data-display",
+      "description": "Container for content with header, body, and footer",
+      "dependencies": [],
+      "files": [
+        "components/ui/card.tsx"
+      ],
+      "subComponents": {
+        "Card": {},
+        "CardHeader": {},
+        "CardTitle": {},
+        "CardDescription": {},
+        "CardContent": {},
+        "CardFooter": {}
+      },
+      "usage": "import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'",
+      "examples": [
+        {
+          "title": "Basic Card",
+          "code": "<Card>\n  <CardHeader>\n    <CardTitle>Card Title</CardTitle>\n    <CardDescription>Card Description</CardDescription>\n  </CardHeader>\n  <CardContent>\n    <p>Card Content</p>\n  </CardContent>\n  <CardFooter>\n    <Button>Action</Button>\n  </CardFooter>\n</Card>"
+        }
+      ]
+    },
+    {
+      "name": "carousel",
+      "category": "data-display",
+      "description": "Carousel with motion and swipe built using Embla",
+      "dependencies": [
+        "embla-carousel-react"
+      ],
+      "files": [
+        "components/ui/carousel.tsx"
+      ],
+      "props": {
+        "opts": {
+          "type": "object",
+          "description": "Embla Carousel options"
+        },
+        "orientation": {
+          "type": "string",
+          "values": [
+            "horizontal",
+            "vertical"
+          ],
+          "default": "horizontal"
+        },
+        "plugins": {
+          "type": "array",
+          "description": "Embla plugins"
+        }
+      },
+      "subComponents": {
+        "Carousel": {},
+        "CarouselContent": {},
+        "CarouselItem": {},
+        "CarouselPrevious": {},
+        "CarouselNext": {}
+      },
+      "usage": "import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel'",
+      "examples": [
+        {
+          "title": "Basic Carousel",
+          "code": "<Carousel>\n  <CarouselContent>\n    <CarouselItem>Slide 1</CarouselItem>\n    <CarouselItem>Slide 2</CarouselItem>\n    <CarouselItem>Slide 3</CarouselItem>\n  </CarouselContent>\n  <CarouselPrevious />\n  <CarouselNext />\n</Carousel>"
+        }
+      ]
+    },
+    {
+      "name": "chart",
+      "category": "data-display",
+      "description": "Beautiful charts built using Recharts",
+      "dependencies": [
+        "recharts"
+      ],
+      "files": [
+        "components/ui/chart.tsx"
+      ],
+      "subComponents": {
+        "ChartContainer": {},
+        "ChartTooltip": {},
+        "ChartTooltipContent": {},
+        "ChartLegend": {},
+        "ChartLegendContent": {}
+      },
+      "usage": "import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'",
+      "examples": [
+        {
+          "title": "Bar Chart",
+          "code": "<ChartContainer config={chartConfig}>\n  <BarChart data={data}>\n    <Bar dataKey='value' fill='var(--color-primary)' />\n    <ChartTooltip content={<ChartTooltipContent />} />\n  </BarChart>\n</ChartContainer>"
+        }
+      ]
+    },
+    {
+      "name": "checkbox",
+      "category": "forms",
+      "description": "Checkbox with text label",
+      "dependencies": [
+        "@radix-ui/react-checkbox"
+      ],
+      "files": [
+        "components/ui/checkbox.tsx"
+      ],
+      "props": {
+        "checked": {
+          "type": "boolean",
+          "description": "Checked state"
+        },
+        "onCheckedChange": {
+          "type": "function",
+          "description": "Callback when checked state changes"
+        },
+        "disabled": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "usage": "import { Checkbox } from '@/components/ui/checkbox'",
+      "examples": [
+        {
+          "title": "Basic Checkbox",
+          "code": "<div className='flex items-center space-x-2'>\n  <Checkbox id='terms' />\n  <label htmlFor='terms'>Accept terms and conditions</label>\n</div>"
+        },
+        {
+          "title": "Controlled Checkbox",
+          "code": "const [checked, setChecked] = React.useState(false)\n\n<Checkbox\n  checked={checked}\n  onCheckedChange={setChecked}\n/>"
+        }
+      ]
+    },
+    {
+      "name": "collapsible",
+      "category": "data-display",
+      "description": "Interactive component which expands/collapses a panel",
+      "dependencies": [
+        "@radix-ui/react-collapsible"
+      ],
+      "files": [
+        "components/ui/collapsible.tsx"
+      ],
+      "props": {
+        "open": {
+          "type": "boolean"
+        },
+        "onOpenChange": {
+          "type": "function"
+        },
+        "disabled": {
+          "type": "boolean"
+        }
+      },
+      "subComponents": {
+        "Collapsible": {},
+        "CollapsibleTrigger": {},
+        "CollapsibleContent": {}
+      },
+      "usage": "import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'",
+      "examples": [
+        {
+          "title": "Basic Collapsible",
+          "code": "<Collapsible>\n  <CollapsibleTrigger>Can I use this in my project?</CollapsibleTrigger>\n  <CollapsibleContent>\n    Yes. Free to use for personal and commercial projects.\n  </CollapsibleContent>\n</Collapsible>"
+        }
+      ]
+    },
+    {
+      "name": "combobox",
+      "category": "forms",
+      "description": "Autocomplete input and command palette with a list of suggestions",
+      "dependencies": [
+        "@radix-ui/react-popover",
+        "cmdk"
+      ],
+      "files": [],
+      "note": "Built using Popover and Command components",
+      "usage": "import { Command, CommandInput, CommandList, CommandItem } from '@/components/ui/command'\nimport { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'",
+      "examples": [
+        {
+          "title": "Framework Selector",
+          "code": "<Popover open={open} onOpenChange={setOpen}>\n  <PopoverTrigger asChild>\n    <Button variant='outline' role='combobox'>\n      {value || 'Select framework...'}\n    </Button>\n  </PopoverTrigger>\n  <PopoverContent>\n    <Command>\n      <CommandInput placeholder='Search framework...' />\n      <CommandList>\n        <CommandItem onSelect={setValue}>Next.js</CommandItem>\n        <CommandItem onSelect={setValue}>React</CommandItem>\n      </CommandList>\n    </Command>\n  </PopoverContent>\n</Popover>"
+        }
+      ]
+    },
+    {
+      "name": "command",
+      "category": "navigation",
+      "description": "Fast, composable, unstyled command menu",
+      "dependencies": [
+        "cmdk"
+      ],
+      "files": [
+        "components/ui/command.tsx"
+      ],
+      "subComponents": {
+        "Command": {},
+        "CommandInput": {},
+        "CommandList": {},
+        "CommandEmpty": {},
+        "CommandGroup": {},
+        "CommandItem": {},
+        "CommandSeparator": {},
+        "CommandShortcut": {}
+      },
+      "usage": "import { Command, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem } from '@/components/ui/command'",
+      "examples": [
+        {
+          "title": "Command Menu",
+          "code": "<Command>\n  <CommandInput placeholder='Type a command or search...' />\n  <CommandList>\n    <CommandEmpty>No results found.</CommandEmpty>\n    <CommandGroup heading='Suggestions'>\n      <CommandItem>Calendar</CommandItem>\n      <CommandItem>Search Emoji</CommandItem>\n    </CommandGroup>\n  </CommandList>\n</Command>"
+        }
+      ]
+    },
+    {
+      "name": "context-menu",
+      "category": "overlay",
+      "description": "Displays a menu located at the pointer, triggered by right-click",
+      "dependencies": [
+        "@radix-ui/react-context-menu"
+      ],
+      "files": [
+        "components/ui/context-menu.tsx"
+      ],
+      "subComponents": {
+        "ContextMenu": {},
+        "ContextMenuTrigger": {},
+        "ContextMenuContent": {},
+        "ContextMenuItem": {},
+        "ContextMenuCheckboxItem": {},
+        "ContextMenuRadioItem": {},
+        "ContextMenuLabel": {},
+        "ContextMenuSeparator": {},
+        "ContextMenuShortcut": {},
+        "ContextMenuSub": {},
+        "ContextMenuSubContent": {},
+        "ContextMenuSubTrigger": {}
+      },
+      "usage": "import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from '@/components/ui/context-menu'",
+      "examples": [
+        {
+          "title": "Basic Context Menu",
+          "code": "<ContextMenu>\n  <ContextMenuTrigger>Right click here</ContextMenuTrigger>\n  <ContextMenuContent>\n    <ContextMenuItem>Copy</ContextMenuItem>\n    <ContextMenuItem>Paste</ContextMenuItem>\n    <ContextMenuItem>Delete</ContextMenuItem>\n  </ContextMenuContent>\n</ContextMenu>"
+        }
+      ]
+    },
+    {
+      "name": "dialog",
+      "category": "overlay",
+      "description": "Window overlaid on primary window or another dialog",
+      "dependencies": [
+        "@radix-ui/react-dialog"
+      ],
+      "files": [
+        "components/ui/dialog.tsx"
+      ],
+      "props": {
+        "open": {
+          "type": "boolean"
+        },
+        "onOpenChange": {
+          "type": "function"
+        },
+        "modal": {
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "subComponents": {
+        "Dialog": {},
+        "DialogTrigger": {},
+        "DialogContent": {},
+        "DialogHeader": {},
+        "DialogFooter": {},
+        "DialogTitle": {},
+        "DialogDescription": {},
+        "DialogClose": {}
+      },
+      "usage": "import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'",
+      "examples": [
+        {
+          "title": "Basic Dialog",
+          "code": "<Dialog>\n  <DialogTrigger asChild>\n    <Button>Open Dialog</Button>\n  </DialogTrigger>\n  <DialogContent>\n    <DialogHeader>\n      <DialogTitle>Are you sure?</DialogTitle>\n      <DialogDescription>This action cannot be undone.</DialogDescription>\n    </DialogHeader>\n  </DialogContent>\n</Dialog>"
+        }
+      ]
+    },
+    {
+      "name": "drawer",
+      "category": "overlay",
+      "description": "Side panel that slides in from the edge of the screen",
+      "dependencies": [
+        "vaul"
+      ],
+      "files": [
+        "components/ui/drawer.tsx"
+      ],
+      "props": {
+        "open": {
+          "type": "boolean"
+        },
+        "onOpenChange": {
+          "type": "function"
+        },
+        "direction": {
+          "type": "string",
+          "values": [
+            "top",
+            "bottom",
+            "left",
+            "right"
+          ],
+          "default": "bottom"
+        }
+      },
+      "subComponents": {
+        "Drawer": {},
+        "DrawerTrigger": {},
+        "DrawerContent": {},
+        "DrawerHeader": {},
+        "DrawerFooter": {},
+        "DrawerTitle": {},
+        "DrawerDescription": {},
+        "DrawerClose": {}
+      },
+      "usage": "import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer'",
+      "examples": [
+        {
+          "title": "Bottom Drawer",
+          "code": "<Drawer>\n  <DrawerTrigger asChild>\n    <Button>Open Drawer</Button>\n  </DrawerTrigger>\n  <DrawerContent>\n    <DrawerHeader>\n      <DrawerTitle>Drawer Title</DrawerTitle>\n      <DrawerDescription>Drawer description</DrawerDescription>\n    </DrawerHeader>\n    <DrawerFooter>\n      <Button>Submit</Button>\n      <DrawerClose asChild>\n        <Button variant='outline'>Cancel</Button>\n      </DrawerClose>\n    </DrawerFooter>\n  </DrawerContent>\n</Drawer>"
+        }
+      ]
+    },
+    {
+      "name": "dropdown-menu",
+      "category": "overlay",
+      "description": "Displays a menu to the user triggered by a button",
+      "dependencies": [
+        "@radix-ui/react-dropdown-menu"
+      ],
+      "files": [
+        "components/ui/dropdown-menu.tsx"
+      ],
+      "props": {
+        "open": {
+          "type": "boolean"
+        },
+        "onOpenChange": {
+          "type": "function"
+        },
+        "modal": {
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "subComponents": {
+        "DropdownMenu": {},
+        "DropdownMenuTrigger": {},
+        "DropdownMenuContent": {},
+        "DropdownMenuItem": {},
+        "DropdownMenuCheckboxItem": {},
+        "DropdownMenuRadioItem": {},
+        "DropdownMenuLabel": {},
+        "DropdownMenuSeparator": {},
+        "DropdownMenuShortcut": {},
+        "DropdownMenuGroup": {},
+        "DropdownMenuSub": {},
+        "DropdownMenuSubContent": {},
+        "DropdownMenuSubTrigger": {}
+      },
+      "usage": "import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'",
+      "examples": [
+        {
+          "title": "Basic Dropdown",
+          "code": "<DropdownMenu>\n  <DropdownMenuTrigger asChild>\n    <Button variant='outline'>Open Menu</Button>\n  </DropdownMenuTrigger>\n  <DropdownMenuContent>\n    <DropdownMenuLabel>My Account</DropdownMenuLabel>\n    <DropdownMenuSeparator />\n    <DropdownMenuItem>Profile</DropdownMenuItem>\n    <DropdownMenuItem>Settings</DropdownMenuItem>\n    <DropdownMenuItem>Logout</DropdownMenuItem>\n  </DropdownMenuContent>\n</DropdownMenu>"
+        }
+      ]
+    },
+    {
+      "name": "form",
+      "category": "forms",
+      "description": "Building forms with React Hook Form and Zod validation",
+      "dependencies": [
+        "react-hook-form",
+        "@hookform/resolvers",
+        "zod"
+      ],
+      "files": [
+        "components/ui/form.tsx"
+      ],
+      "subComponents": {
+        "Form": {},
+        "FormItem": {},
+        "FormLabel": {},
+        "FormControl": {},
+        "FormDescription": {},
+        "FormMessage": {},
+        "FormField": {}
+      },
+      "usage": "import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'",
+      "examples": [
+        {
+          "title": "Form with Validation",
+          "code": "const form = useForm({\n  resolver: zodResolver(formSchema)\n})\n\n<Form {...form}>\n  <form onSubmit={form.handleSubmit(onSubmit)}>\n    <FormField\n      control={form.control}\n      name='username'\n      render={({ field }) => (\n        <FormItem>\n          <FormLabel>Username</FormLabel>\n          <FormControl>\n            <Input placeholder='shadcn' {...field} />\n          </FormControl>\n          <FormMessage />\n        </FormItem>\n      )}\n    />\n    <Button type='submit'>Submit</Button>\n  </form>\n</Form>"
+        }
+      ]
+    },
+    {
+      "name": "hover-card",
+      "category": "overlay",
+      "description": "For sighted users to preview content available behind a link",
+      "dependencies": [
+        "@radix-ui/react-hover-card"
+      ],
+      "files": [
+        "components/ui/hover-card.tsx"
+      ],
+      "props": {
+        "open": {
+          "type": "boolean"
+        },
+        "onOpenChange": {
+          "type": "function"
+        },
+        "openDelay": {
+          "type": "number",
+          "default": 700
+        },
+        "closeDelay": {
+          "type": "number",
+          "default": 300
+        }
+      },
+      "subComponents": {
+        "HoverCard": {},
+        "HoverCardTrigger": {},
+        "HoverCardContent": {}
+      },
+      "usage": "import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card'",
+      "examples": [
+        {
+          "title": "Profile Hover Card",
+          "code": "<HoverCard>\n  <HoverCardTrigger asChild>\n    <Button variant='link'>@nextjs</Button>\n  </HoverCardTrigger>\n  <HoverCardContent className='w-80'>\n    <div className='flex justify-between space-x-4'>\n      <Avatar>\n        <AvatarImage src='avatar.jpg' />\n        <AvatarFallback>VC</AvatarFallback>\n      </Avatar>\n      <div className='space-y-1'>\n        <h4 className='text-sm font-semibold'>@nextjs</h4>\n        <p className='text-sm'>The React Framework</p>\n      </div>\n    </div>\n  </HoverCardContent>\n</HoverCard>"
+        }
+      ]
+    },
+    {
+      "name": "input",
+      "category": "forms",
+      "description": "Displays a form input field or a component that looks like an input field",
+      "dependencies": [],
+      "files": [
+        "components/ui/input.tsx"
+      ],
+      "props": {
+        "type": {
+          "type": "string",
+          "values": [
+            "text",
+            "email",
+            "password",
+            "number",
+            "tel",
+            "url",
+            "search"
+          ],
+          "default": "text"
+        },
+        "disabled": {
+          "type": "boolean"
+        },
+        "placeholder": {
+          "type": "string"
+        }
+      },
+      "usage": "import { Input } from '@/components/ui/input'",
+      "examples": [
+        {
+          "title": "Text Input",
+          "code": "<Input type='text' placeholder='Email' />"
+        },
+        {
+          "title": "With Label",
+          "code": "<div>\n  <Label htmlFor='email'>Email</Label>\n  <Input type='email' id='email' placeholder='Email' />\n</div>"
+        }
+      ]
+    },
+    {
+      "name": "input-otp",
+      "category": "forms",
+      "description": "Accessible one-time password component with copy paste functionality",
+      "dependencies": [
+        "input-otp"
+      ],
+      "files": [
+        "components/ui/input-otp.tsx"
+      ],
+      "props": {
+        "maxLength": {
+          "type": "number",
+          "default": 6
+        },
+        "pattern": {
+          "type": "string"
+        }
+      },
+      "subComponents": {
+        "InputOTP": {},
+        "InputOTPGroup": {},
+        "InputOTPSlot": {},
+        "InputOTPSeparator": {}
+      },
+      "usage": "import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from '@/components/ui/input-otp'",
+      "examples": [
+        {
+          "title": "6-Digit OTP",
+          "code": "<InputOTP maxLength={6}>\n  <InputOTPGroup>\n    <InputOTPSlot index={0} />\n    <InputOTPSlot index={1} />\n    <InputOTPSlot index={2} />\n  </InputOTPGroup>\n  <InputOTPSeparator />\n  <InputOTPGroup>\n    <InputOTPSlot index={3} />\n    <InputOTPSlot index={4} />\n    <InputOTPSlot index={5} />\n  </InputOTPGroup>\n</InputOTP>"
+        }
+      ]
+    },
+    {
+      "name": "label",
+      "category": "forms",
+      "description": "Renders an accessible label associated with controls",
+      "dependencies": [
+        "@radix-ui/react-label"
+      ],
+      "files": [
+        "components/ui/label.tsx"
+      ],
+      "props": {
+        "htmlFor": {
+          "type": "string",
+          "description": "ID of the form element"
+        }
+      },
+      "usage": "import { Label } from '@/components/ui/label'",
+      "examples": [
+        {
+          "title": "With Input",
+          "code": "<div>\n  <Label htmlFor='email'>Email</Label>\n  <Input type='email' id='email' />\n</div>"
+        }
+      ]
+    },
+    {
+      "name": "menubar",
+      "category": "navigation",
+      "description": "Visually persistent menu common in desktop applications",
+      "dependencies": [
+        "@radix-ui/react-menubar"
+      ],
+      "files": [
+        "components/ui/menubar.tsx"
+      ],
+      "subComponents": {
+        "Menubar": {},
+        "MenubarMenu": {},
+        "MenubarTrigger": {},
+        "MenubarContent": {},
+        "MenubarItem": {},
+        "MenubarSeparator": {},
+        "MenubarLabel": {},
+        "MenubarCheckboxItem": {},
+        "MenubarRadioGroup": {},
+        "MenubarRadioItem": {},
+        "MenubarSub": {},
+        "MenubarSubContent": {},
+        "MenubarSubTrigger": {},
+        "MenubarShortcut": {}
+      },
+      "usage": "import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarSeparator, MenubarTrigger } from '@/components/ui/menubar'",
+      "examples": [
+        {
+          "title": "Application Menu",
+          "code": "<Menubar>\n  <MenubarMenu>\n    <MenubarTrigger>File</MenubarTrigger>\n    <MenubarContent>\n      <MenubarItem>New Tab</MenubarItem>\n      <MenubarItem>New Window</MenubarItem>\n      <MenubarSeparator />\n      <MenubarItem>Save</MenubarItem>\n    </MenubarContent>\n  </MenubarMenu>\n  <MenubarMenu>\n    <MenubarTrigger>Edit</MenubarTrigger>\n    <MenubarContent>\n      <MenubarItem>Cut</MenubarItem>\n      <MenubarItem>Copy</MenubarItem>\n      <MenubarItem>Paste</MenubarItem>\n    </MenubarContent>\n  </MenubarMenu>\n</Menubar>"
+        }
+      ]
+    },
+    {
+      "name": "navigation-menu",
+      "category": "navigation",
+      "description": "Collection of links for navigating websites",
+      "dependencies": [
+        "@radix-ui/react-navigation-menu"
+      ],
+      "files": [
+        "components/ui/navigation-menu.tsx"
+      ],
+      "subComponents": {
+        "NavigationMenu": {},
+        "NavigationMenuList": {},
+        "NavigationMenuItem": {},
+        "NavigationMenuContent": {},
+        "NavigationMenuTrigger": {},
+        "NavigationMenuLink": {},
+        "NavigationMenuIndicator": {},
+        "NavigationMenuViewport": {}
+      },
+      "usage": "import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from '@/components/ui/navigation-menu'",
+      "examples": [
+        {
+          "title": "Header Navigation",
+          "code": "<NavigationMenu>\n  <NavigationMenuList>\n    <NavigationMenuItem>\n      <NavigationMenuTrigger>Getting started</NavigationMenuTrigger>\n      <NavigationMenuContent>\n        <NavigationMenuLink>Introduction</NavigationMenuLink>\n        <NavigationMenuLink>Installation</NavigationMenuLink>\n      </NavigationMenuContent>\n    </NavigationMenuItem>\n    <NavigationMenuItem>\n      <NavigationMenuLink href='/docs'>Documentation</NavigationMenuLink>\n    </NavigationMenuItem>\n  </NavigationMenuList>\n</NavigationMenu>"
+        }
+      ]
+    },
+    {
+      "name": "pagination",
+      "category": "navigation",
+      "description": "Pagination with page navigation, next and previous links",
+      "dependencies": [],
+      "files": [
+        "components/ui/pagination.tsx"
+      ],
+      "subComponents": {
+        "Pagination": {},
+        "PaginationContent": {},
+        "PaginationEllipsis": {},
+        "PaginationItem": {},
+        "PaginationLink": {},
+        "PaginationNext": {},
+        "PaginationPrevious": {}
+      },
+      "usage": "import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination'",
+      "examples": [
+        {
+          "title": "Basic Pagination",
+          "code": "<Pagination>\n  <PaginationContent>\n    <PaginationItem>\n      <PaginationPrevious href='#' />\n    </PaginationItem>\n    <PaginationItem>\n      <PaginationLink href='#'>1</PaginationLink>\n    </PaginationItem>\n    <PaginationItem>\n      <PaginationLink href='#' isActive>2</PaginationLink>\n    </PaginationItem>\n    <PaginationItem>\n      <PaginationLink href='#'>3</PaginationLink>\n    </PaginationItem>\n    <PaginationItem>\n      <PaginationEllipsis />\n    </PaginationItem>\n    <PaginationItem>\n      <PaginationNext href='#' />\n    </PaginationItem>\n  </PaginationContent>\n</Pagination>"
+        }
+      ]
+    },
+    {
+      "name": "popover",
+      "category": "overlay",
+      "description": "Displays rich content in a portal, triggered by a button",
+      "dependencies": [
+        "@radix-ui/react-popover"
+      ],
+      "files": [
+        "components/ui/popover.tsx"
+      ],
+      "props": {
+        "open": {
+          "type": "boolean"
+        },
+        "onOpenChange": {
+          "type": "function"
+        },
+        "modal": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "subComponents": {
+        "Popover": {},
+        "PopoverTrigger": {},
+        "PopoverContent": {},
+        "PopoverAnchor": {}
+      },
+      "usage": "import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'",
+      "examples": [
+        {
+          "title": "Basic Popover",
+          "code": "<Popover>\n  <PopoverTrigger asChild>\n    <Button variant='outline'>Open popover</Button>\n  </PopoverTrigger>\n  <PopoverContent className='w-80'>\n    <div className='grid gap-4'>\n      <h4 className='font-medium'>Dimensions</h4>\n      <p className='text-sm text-muted-foreground'>Set dimensions</p>\n    </div>\n  </PopoverContent>\n</Popover>"
+        }
+      ]
+    },
+    {
+      "name": "progress",
+      "category": "feedback",
+      "description": "Displays an indicator showing the completion progress",
+      "dependencies": [
+        "@radix-ui/react-progress"
+      ],
+      "files": [
+        "components/ui/progress.tsx"
+      ],
+      "props": {
+        "value": {
+          "type": "number",
+          "description": "Progress value (0-100)"
+        },
+        "max": {
+          "type": "number",
+          "default": 100
+        }
+      },
+      "usage": "import { Progress } from '@/components/ui/progress'",
+      "examples": [
+        {
+          "title": "Basic Progress",
+          "code": "<Progress value={33} />"
+        },
+        {
+          "title": "With Label",
+          "code": "<div>\n  <div className='flex justify-between mb-2'>\n    <span className='text-sm'>Uploading...</span>\n    <span className='text-sm'>{progress}%</span>\n  </div>\n  <Progress value={progress} />\n</div>"
+        }
+      ]
+    },
+    {
+      "name": "radio-group",
+      "category": "forms",
+      "description": "Set of checkable buttons where only one can be checked",
+      "dependencies": [
+        "@radix-ui/react-radio-group"
+      ],
+      "files": [
+        "components/ui/radio-group.tsx"
+      ],
+      "props": {
+        "value": {
+          "type": "string"
+        },
+        "onValueChange": {
+          "type": "function"
+        },
+        "disabled": {
+          "type": "boolean"
+        }
+      },
+      "subComponents": {
+        "RadioGroup": {},
+        "RadioGroupItem": {}
+      },
+      "usage": "import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'",
+      "examples": [
+        {
+          "title": "Basic Radio Group",
+          "code": "<RadioGroup defaultValue='option-one'>\n  <div className='flex items-center space-x-2'>\n    <RadioGroupItem value='option-one' id='option-one' />\n    <Label htmlFor='option-one'>Option One</Label>\n  </div>\n  <div className='flex items-center space-x-2'>\n    <RadioGroupItem value='option-two' id='option-two' />\n    <Label htmlFor='option-two'>Option Two</Label>\n  </div>\n</RadioGroup>"
+        }
+      ]
+    },
+    {
+      "name": "resizable",
+      "category": "layout",
+      "description": "Accessible resizable panel groups and layouts",
+      "dependencies": [
+        "react-resizable-panels"
+      ],
+      "files": [
+        "components/ui/resizable.tsx"
+      ],
+      "subComponents": {
+        "ResizablePanelGroup": {
+          "direction": {
+            "type": "string",
+            "values": [
+              "horizontal",
+              "vertical"
+            ]
+          }
+        },
+        "ResizablePanel": {
+          "defaultSize": {
+            "type": "number"
+          }
+        },
+        "ResizableHandle": {
+          "withHandle": {
+            "type": "boolean"
+          }
+        }
+      },
+      "usage": "import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'",
+      "examples": [
+        {
+          "title": "Horizontal Panels",
+          "code": "<ResizablePanelGroup direction='horizontal'>\n  <ResizablePanel defaultSize={50}>\n    <div>Panel 1</div>\n  </ResizablePanel>\n  <ResizableHandle />\n  <ResizablePanel defaultSize={50}>\n    <div>Panel 2</div>\n  </ResizablePanel>\n</ResizablePanelGroup>"
+        }
+      ]
+    },
+    {
+      "name": "scroll-area",
+      "category": "layout",
+      "description": "Augments native scroll functionality for custom, cross-browser styling",
+      "dependencies": [
+        "@radix-ui/react-scroll-area"
+      ],
+      "files": [
+        "components/ui/scroll-area.tsx"
+      ],
+      "props": {
+        "type": {
+          "type": "string",
+          "values": [
+            "auto",
+            "always",
+            "scroll",
+            "hover"
+          ],
+          "default": "hover"
+        }
+      },
+      "subComponents": {
+        "ScrollArea": {},
+        "ScrollBar": {}
+      },
+      "usage": "import { ScrollArea } from '@/components/ui/scroll-area'",
+      "examples": [
+        {
+          "title": "Vertical Scroll",
+          "code": "<ScrollArea className='h-72 w-48 rounded-md border'>\n  <div className='p-4'>\n    {Array.from({ length: 50 }).map((_, i) => (\n      <div key={i}>Item {i + 1}</div>\n    ))}\n  </div>\n</ScrollArea>"
+        }
+      ]
+    },
+    {
+      "name": "select",
+      "category": "forms",
+      "description": "Displays a list of options for the user to pick from",
+      "dependencies": [
+        "@radix-ui/react-select"
+      ],
+      "files": [
+        "components/ui/select.tsx"
+      ],
+      "props": {
+        "value": {
+          "type": "string"
+        },
+        "onValueChange": {
+          "type": "function"
+        },
+        "disabled": {
+          "type": "boolean"
+        },
+        "defaultValue": {
+          "type": "string"
+        }
+      },
+      "subComponents": {
+        "Select": {},
+        "SelectGroup": {},
+        "SelectValue": {},
+        "SelectTrigger": {},
+        "SelectContent": {},
+        "SelectLabel": {},
+        "SelectItem": {},
+        "SelectSeparator": {}
+      },
+      "usage": "import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'",
+      "examples": [
+        {
+          "title": "Basic Select",
+          "code": "<Select>\n  <SelectTrigger className='w-[180px]'>\n    <SelectValue placeholder='Select a fruit' />\n  </SelectTrigger>\n  <SelectContent>\n    <SelectItem value='apple'>Apple</SelectItem>\n    <SelectItem value='banana'>Banana</SelectItem>\n    <SelectItem value='orange'>Orange</SelectItem>\n  </SelectContent>\n</Select>"
+        }
+      ]
+    },
+    {
+      "name": "separator",
+      "category": "layout",
+      "description": "Visually or semantically separates content",
+      "dependencies": [
+        "@radix-ui/react-separator"
+      ],
+      "files": [
+        "components/ui/separator.tsx"
+      ],
+      "props": {
+        "orientation": {
+          "type": "string",
+          "values": [
+            "horizontal",
+            "vertical"
+          ],
+          "default": "horizontal"
+        },
+        "decorative": {
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "usage": "import { Separator } from '@/components/ui/separator'",
+      "examples": [
+        {
+          "title": "Horizontal Separator",
+          "code": "<div>\n  <div>Content above</div>\n  <Separator className='my-4' />\n  <div>Content below</div>\n</div>"
+        },
+        {
+          "title": "Vertical Separator",
+          "code": "<div className='flex h-5 items-center space-x-4'>\n  <div>Item 1</div>\n  <Separator orientation='vertical' />\n  <div>Item 2</div>\n</div>"
+        }
+      ]
+    },
+    {
+      "name": "sheet",
+      "category": "overlay",
+      "description": "Extends the Dialog component to display content that complements the main content",
+      "dependencies": [
+        "@radix-ui/react-dialog"
+      ],
+      "files": [
+        "components/ui/sheet.tsx"
+      ],
+      "props": {
+        "open": {
+          "type": "boolean"
+        },
+        "onOpenChange": {
+          "type": "function"
+        },
+        "side": {
+          "type": "string",
+          "values": [
+            "top",
+            "right",
+            "bottom",
+            "left"
+          ],
+          "default": "right"
+        }
+      },
+      "subComponents": {
+        "Sheet": {},
+        "SheetTrigger": {},
+        "SheetContent": {},
+        "SheetHeader": {},
+        "SheetFooter": {},
+        "SheetTitle": {},
+        "SheetDescription": {},
+        "SheetClose": {}
+      },
+      "usage": "import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'",
+      "examples": [
+        {
+          "title": "Right Side Sheet",
+          "code": "<Sheet>\n  <SheetTrigger asChild>\n    <Button variant='outline'>Open</Button>\n  </SheetTrigger>\n  <SheetContent>\n    <SheetHeader>\n      <SheetTitle>Edit profile</SheetTitle>\n      <SheetDescription>Make changes to your profile</SheetDescription>\n    </SheetHeader>\n  </SheetContent>\n</Sheet>"
+        }
+      ]
+    },
+    {
+      "name": "sidebar",
+      "category": "navigation",
+      "description": "Composable, themeable and customizable sidebar component",
+      "dependencies": [],
+      "files": [
+        "components/ui/sidebar.tsx"
+      ],
+      "subComponents": {
+        "Sidebar": {},
+        "SidebarContent": {},
+        "SidebarFooter": {},
+        "SidebarGroup": {},
+        "SidebarGroupAction": {},
+        "SidebarGroupContent": {},
+        "SidebarGroupLabel": {},
+        "SidebarHeader": {},
+        "SidebarInset": {},
+        "SidebarInput": {},
+        "SidebarMenu": {},
+        "SidebarMenuAction": {},
+        "SidebarMenuBadge": {},
+        "SidebarMenuButton": {},
+        "SidebarMenuItem": {},
+        "SidebarMenuSkeleton": {},
+        "SidebarMenuSub": {},
+        "SidebarMenuSubButton": {},
+        "SidebarMenuSubItem": {},
+        "SidebarProvider": {},
+        "SidebarRail": {},
+        "SidebarSeparator": {},
+        "SidebarTrigger": {}
+      },
+      "usage": "import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider } from '@/components/ui/sidebar'",
+      "examples": [
+        {
+          "title": "Application Sidebar",
+          "code": "<SidebarProvider>\n  <Sidebar>\n    <SidebarContent>\n      <SidebarGroup>\n        <SidebarGroupLabel>Application</SidebarGroupLabel>\n        <SidebarGroupContent>\n          <SidebarMenu>\n            <SidebarMenuItem>\n              <SidebarMenuButton asChild>\n                <a href='/'><Home />Home</a>\n              </SidebarMenuButton>\n            </SidebarMenuItem>\n          </SidebarMenu>\n        </SidebarGroupContent>\n      </SidebarGroup>\n    </SidebarContent>\n  </Sidebar>\n</SidebarProvider>"
+        }
+      ]
+    },
+    {
+      "name": "skeleton",
+      "category": "feedback",
+      "description": "Use to show a placeholder while content is loading",
+      "dependencies": [],
+      "files": [
+        "components/ui/skeleton.tsx"
+      ],
+      "usage": "import { Skeleton } from '@/components/ui/skeleton'",
+      "examples": [
+        {
+          "title": "Loading Card",
+          "code": "<div className='flex flex-col space-y-3'>\n  <Skeleton className='h-[125px] w-[250px] rounded-xl' />\n  <div className='space-y-2'>\n    <Skeleton className='h-4 w-[250px]' />\n    <Skeleton className='h-4 w-[200px]' />\n  </div>\n</div>"
+        }
+      ]
+    },
+    {
+      "name": "slider",
+      "category": "forms",
+      "description": "An input where the user selects a value from within a given range",
+      "dependencies": [
+        "@radix-ui/react-slider"
+      ],
+      "files": [
+        "components/ui/slider.tsx"
+      ],
+      "props": {
+        "value": {
+          "type": "number[]"
+        },
+        "onValueChange": {
+          "type": "function"
+        },
+        "min": {
+          "type": "number",
+          "default": 0
+        },
+        "max": {
+          "type": "number",
+          "default": 100
+        },
+        "step": {
+          "type": "number",
+          "default": 1
+        },
+        "disabled": {
+          "type": "boolean"
+        }
+      },
+      "usage": "import { Slider } from '@/components/ui/slider'",
+      "examples": [
+        {
+          "title": "Basic Slider",
+          "code": "<Slider defaultValue={[50]} max={100} step={1} />"
+        },
+        {
+          "title": "Range Slider",
+          "code": "<Slider defaultValue={[25, 75]} max={100} step={1} />"
+        }
+      ]
+    },
+    {
+      "name": "sonner",
+      "category": "feedback",
+      "description": "An opinionated toast component for React",
+      "dependencies": [
+        "sonner"
+      ],
+      "files": [
+        "components/ui/sonner.tsx"
+      ],
+      "usage": "import { toast } from 'sonner'\nimport { Toaster } from '@/components/ui/sonner'",
+      "examples": [
+        {
+          "title": "Show Toast",
+          "code": "// Add to root layout\n<Toaster />\n\n// Trigger toast\n<Button onClick={() => toast('Event has been created')}>Show Toast</Button>"
+        },
+        {
+          "title": "Success Toast",
+          "code": "toast.success('Account created successfully')"
+        },
+        {
+          "title": "Error Toast",
+          "code": "toast.error('Something went wrong')"
+        }
+      ]
+    },
+    {
+      "name": "switch",
+      "category": "forms",
+      "description": "A control that allows the user to toggle between checked and not checked",
+      "dependencies": [
+        "@radix-ui/react-switch"
+      ],
+      "files": [
+        "components/ui/switch.tsx"
+      ],
+      "props": {
+        "checked": {
+          "type": "boolean"
+        },
+        "onCheckedChange": {
+          "type": "function"
+        },
+        "disabled": {
+          "type": "boolean"
+        }
+      },
+      "usage": "import { Switch } from '@/components/ui/switch'",
+      "examples": [
+        {
+          "title": "Basic Switch",
+          "code": "<div className='flex items-center space-x-2'>\n  <Switch id='airplane-mode' />\n  <Label htmlFor='airplane-mode'>Airplane Mode</Label>\n</div>"
+        }
+      ]
+    },
+    {
+      "name": "table",
+      "category": "data-display",
+      "description": "A responsive table component",
+      "dependencies": [],
+      "files": [
+        "components/ui/table.tsx"
+      ],
+      "subComponents": {
+        "Table": {},
+        "TableHeader": {},
+        "TableBody": {},
+        "TableFooter": {},
+        "TableHead": {},
+        "TableRow": {},
+        "TableCell": {},
+        "TableCaption": {}
+      },
+      "usage": "import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'",
+      "examples": [
+        {
+          "title": "Basic Table",
+          "code": "<Table>\n  <TableCaption>A list of your recent invoices.</TableCaption>\n  <TableHeader>\n    <TableRow>\n      <TableHead>Invoice</TableHead>\n      <TableHead>Status</TableHead>\n      <TableHead>Amount</TableHead>\n    </TableRow>\n  </TableHeader>\n  <TableBody>\n    <TableRow>\n      <TableCell>INV001</TableCell>\n      <TableCell>Paid</TableCell>\n      <TableCell>$250.00</TableCell>\n    </TableRow>\n  </TableBody>\n</Table>"
+        }
+      ]
+    },
+    {
+      "name": "tabs",
+      "category": "navigation",
+      "description": "A set of layered sections of content, one at a time",
+      "dependencies": [
+        "@radix-ui/react-tabs"
+      ],
+      "files": [
+        "components/ui/tabs.tsx"
+      ],
+      "props": {
+        "value": {
+          "type": "string"
+        },
+        "onValueChange": {
+          "type": "function"
+        },
+        "defaultValue": {
+          "type": "string"
+        }
+      },
+      "subComponents": {
+        "Tabs": {},
+        "TabsList": {},
+        "TabsTrigger": {},
+        "TabsContent": {}
+      },
+      "usage": "import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'",
+      "examples": [
+        {
+          "title": "Basic Tabs",
+          "code": "<Tabs defaultValue='account'>\n  <TabsList>\n    <TabsTrigger value='account'>Account</TabsTrigger>\n    <TabsTrigger value='password'>Password</TabsTrigger>\n  </TabsList>\n  <TabsContent value='account'>Account content</TabsContent>\n  <TabsContent value='password'>Password content</TabsContent>\n</Tabs>"
+        }
+      ]
+    },
+    {
+      "name": "textarea",
+      "category": "forms",
+      "description": "Displays a form textarea or a component that looks like a textarea",
+      "dependencies": [],
+      "files": [
+        "components/ui/textarea.tsx"
+      ],
+      "props": {
+        "disabled": {
+          "type": "boolean"
+        },
+        "placeholder": {
+          "type": "string"
+        },
+        "rows": {
+          "type": "number"
+        }
+      },
+      "usage": "import { Textarea } from '@/components/ui/textarea'",
+      "examples": [
+        {
+          "title": "Basic Textarea",
+          "code": "<Textarea placeholder='Type your message here.' />"
+        },
+        {
+          "title": "With Label",
+          "code": "<div>\n  <Label htmlFor='message'>Your message</Label>\n  <Textarea id='message' placeholder='Type your message here.' />\n</div>"
+        }
+      ]
+    },
+    {
+      "name": "toast",
+      "category": "feedback",
+      "description": "A succinct message that is displayed temporarily",
+      "dependencies": [
+        "@radix-ui/react-toast"
+      ],
+      "files": [
+        "components/ui/toast.tsx",
+        "components/ui/toaster.tsx",
+        "components/ui/use-toast.ts"
+      ],
+      "subComponents": {
+        "Toast": {},
+        "ToastAction": {},
+        "ToastClose": {},
+        "ToastDescription": {},
+        "ToastProvider": {},
+        "ToastTitle": {},
+        "ToastViewport": {},
+        "Toaster": {}
+      },
+      "usage": "import { useToast } from '@/components/ui/use-toast'\nimport { Toaster } from '@/components/ui/toaster'",
+      "examples": [
+        {
+          "title": "Show Toast",
+          "code": "// Add to root layout\n<Toaster />\n\n// Use in component\nconst { toast } = useToast()\n\n<Button\n  onClick={() => {\n    toast({\n      title: 'Scheduled: Catch up',\n      description: 'Friday, February 10, 2023 at 5:57 PM'\n    })\n  }}\n>\n  Show Toast\n</Button>"
+        },
+        {
+          "title": "With Action",
+          "code": "toast({\n  title: 'Uh oh! Something went wrong.',\n  description: 'There was a problem with your request.',\n  action: <ToastAction altText='Try again'>Try again</ToastAction>\n})"
+        }
+      ]
+    },
+    {
+      "name": "toggle",
+      "category": "forms",
+      "description": "A two-state button that can be either on or off",
+      "dependencies": [
+        "@radix-ui/react-toggle"
+      ],
+      "files": [
+        "components/ui/toggle.tsx"
+      ],
+      "props": {
+        "pressed": {
+          "type": "boolean"
+        },
+        "onPressedChange": {
+          "type": "function"
+        },
+        "disabled": {
+          "type": "boolean"
+        },
+        "variant": {
+          "type": "string",
+          "values": [
+            "default",
+            "outline"
+          ],
+          "default": "default"
+        },
+        "size": {
+          "type": "string",
+          "values": [
+            "default",
+            "sm",
+            "lg"
+          ],
+          "default": "default"
+        }
+      },
+      "usage": "import { Toggle } from '@/components/ui/toggle'",
+      "examples": [
+        {
+          "title": "Basic Toggle",
+          "code": "<Toggle aria-label='Toggle italic'>\n  <Italic className='h-4 w-4' />\n</Toggle>"
+        },
+        {
+          "title": "Outline Toggle",
+          "code": "<Toggle variant='outline' aria-label='Toggle bold'>\n  <Bold className='h-4 w-4' />\n</Toggle>"
+        }
+      ]
+    },
+    {
+      "name": "toggle-group",
+      "category": "forms",
+      "description": "A set of two-state buttons that can be toggled on or off",
+      "dependencies": [
+        "@radix-ui/react-toggle-group"
+      ],
+      "files": [
+        "components/ui/toggle-group.tsx"
+      ],
+      "props": {
+        "type": {
+          "type": "string",
+          "values": [
+            "single",
+            "multiple"
+          ],
+          "required": true,
+          "description": "Whether only one or multiple items can be pressed at a time"
+        },
+        "value": {
+          "type": "string | string[]",
+          "description": "Controlled value (string for single, string[] for multiple)"
+        },
+        "onValueChange": {
+          "type": "function",
+          "description": "Callback when value changes"
+        },
+        "disabled": {
+          "type": "boolean",
+          "default": false
+        },
+        "variant": {
+          "type": "string",
+          "values": [
+            "default",
+            "outline"
+          ],
+          "default": "default",
+          "description": "Visual style of toggle items"
+        },
+        "size": {
+          "type": "string",
+          "values": [
+            "default",
+            "sm",
+            "lg"
+          ],
+          "default": "default",
+          "description": "Size of toggle items"
+        },
+        "spacing": {
+          "type": "number",
+          "description": "Gap between toggle items (in spacing units)"
+        }
+      },
+      "subComponents": {
+        "ToggleGroup": {},
+        "ToggleGroupItem": {
+          "value": {
+            "type": "string",
+            "required": true,
+            "description": "Unique value for this item"
+          },
+          "aria-label": {
+            "type": "string",
+            "description": "Accessible label for screen readers"
+          },
+          "disabled": {
+            "type": "boolean"
+          }
+        }
+      },
+      "usage": "import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'",
+      "examples": [
+        {
+          "title": "Single Selection",
+          "code": "<ToggleGroup type='single'>\n  <ToggleGroupItem value='left' aria-label='Align left'>\n    <AlignLeft className='h-4 w-4' />\n  </ToggleGroupItem>\n  <ToggleGroupItem value='center' aria-label='Align center'>\n    <AlignCenter className='h-4 w-4' />\n  </ToggleGroupItem>\n  <ToggleGroupItem value='right' aria-label='Align right'>\n    <AlignRight className='h-4 w-4' />\n  </ToggleGroupItem>\n</ToggleGroup>"
+        },
+        {
+          "title": "Multiple Selection",
+          "code": "<ToggleGroup type='multiple'>\n  <ToggleGroupItem value='bold' aria-label='Toggle bold'>\n    <Bold className='h-4 w-4' />\n  </ToggleGroupItem>\n  <ToggleGroupItem value='italic' aria-label='Toggle italic'>\n    <Italic className='h-4 w-4' />\n  </ToggleGroupItem>\n  <ToggleGroupItem value='underline' aria-label='Toggle underline'>\n    <Underline className='h-4 w-4' />\n  </ToggleGroupItem>\n</ToggleGroup>"
+        },
+        {
+          "title": "With Variant and Size",
+          "code": "<ToggleGroup type='single' variant='outline' size='lg'>\n  <ToggleGroupItem value='list'>List</ToggleGroupItem>\n  <ToggleGroupItem value='grid'>Grid</ToggleGroupItem>\n</ToggleGroup>"
+        },
+        {
+          "title": "With Spacing and Custom Styles",
+          "code": "import { BookmarkIcon, HeartIcon, StarIcon } from 'lucide-react'\n\n<ToggleGroup type='multiple' variant='outline' spacing={2} size='sm'>\n  <ToggleGroupItem\n    value='star'\n    aria-label='Toggle star'\n    className='data-[state=on]:bg-transparent data-[state=on]:*:[svg]:fill-yellow-500 data-[state=on]:*:[svg]:stroke-yellow-500'\n  >\n    <StarIcon />\n    Star\n  </ToggleGroupItem>\n  <ToggleGroupItem\n    value='heart'\n    aria-label='Toggle heart'\n    className='data-[state=on]:bg-transparent data-[state=on]:*:[svg]:fill-red-500 data-[state=on]:*:[svg]:stroke-red-500'\n  >\n    <HeartIcon />\n    Heart\n  </ToggleGroupItem>\n  <ToggleGroupItem\n    value='bookmark'\n    aria-label='Toggle bookmark'\n    className='data-[state=on]:bg-transparent data-[state=on]:*:[svg]:fill-blue-500 data-[state=on]:*:[svg]:stroke-blue-500'\n  >\n    <BookmarkIcon />\n    Bookmark\n  </ToggleGroupItem>\n</ToggleGroup>"
+        }
+      ]
+    },
+    {
+      "name": "tooltip",
+      "category": "overlay",
+      "description": "Popup that displays information related to an element when the element receives keyboard focus or the mouse hovers over it",
+      "dependencies": [
+        "@radix-ui/react-tooltip"
+      ],
+      "files": [
+        "components/ui/tooltip.tsx"
+      ],
+      "props": {
+        "open": {
+          "type": "boolean"
+        },
+        "onOpenChange": {
+          "type": "function"
+        },
+        "delayDuration": {
+          "type": "number",
+          "default": 700
+        }
+      },
+      "subComponents": {
+        "TooltipProvider": {},
+        "Tooltip": {},
+        "TooltipTrigger": {},
+        "TooltipContent": {}
+      },
+      "usage": "import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'",
+      "examples": [
+        {
+          "title": "Basic Tooltip",
+          "code": "<TooltipProvider>\n  <Tooltip>\n    <TooltipTrigger asChild>\n      <Button variant='outline'>Hover</Button>\n    </TooltipTrigger>\n    <TooltipContent>\n      <p>Add to library</p>\n    </TooltipContent>\n  </Tooltip>\n</TooltipProvider>"
+        }
+      ]
+    }
+  ]
+}

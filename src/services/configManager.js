@@ -245,7 +245,7 @@ class ConfigManager {
    * @returns {number}
    */
   getMaxTokens() {
-    return this._getConfig().get('maxTokens', 4096);
+    return this._getConfig().get('maxTokens', 10000);
   }
 /**
  * Get chat history limit (number of messages to remember)

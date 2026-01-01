@@ -308,6 +308,15 @@ function registerCommands(context) {
   },
   description: 'Generate unit tests for selected code'
 },
+      {
+    name: 'codeSentinel.generateProject',
+    callback: async () => {
+      const { generateProjectCommand } = require('./commands/projectGenerator');
+      await generateProjectCommand();
+    },
+    description: 'Build complete project from description'
+  },
+
     {
       name: 'codeSentinel.migrateSettings',
       callback: async () => {

@@ -1,0 +1,603 @@
+{
+  "id": "magicui",
+  "name": "Magic UI",
+  "description": "Animated React components and effects for landing pages, built with React, Tailwind CSS, and Framer Motion.",
+  "type": "animated-components",
+  "website": "https://magicui.design",
+  "installMethod": "copy-paste",
+  "dependencies": [
+    "react",
+    "framer-motion",
+    "tailwindcss"
+  ],
+  "categories": [
+    "animations",
+    "layout",
+    "effects",
+    "backgrounds",
+    "interactive",
+    "text",
+    "feedback",
+    "navigation"
+  ],
+  "components": [
+    {
+      "name": "animated-beam",
+      "category": "animations",
+      "description": "Animated connection lines between elements with smooth transitions.",
+      "dependencies": ["framer-motion"],
+      "props": {
+        "from": {
+          "type": "HTMLElement | null",
+          "description": "Source element for the beam line."
+        },
+        "to": {
+          "type": "HTMLElement | null",
+          "description": "Target element for the beam line."
+        },
+        "duration": {
+          "type": "number",
+          "default": 1.2,
+          "description": "Animation duration in seconds."
+        }
+      },
+      "usage": "import { AnimatedBeam } from \"@/components/magicui/animated-beam\"",
+      "examples": [
+        {
+          "title": "Connect Two Cards",
+          "code": "<AnimatedBeam from={cardRefA.current} to={cardRefB.current} />"
+        }
+      ]
+    },
+    {
+      "name": "animated-list",
+      "category": "animations",
+      "description": "List with staggered entrance animations for each item.",
+      "dependencies": ["framer-motion"],
+      "props": {
+        "as": {
+          "type": "string",
+          "default": "ul",
+          "description": "Rendered HTML tag."
+        },
+        "stagger": {
+          "type": "number",
+          "default": 0.08,
+          "description": "Delay between each child item."
+        }
+      },
+      "usage": "import { AnimatedList, AnimatedListItem } from \"@/components/magicui/animated-list\"",
+      "examples": [
+        {
+          "title": "Feature List",
+          "code": "<AnimatedList>\n  <AnimatedListItem>Type-safe components</AnimatedListItem>\n  <AnimatedListItem>Framer Motion animations</AnimatedListItem>\n  <AnimatedListItem>Perfect for landing pages</AnimatedListItem>\n</AnimatedList>"
+        }
+      ]
+    },
+    {
+      "name": "bento-grid",
+      "category": "layout",
+      "description": "Masonry-style bento grid layout with smooth hover effects.",
+      "dependencies": ["framer-motion"],
+      "props": {
+        "cols": {
+          "type": "number",
+          "default": 3,
+          "description": "Number of columns in the grid."
+        }
+      },
+      "usage": "import { BentoGrid, BentoCard } from \"@/components/magicui/bento-grid\"",
+      "examples": [
+        {
+          "title": "Marketing Bento Grid",
+          "code": "<BentoGrid cols={3}>\n  <BentoCard title=\"Fast\" description=\"Optimized animations.\" />\n  <BentoCard title=\"Beautiful\" description=\"Thoughtful motion design.\" />\n  <BentoCard title=\"Copy-paste\" description=\"Drop into any Next.js app.\" />\n</BentoGrid>"
+        }
+      ]
+    },
+    {
+      "name": "blur-in",
+      "category": "effects",
+      "description": "Text that blurs in on mount or when scrolled into view.",
+      "dependencies": ["framer-motion"],
+      "props": {
+        "delay": {
+          "type": "number",
+          "default": 0.1
+        },
+        "duration": {
+          "type": "number",
+          "default": 0.6
+        }
+      },
+      "usage": "import { BlurIn } from \"@/components/magicui/blur-in\"",
+      "examples": [
+        {
+          "title": "Blurred Heading",
+          "code": "<BlurIn>\n  <h2 className=\"text-3xl font-bold\">Blur into view</h2>\n</BlurIn>"
+        }
+      ]
+    },
+    {
+      "name": "border-beam",
+      "category": "effects",
+      "description": "Animated border beam that moves around the edges of a container.",
+      "dependencies": ["framer-motion"],
+      "props": {
+        "duration": {
+          "type": "number",
+          "default": 3
+        }
+      },
+      "usage": "import { BorderBeam } from \"@/components/magicui/border-beam\"",
+      "examples": [
+        {
+          "title": "Highlighted Card",
+          "code": "<BorderBeam>\n  <div className=\"rounded-xl border bg-card p-6\">\n    <h3 className=\"text-lg font-semibold\">Border Beam</h3>\n  </div>\n</BorderBeam>"
+        }
+      ]
+    },
+    {
+      "name": "box-reveal",
+      "category": "animations",
+      "description": "Content reveals from inside a box with a masking animation.",
+      "dependencies": ["framer-motion"],
+      "props": {
+        "direction": {
+          "type": "string",
+          "values": ["left", "right", "up", "down"],
+          "default": "up"
+        }
+      },
+      "usage": "import { BoxReveal } from \"@/components/magicui/box-reveal\"",
+      "examples": [
+        {
+          "title": "Reveal Text",
+          "code": "<BoxReveal>\n  Hidden content\n</BoxReveal>"
+        }
+      ]
+    },
+    {
+      "name": "confetti",
+      "category": "effects",
+      "description": "Celebratory confetti animation triggered by an event.",
+      "dependencies": ["canvas-confetti"],
+      "props": {
+        "onComplete": {
+          "type": "function",
+          "description": "Optional callback after confetti completes."
+        }
+      },
+      "usage": "import { Confetti } from \"@/components/magicui/confetti\"",
+      "examples": [
+        {
+          "title": "Trigger On Click",
+          "code": "<Confetti trigger={onClick} />"
+        }
+      ]
+    },
+    {
+      "name": "dock",
+      "category": "navigation",
+      "description": "macOS-style dock navigation with hover magnification.",
+      "dependencies": ["framer-motion"],
+      "props": {
+        "items": {
+          "type": "Array<{icon:ReactNode; label:string; href?:string}>",
+          "required": true
+        }
+      },
+      "usage": "import { Dock, DockIcon } from \"@/components/magicui/dock\"",
+      "examples": [
+        {
+          "title": "Floating Dock",
+          "code": "<Dock>\n  <DockIcon icon={<HomeIcon />} label=\"Home\" href=\"#home\" />\n  <DockIcon icon={<UserIcon />} label=\"Profile\" href=\"#profile\" />\n</Dock>"
+        }
+      ]
+    },
+    {
+      "name": "dot-pattern",
+      "category": "backgrounds",
+      "description": "Animated dot pattern background.",
+      "dependencies": [],
+      "props": {
+        "className": {
+          "type": "string"
+        }
+      },
+      "usage": "import { DotPattern } from \"@/components/magicui/dot-pattern\"",
+      "examples": [
+        {
+          "title": "Subtle Card Background",
+          "code": "<div className=\"relative overflow-hidden rounded-xl border bg-background\">\n  <DotPattern className=\"absolute inset-0 opacity-20\" />\n  <div className=\"relative p-6\">Content</div>\n</div>"
+        }
+      ]
+    },
+    {
+      "name": "fade-text",
+      "category": "text",
+      "description": "Text that fades in character by character.",
+      "dependencies": ["framer-motion"],
+      "props": {
+        "children": {
+          "type": "string | ReactNode",
+          "required": true
+        },
+        "duration": {
+          "type": "number",
+          "default": 0.6
+        }
+      },
+      "usage": "import { FadeText } from \"@/components/magicui/fade-text\"",
+      "examples": [
+        {
+          "title": "Animated Heading",
+          "code": "<FadeText>Your text</FadeText>"
+        }
+      ]
+    },
+    {
+      "name": "globe",
+      "category": "interactive",
+      "description": "Interactive 3D rotating globe with markers.",
+      "dependencies": ["three", "@react-three/fiber"],
+      "props": {
+        "markers": {
+          "type": "Array<{lat:number; lng:number; label?:string}>"
+        }
+      },
+      "usage": "import { Globe } from \"@/components/magicui/globe\"",
+      "examples": [
+        {
+          "title": "User Locations",
+          "code": "<Globe markers={[{ lat: 40, lng: -74, label: \"NYC\" }]} />"
+        }
+      ]
+    },
+    {
+      "name": "grid-pattern",
+      "category": "backgrounds",
+      "description": "Animated grid background pattern.",
+      "dependencies": [],
+      "props": {
+        "className": {
+          "type": "string"
+        }
+      },
+      "usage": "import { GridPattern } from \"@/components/magicui/grid-pattern\"",
+      "examples": [
+        {
+          "title": "Section Background",
+          "code": "<section className=\"relative overflow-hidden rounded-3xl border\">\n  <GridPattern className=\"absolute inset-0 opacity-10\" />\n  <div className=\"relative z-10 p-10\">Content</div>\n</section>"
+        }
+      ]
+    },
+    {
+      "name": "hyper-text",
+      "category": "text",
+      "description": "Text with glitch/scramble animation effect.",
+      "dependencies": [],
+      "props": {
+        "text": {
+          "type": "string",
+          "required": true
+        }
+      },
+      "usage": "import { HyperText } from \"@/components/magicui/hyper-text\"",
+      "examples": [
+        {
+          "title": "Glitch Heading",
+          "code": "<HyperText text=\"Scramble Me\" />"
+        }
+      ]
+    },
+    {
+      "name": "icon-cloud",
+      "category": "interactive",
+      "description": "3D rotating cloud of icons.",
+      "dependencies": ["react-icon-cloud"],
+      "props": {
+        "iconSlugs": {
+          "type": "string[]",
+          "required": true,
+          "description": "List of icon slugs, e.g. 'react', 'typescript'."
+        }
+      },
+      "usage": "import { IconCloud } from \"@/components/magicui/icon-cloud\"",
+      "examples": [
+        {
+          "title": "Tech Stack Cloud",
+          "code": "<IconCloud iconSlugs={[\"react\", \"typescript\", \"tailwindcss\", \"nextdotjs\"]} />"
+        }
+      ]
+    },
+    {
+      "name": "marquee",
+      "category": "animations",
+      "description": "Infinite scrolling marquee for text, logos, or cards.",
+      "dependencies": [],
+      "props": {
+        "children": {
+          "type": "ReactNode",
+          "required": true,
+          "description": "Content to scroll inside the marquee."
+        },
+        "direction": {
+          "type": "string",
+          "values": ["left", "right"],
+          "default": "left"
+        },
+        "speed": {
+          "type": "number",
+          "default": 30,
+          "description": "Time in seconds for a full loop."
+        },
+        "pauseOnHover": {
+          "type": "boolean",
+          "default": true
+        },
+        "className": {
+          "type": "string"
+        }
+      },
+      "usage": "import { Marquee } from \"@/components/magicui/marquee\"",
+      "examples": [
+        {
+          "title": "Basic Text Marquee",
+          "code": "<Marquee>\n  <span className=\"mx-8\">Super smooth UI animations</span>\n  <span className=\"mx-8\">Built with Magic UI</span>\n</Marquee>"
+        },
+        {
+          "title": "Logo Marquee",
+          "code": "<Marquee direction=\"left\" speed={25} pauseOnHover>\n  <img src=\"/logos/nextjs.svg\" className=\"h-8\" />\n  <img src=\"/logos/vercel.svg\" className=\"h-8\" />\n  <img src=\"/logos/react.svg\" className=\"h-8\" />\n</Marquee>"
+        }
+      ]
+    },
+    {
+      "name": "meteors",
+      "category": "effects",
+      "description": "Falling meteor animation effect.",
+      "dependencies": [],
+      "props": {
+        "number": {
+          "type": "number",
+          "default": 20
+        }
+      },
+      "usage": "import { Meteors } from \"@/components/magicui/meteors\"",
+      "examples": [
+        {
+          "title": "Meteors Background",
+          "code": "<div className=\"relative overflow-hidden rounded-3xl\">\n  <Meteors number={20} />\n  <div className=\"relative z-10 p-8\">Content</div>\n</div>"
+        }
+      ]
+    },
+    {
+      "name": "number-ticker",
+      "category": "animations",
+      "description": "Animated number counter.",
+      "dependencies": ["framer-motion"],
+      "props": {
+        "value": {
+          "type": "number",
+          "required": true
+        },
+        "duration": {
+          "type": "number",
+          "default": 1.2
+        }
+      },
+      "usage": "import { NumberTicker } from \"@/components/magicui/number-ticker\"",
+      "examples": [
+        {
+          "title": "Metric Counter",
+          "code": "<NumberTicker value={1000} />"
+        }
+      ]
+    },
+    {
+      "name": "orbiting-circles",
+      "category": "animations",
+      "description": "Circles that orbit around a center point.",
+      "dependencies": [],
+      "props": {},
+      "usage": "import { OrbitingCircles } from \"@/components/magicui/orbiting-circles\"",
+      "examples": [
+        {
+          "title": "Orbit Icons",
+          "code": "<OrbitingCircles>\n  <Icon />\n</OrbitingCircles>"
+        }
+      ]
+    },
+    {
+      "name": "particles",
+      "category": "backgrounds",
+      "description": "Animated particle background.",
+      "dependencies": ["tsparticles"],
+      "props": {
+        "className": {
+          "type": "string"
+        }
+      },
+      "usage": "import { Particles } from \"@/components/magicui/particles\"",
+      "examples": [
+        {
+          "title": "Hero Background Particles",
+          "code": "<div className=\"relative\">\n  <Particles className=\"absolute inset-0\" />\n  <div className=\"relative z-10 p-16\">Content</div>\n</div>"
+        }
+      ]
+    },
+    {
+      "name": "pulsating-button",
+      "category": "interactive",
+      "description": "Button with pulsating animation.",
+      "dependencies": [],
+      "props": {},
+      "usage": "import { PulsatingButton } from \"@/components/magicui/pulsating-button\"",
+      "examples": [
+        {
+          "title": "CTA Button",
+          "code": "<PulsatingButton>Click me</PulsatingButton>"
+        }
+      ]
+    },
+    {
+      "name": "retro-grid",
+      "category": "backgrounds",
+      "description": "Retro-style animated grid background.",
+      "dependencies": [],
+      "props": {},
+      "usage": "import { RetroGrid } from \"@/components/magicui/retro-grid\"",
+      "examples": [
+        {
+          "title": "Hero Retro Grid",
+          "code": "<RetroGrid />"
+        }
+      ]
+    },
+    {
+      "name": "ripple",
+      "category": "effects",
+      "description": "Ripple effect on click.",
+      "dependencies": [],
+      "props": {},
+      "usage": "import { Ripple } from \"@/components/magicui/ripple\"",
+      "examples": [
+        {
+          "title": "Button Ripple",
+          "code": "<Ripple>\n  <button>Click</button>\n</Ripple>"
+        }
+      ]
+    },
+    {
+      "name": "scroll-progress",
+      "category": "feedback",
+      "description": "Progress bar showing scroll position.",
+      "dependencies": ["framer-motion"],
+      "props": {},
+      "usage": "import { ScrollProgress } from \"@/components/magicui/scroll-progress\"",
+      "examples": [
+        {
+          "title": "Top Scroll Bar",
+          "code": "<ScrollProgress />"
+        }
+      ]
+    },
+    {
+      "name": "shimmer-button",
+      "category": "interactive",
+      "description": "Button with shimmer animation effect.",
+      "dependencies": [],
+      "props": {},
+      "usage": "import { ShimmerButton } from \"@/components/magicui/shimmer-button\"",
+      "examples": [
+        {
+          "title": "Shimmer CTA",
+          "code": "<ShimmerButton>Hover me</ShimmerButton>"
+        }
+      ]
+    },
+    {
+      "name": "shine-border",
+      "category": "effects",
+      "description": "Animated shining border effect.",
+      "dependencies": [],
+      "props": {},
+      "usage": "import { ShineBorder } from \"@/components/magicui/shine-border\"",
+      "examples": [
+        {
+          "title": "Card Shine",
+          "code": "<ShineBorder>\n  <div>Content</div>\n</ShineBorder>"
+        }
+      ]
+    },
+    {
+      "name": "sparkles",
+      "category": "effects",
+      "description": "Sparkle animation effect.",
+      "dependencies": [],
+      "props": {},
+      "usage": "import { Sparkles } from \"@/components/magicui/sparkles\"",
+      "examples": [
+        {
+          "title": "Sparkling Heading",
+          "code": "<Sparkles>\n  <h1>Title</h1>\n</Sparkles>"
+        }
+      ]
+    },
+    {
+      "name": "text-reveal",
+      "category": "text",
+      "description": "Text reveals on scroll with mask effect.",
+      "dependencies": ["framer-motion"],
+      "props": {
+        "text": {
+          "type": "string",
+          "required": true
+        }
+      },
+      "usage": "import { TextReveal } from \"@/components/magicui/text-reveal\"",
+      "examples": [
+        {
+          "title": "Reveal Text",
+          "code": "<TextReveal text=\"Reveal this\" />"
+        }
+      ]
+    },
+    {
+      "name": "typing-animation",
+      "category": "text",
+      "description": "Typewriter text animation.",
+      "dependencies": [],
+      "props": {
+        "text": {
+          "type": "string",
+          "required": true
+        }
+      },
+      "usage": "import { TypingAnimation } from \"@/components/magicui/typing-animation\"",
+      "examples": [
+        {
+          "title": "Typewriter Hero",
+          "code": "<TypingAnimation text=\"Type this out\" />"
+        }
+      ]
+    },
+    {
+      "name": "word-pull-up",
+      "category": "text",
+      "description": "Words pull up into view animation.",
+      "dependencies": ["framer-motion"],
+      "props": {
+        "words": {
+          "type": "string",
+          "required": true
+        }
+      },
+      "usage": "import { WordPullUp } from \"@/components/magicui/word-pull-up\"",
+      "examples": [
+        {
+          "title": "Animated Sentence",
+          "code": "<WordPullUp words=\"Pull up animation\" />"
+        }
+      ]
+    },
+    {
+      "name": "word-rotate",
+      "category": "text",
+      "description": "Rotating words animation.",
+      "dependencies": ["framer-motion"],
+      "props": {
+        "words": {
+          "type": "string[]",
+          "required": true
+        }
+      },
+      "usage": "import { WordRotate } from \"@/components/magicui/word-rotate\"",
+      "examples": [
+        {
+          "title": "Rotating Keywords",
+          "code": "<WordRotate words={[\"Fast\", \"Reliable\", \"Secure\"]} />"
+        }
+      ]
+    }
+  ]
+}

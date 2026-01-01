@@ -78,7 +78,7 @@ async function generateCommitMessageCommand() {
       const prompt = getCommitMessagePrompt(diff, metadata);
       const commitMessage = await aiClient.generate(prompt, {
         systemPrompt: 'You are a Git commit message expert. Generate concise conventional commit messages.',
-        maxTokens: 150
+        maxTokens: 1000
       });
 
       const cleanMessage = commitMessage.trim().replace(/```/g, '`\n`');logger.info('Generated commit message:', cleanMessage);

@@ -275,7 +275,7 @@ Code:`;
 
         const generatedCode = await aiClient.generate(prompt, {
           systemPrompt: 'You are an expert code generator. Generate clean, production-ready code. Return ONLY the raw code without any markdown formatting, explanations, or code blocks. Do NOT wrap in `````.',
-          maxTokens: 1500
+          maxTokens: 10000
         });
 
         // Clean up response (remove markdown, extra whitespace, etc.)

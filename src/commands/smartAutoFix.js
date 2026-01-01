@@ -249,7 +249,7 @@ Return format: Markdown code block with ${language} syntax.`;
   try {
     const response = await aiClient.generate(prompt, {
       systemPrompt,
-      maxTokens: 2000
+      maxTokens: 5000
     });
 
     return extractCode(response, language);

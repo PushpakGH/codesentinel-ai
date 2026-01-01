@@ -2,7 +2,7 @@
   "name": "codesentinel-ai",
   "displayName": "CodeSentinel AI - Multi-Agent Code Review",
   "description": "Multi-agent AI code review with self-correction, security scanning, BYOK support, AI chat, and universal model compatibility",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "publisher": "PushpakBadgujar1",
   "icon": "media/icon.png",
   "engines": {
@@ -36,126 +36,125 @@
   "main": "./src/extension.js",
   "contributes": {
     "commands": [
-      {
-        "command": "codeSentinel.reviewCode",
-        "title": "CodeSentinel: Review Selected Code",
-        "category": "CodeSentinel",
-        "icon": "$(shield)"
-      },
-      {
-        "command": "codeSentinel.autoFix",
-        "title": "CodeSentinel: Apply AI Fix",
-        "category": "CodeSentinel",
-        "icon": "$(wand)"
-      },
-      {
-        "command": "codeSentinel.smartAutoFix",
-        "title": "CodeSentinel: Apply Smart Fix (Analyze + Fix All)",
-        "category": "CodeSentinel",
-        "icon": "$(sparkle)"
-      },
-      {
-        "command": "codeSentinel.explainIssue",
-        "title": "CodeSentinel: Explain Issue",
-        "category": "CodeSentinel",
-        "icon": "$(question)"
-      },
-      {
-        "command": "codeSentinel.toggleDebug",
-        "title": "CodeSentinel: Toggle Debug Mode",
-        "category": "CodeSentinel",
-        "icon": "$(bug)"
-      },
-      {
-        "command": "codeSentinel.openSettings",
-        "title": "CodeSentinel: Open Settings",
-        "category": "CodeSentinel",
-        "icon": "$(settings-gear)"
-      },
-      {
-        "command": "codeSentinel.reviewFolder",
-        "title": "CodeSentinel: Review Folder",
-        "category": "CodeSentinel",
-        "icon": "$(folder)"
-      },
-      {
-        "command": "codeSentinel.reviewWorkspace",
-        "title": "CodeSentinel: Review Entire Workspace",
-        "category": "CodeSentinel",
-        "icon": "$(root-folder)"
-      },
-      {
-        "command": "codeSentinel.smartFixFolder",
-        "title": "CodeSentinel: Smart Fix Entire Folder",
-        "category": "CodeSentinel",
-        "icon": "$(wand)"
-      },
-      {
-        "command": "codeSentinel.openChat",
-        "title": "CodeSentinel: Open AI Chat",
-        "category": "CodeSentinel",
-        "icon": "$(comment-discussion)"
-      },
-      {
-        "command": "codeSentinel.migrateSettings",
-        "title": "CodeSentinel: Migrate Settings to Secure Storage",
-        "category": "CodeSentinel"
-      },
-      {
-        "command": "codeSentinel.exportDebugInfo",
-        "title": "CodeSentinel: Export Debug Info",
-        "category": "CodeSentinel"
-      },
-      {
-        "command": "codeSentinel.clearCache",
-        "title": "CodeSentinel: Clear Analysis Cache",
-        "category": "CodeSentinel"
-      }
-      ,
-{
-  "command": "codeSentinel.generateCommitMessage",
-  "title": "CodeSentinel: Generate Commit Message",
-  "category": "CodeSentinel",
-  "icon": "$(git-commit)"
-},
-{
-  "command": "codeSentinel.generateSnippet",
-  "title": "CodeSentinel: Generate Code Snippet",
-  "category": "CodeSentinel",
-  "icon": "$(code)"
-},
-{
-  "command": "codeSentinel.generateDocumentation",
-  "title": "CodeSentinel: Generate Documentation",
-  "category": "CodeSentinel",
-  "icon": "$(book)"
-},
-{
-  "command": "codeSentinel.generateTests",
-  "title": "CodeSentinel: Generate Unit Tests",
-  "category": "CodeSentinel",
-  "icon": "$(beaker)"
-},
-      {
-  "command": "codeSentinel.configureApiKey",
-  "title": "CodeSentinel: Configure API Key (Secure)",
-  "category": "CodeSentinel",
-  "icon": "$(key)"
-},
-{
-  "command": "codeSentinel.deleteApiKey",
-  "title": "CodeSentinel: Delete API Key",
-  "category": "CodeSentinel",
-  "icon": "$(trash)"
-},
-{
-  "command": "codeSentinel.generateCommitMessage",
-  "title": "CodeSentinel: Generate Commit Message",
-  "category": "CodeSentinel",
-  "icon": "$(git-commit)"
-}
-
-    ],
+  {
+    "command": "codeSentinel.reviewCode",
+    "title": "CodeSentinel: Review Selected Code",
+    "category": "CodeSentinel",
+    "icon": "$(shield)"
+  },
+  {
+    "command": "codeSentinel.autoFix",
+    "title": "CodeSentinel: Apply AI Fix",
+    "category": "CodeSentinel",
+    "icon": "$(wand)"
+  },
+  {
+    "command": "codeSentinel.smartAutoFix",
+    "title": "CodeSentinel: Apply Smart Fix (Analyze + Fix All)",
+    "category": "CodeSentinel",
+    "icon": "$(sparkle)"
+  },
+  {
+    "command": "codeSentinel.explainIssue",
+    "title": "CodeSentinel: Explain Issue",
+    "category": "CodeSentinel",
+    "icon": "$(question)"
+  },
+  {
+    "command": "codeSentinel.toggleDebug",
+    "title": "CodeSentinel: Toggle Debug Mode",
+    "category": "CodeSentinel",
+    "icon": "$(bug)"
+  },
+  {
+    "command": "codeSentinel.openSettings",
+    "title": "CodeSentinel: Open Settings",
+    "category": "CodeSentinel",
+    "icon": "$(settings-gear)"
+  },
+  {
+    "command": "codeSentinel.reviewFolder",
+    "title": "CodeSentinel: Review Folder",
+    "category": "CodeSentinel",
+    "icon": "$(folder)"
+  },
+  {
+    "command": "codeSentinel.reviewWorkspace",
+    "title": "CodeSentinel: Review Entire Workspace",
+    "category": "CodeSentinel",
+    "icon": "$(root-folder)"
+  },
+  {
+    "command": "codeSentinel.smartFixFolder",
+    "title": "CodeSentinel: Smart Fix Entire Folder",
+    "category": "CodeSentinel",
+    "icon": "$(wand)"
+  },
+  {
+    "command": "codeSentinel.openChat",
+    "title": "CodeSentinel: Open AI Chat",
+    "category": "CodeSentinel",
+    "icon": "$(comment-discussion)"
+  },
+  {
+    "command": "codeSentinel.migrateSettings",
+    "title": "CodeSentinel: Migrate Settings to Secure Storage",
+    "category": "CodeSentinel"
+  },
+  {
+    "command": "codeSentinel.exportDebugInfo",
+    "title": "CodeSentinel: Export Debug Info",
+    "category": "CodeSentinel"
+  },
+  {
+    "command": "codeSentinel.clearCache",
+    "title": "CodeSentinel: Clear Analysis Cache",
+    "category": "CodeSentinel"
+  },
+  {
+    "command": "codeSentinel.generateCommitMessage",
+    "title": "CodeSentinel: Generate Commit Message",
+    "category": "CodeSentinel",
+    "icon": "$(git-commit)"
+  },
+  {
+    "command": "codeSentinel.generateSnippet",
+    "title": "CodeSentinel: Generate Code Snippet",
+    "category": "CodeSentinel",
+    "icon": "$(code)"
+  },
+  {
+    "command": "codeSentinel.generateDocumentation",
+    "title": "CodeSentinel: Generate Documentation",
+    "category": "CodeSentinel",
+    "icon": "$(book)"
+  },
+  {
+    "command": "codeSentinel.generateTests",
+    "title": "CodeSentinel: Generate Unit Tests",
+    "category": "CodeSentinel",
+    "icon": "$(beaker)"
+  },
+  {
+    "command": "codeSentinel.generateProject",
+    "title": "CodeSentinel: Build Project",
+    "category": "CodeSentinel",
+    "icon": "$(rocket)"
+  },
+  {
+    "command": "codeSentinel.configureApiKey",
+    "title": "CodeSentinel: Configure API Key (Secure)",
+    "category": "CodeSentinel",
+    "icon": "$(key)"
+  },
+  {
+    "command": "codeSentinel.deleteApiKey",
+    "title": "CodeSentinel: Delete API Key",
+    "category": "CodeSentinel",
+    "icon": "$(trash)"
+  }
+]
+,
     "menus": {
        "scm/title": [
     {
@@ -249,7 +248,10 @@
         },
         {
           "command": "codeSentinel.deleteApiKey"
-        }
+        },{
+  "command": "codeSentinel.generateProject"
+}
+
       ]
     },
     "configuration": {
@@ -343,6 +345,13 @@
           "markdownDescription": "**Debug Mode** (Perfect for demos & judging)",
           "order": 12
         },
+        "codeSentinel.autoInstallDependencies": {
+  "type": "boolean",
+  "default": true,
+  "markdownDescription": "**Auto-install Dependencies**\n\nAutomatically run `npm install` after project generation.",
+  "order": 13
+}
+,
         "codeSentinel.chatHistoryLimit": {
           "type": "number",
           "default": 50,

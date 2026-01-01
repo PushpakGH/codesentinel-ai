@@ -1,0 +1,323 @@
+{
+  "id": "motion-primitives",
+  "name": "Motion Primitives",
+  "description": "Open-source UI kit of Framer Motion primitives for building beautiful, animated interfaces quickly with React and Tailwind CSS.",
+  "type": "animation-primitives",
+  "website": "https://motion-primitives.com",
+  "namespace": "@motion/primitives",
+  "installMethod": "npm",
+  "installCommand": "npm install framer-motion @motion/primitives",
+  "dependencies": [
+    "react",
+    "framer-motion"
+  ],
+  "categories": [
+    "layout",
+    "gestures",
+    "scroll",
+    "transitions",
+    "effects"
+  ],
+  "licensing": {
+  "model": "freemium",
+  "notes": "Core primitives are free under MIT; some advanced components and templates require Motion Primitives Pro."
+},
+  "components": [
+    {
+      "name": "motion-box",
+      "category": "layout",
+      "description": "Convenience wrapper around motion.div with sensible defaults that works with any Tailwind layout.",
+      "dependencies": ["framer-motion"],
+      "files": ["components/motion/motion-box.tsx"],
+      "props": {
+        "as": {
+          "type": "string | React.ComponentType",
+          "default": "div",
+          "description": "Element or component to render (e.g. 'div', 'section')."
+        },
+        "initial": {
+          "type": "object",
+          "description": "Initial animation state passed to Framer Motion."
+        },
+        "animate": {
+          "type": "object",
+          "description": "Target animation state when component is mounted or active."
+        },
+        "exit": {
+          "type": "object",
+          "description": "Exit animation state used with AnimatePresence."
+        },
+        "transition": {
+          "type": "object",
+          "description": "Framer Motion transition config (duration, ease, type, etc.)."
+        },
+        "className": {
+          "type": "string",
+          "description": "Tailwind utility classes for styling the element."
+        }
+      },
+      "usage": "import { MotionBox } from \"@motion/primitives\"",
+      "examples": [
+        {
+          "title": "Fade In",
+          "code": "<MotionBox\n  initial={{ opacity: 0 }}\n  animate={{ opacity: 1 }}\n  transition={{ duration: 0.4 }}\n  className=\"rounded-xl bg-card p-6 shadow\"\n>\n  Content\n</MotionBox>"
+        }
+      ]
+    },
+    {
+      "name": "draggable",
+      "category": "gestures",
+      "description": "Makes any child draggable with optional axis and constraints, using Framer Motion drag.",
+      "dependencies": ["framer-motion"],
+      "files": ["components/motion/draggable.tsx"],
+      "props": {
+        "axis": {
+          "type": "string",
+          "values": ["x", "y", "both"],
+          "default": "both",
+          "description": "Limits drag to the x-axis, y-axis, or both."
+        },
+        "constraints": {
+          "type": "object | React.RefObject<HTMLElement>",
+          "description": "Drag constraints passed through to the Motion component."
+        },
+        "className": {
+          "type": "string",
+          "description": "Tailwind classes for the draggable wrapper."
+        }
+      },
+      "usage": "import { Draggable } from \"@motion/primitives\"",
+      "examples": [
+        {
+          "title": "Draggable Card",
+          "code": "<Draggable axis=\"x\" constraints={{ left: -100, right: 100 }}>\n  <div className=\"rounded-xl border bg-card p-4\">Drag me horizontally</div>\n</Draggable>"
+        }
+      ]
+    },
+    {
+      "name": "hover-lift",
+      "category": "effects",
+      "description": "Adds a subtle scale, translate and shadow on hover using whileHover under the hood.",
+      "dependencies": ["framer-motion"],
+      "files": ["components/motion/hover-lift.tsx"],
+      "props": {
+        "scale": {
+          "type": "number",
+          "default": 1.03,
+          "description": "Scale applied on hover."
+        },
+        "lift": {
+          "type": "number",
+          "default": 4,
+          "description": "Vertical translate in pixels on hover."
+        },
+        "transition": {
+          "type": "object",
+          "description": "Optional custom transition for the hover effect."
+        }
+      },
+      "usage": "import { HoverLift } from \"@motion/primitives\"",
+      "examples": [
+        {
+          "title": "Hover Card",
+          "code": "<HoverLift>\n  <div className=\"rounded-xl border bg-card p-4 shadow-sm\">\n    Hover me\n  </div>\n</HoverLift>"
+        }
+      ]
+    },
+    {
+      "name": "pressable",
+      "category": "gestures",
+      "description": "Adds press/tap feedback via scale animation using whileTap.",
+      "dependencies": ["framer-motion"],
+      "files": ["components/motion/pressable.tsx"],
+      "props": {
+        "scale": {
+          "type": "number",
+          "default": 0.95,
+          "description": "Scale applied while the element is pressed or tapped."
+        },
+        "transition": {
+          "type": "object",
+          "description": "Optional transition override for press animation."
+        }
+      },
+      "usage": "import { Pressable } from \"@motion/primitives\"",
+      "examples": [
+        {
+          "title": "Pressable Button",
+          "code": "<Pressable>\n  <button className=\"rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground\">\n    Click me\n  </button>\n</Pressable>"
+        }
+      ]
+    },
+    {
+      "name": "scroll-reveal",
+      "category": "scroll",
+      "description": "Reveals content when it scrolls into view using whileInView and viewport options.",
+      "dependencies": ["framer-motion"],
+      "files": ["components/motion/scroll-reveal.tsx"],
+      "props": {
+        "offset": {
+          "type": "number",
+          "default": 0.2,
+          "description": "Fraction of viewport height before triggering reveal."
+        },
+        "initial": {
+          "type": "object",
+          "default": "{ opacity: 0, y: 16 }",
+          "description": "Initial state before the section is in view."
+        },
+        "animate": {
+          "type": "object",
+          "default": "{ opacity: 1, y: 0 }",
+          "description": "Target state once the section has entered the viewport."
+        },
+        "once": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether the reveal should only happen once."
+        }
+      },
+      "usage": "import { ScrollReveal } from \"@motion/primitives\"",
+      "examples": [
+        {
+          "title": "Section Reveal",
+          "code": "<ScrollReveal>\n  <section className=\"space-y-4 py-16\">\n    <h2 className=\"text-2xl font-semibold\">Scroll into view</h2>\n    <p className=\"text-muted-foreground\">This section animates as it appears.</p>\n  </section>\n</ScrollReveal>"
+        }
+      ]
+    },
+    {
+      "name": "parallax-layer",
+      "category": "scroll",
+      "description": "Parallax layer that moves at a different speed than scroll, ideal for hero backgrounds.",
+      "dependencies": ["framer-motion"],
+      "files": ["components/motion/parallax-layer.tsx"],
+      "props": {
+        "speed": {
+          "type": "number",
+          "default": -0.1,
+          "description": "Scroll speed multiplier; negative values move opposite the scroll."
+        },
+        "className": {
+          "type": "string",
+          "description": "Tailwind classes for the parallax layer container."
+        }
+      },
+      "usage": "import { ParallaxLayer } from \"@motion/primitives\"",
+      "examples": [
+        {
+          "title": "Parallax Background",
+          "code": "<div className=\"relative h-[400px] overflow-hidden\">\n  <ParallaxLayer speed={-0.2}>\n    <div className=\"h-full w-full bg-gradient-to-br from-purple-500 to-indigo-500\" />\n  </ParallaxLayer>\n  <div className=\"relative z-10 flex h-full items-center justify-center\">\n    <h1 className=\"text-3xl font-bold text-white\">Parallax Hero</h1>\n  </div>\n</div>"
+        }
+      ]
+    },
+    {
+      "name": "stagger-container",
+      "category": "transitions",
+      "description": "Parent container that staggers children animations using Framer Motion variants.",
+      "dependencies": ["framer-motion"],
+      "files": ["components/motion/stagger-container.tsx"],
+      "props": {
+        "delay": {
+          "type": "number",
+          "default": 0.08,
+          "description": "Delay between each child animation in seconds."
+        },
+        "initial": {
+          "type": "string",
+          "default": "hidden",
+          "description": "Initial variant key for children."
+        },
+        "animate": {
+          "type": "string",
+          "default": "show",
+          "description": "Target variant key for children."
+        }
+      },
+      "usage": "import { StaggerContainer } from \"@motion/primitives\"",
+      "examples": [
+        {
+          "title": "Staggered Items",
+          "code": "<StaggerContainer>\n  {features.map((f) => (\n    <MotionBox\n      key={f.title}\n      initial={{ opacity: 0, y: 8 }}\n      animate={{ opacity: 1, y: 0 }}\n      className=\"rounded-md bg-card p-3\"\n    >\n      <h3 className=\"text-sm font-semibold\">{f.title}</h3>\n    </MotionBox>\n  ))}\n</StaggerContainer>"
+        }
+      ]
+    },
+    {
+      "name": "presence",
+      "category": "transitions",
+      "description": "Thin wrapper around AnimatePresence for handling exit animations of conditional content.",
+      "dependencies": ["framer-motion"],
+      "files": ["components/motion/presence.tsx"],
+      "props": {
+        "mode": {
+          "type": "string",
+          "values": ["sync", "wait", "popLayout"],
+          "default": "sync",
+          "description": "AnimatePresence mode controlling how exiting/entering elements are coordinated."
+        }
+      },
+      "usage": "import { Presence } from \"@motion/primitives\"",
+      "examples": [
+        {
+          "title": "Conditional Modal",
+          "code": "<Presence>\n  {open && (\n    <MotionBox\n      initial={{ opacity: 0, scale: 0.95 }}\n      animate={{ opacity: 1, scale: 1 }}\n      exit={{ opacity: 0, scale: 0.95 }}\n      className=\"fixed inset-0 grid place-items-center bg-black/40\"\n    >\n      <div className=\"rounded-xl bg-card p-6\">Modal content</div>\n    </MotionBox>\n  )}\n</Presence>"
+        }
+      ]
+    },
+    {
+      "name": "cursor-follow",
+      "category": "effects",
+      "description": "Element that smoothly follows the cursor with spring physics for custom cursors or highlights.",
+      "dependencies": ["framer-motion"],
+      "files": ["components/motion/cursor-follow.tsx"],
+      "props": {
+        "className": {
+          "type": "string",
+          "description": "Tailwind classes for the follower element."
+        },
+        "stiffness": {
+          "type": "number",
+          "default": 200,
+          "description": "Spring stiffness for the follower motion."
+        },
+        "damping": {
+          "type": "number",
+          "default": 20,
+          "description": "Spring damping for the follower motion."
+        }
+      },
+      "usage": "import { CursorFollow } from \"@motion/primitives\"",
+      "examples": [
+        {
+          "title": "Custom Cursor",
+          "code": "<CursorFollow className=\"pointer-events-none h-6 w-6 rounded-full bg-primary/60 mix-blend-screen\" />"
+        }
+      ]
+    },
+    {
+      "name": "motion-stack",
+      "category": "layout",
+      "description": "Stacked list with enter/exit animations built on AnimatePresence; ideal for toasts or notifications.",
+      "dependencies": ["framer-motion"],
+      "files": ["components/motion/motion-stack.tsx"],
+      "props": {
+        "items": {
+          "type": "any[]",
+          "required": true,
+          "description": "Array of items to render in the stack."
+        },
+        "renderItem": {
+          "type": "function",
+          "required": true,
+          "description": "Render function that receives an item and returns a MotionBox or animated element."
+        }
+      },
+      "usage": "import { MotionStack } from \"@motion/primitives\"",
+      "examples": [
+        {
+          "title": "Animated Notifications",
+          "code": "<MotionStack\n  items={notifications}\n  renderItem={(n) => (\n    <MotionBox\n      key={n.id}\n      initial={{ opacity: 0, y: 8 }}\n      animate={{ opacity: 1, y: 0 }}\n      exit={{ opacity: 0, y: 8 }}\n      className=\"rounded-md bg-card p-3 text-sm shadow\"\n    >\n      {n.message}\n    </MotionBox>\n  )}\n/>"
+        }
+      ]
+    }
+  ]
+}

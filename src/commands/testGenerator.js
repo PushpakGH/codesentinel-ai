@@ -54,7 +54,7 @@ async function generateTestsCommand() {
 
       const testCode = await aiClient.generate(prompt, {
         systemPrompt: 'You are a test writing expert. Generate comprehensive unit tests with edge cases. Return ONLY the test code without explanations or markdown.',
-        maxTokens: 2000
+        maxTokens: 10000
       });
 
       const cleanTests = cleanTestCode(testCode, framework);

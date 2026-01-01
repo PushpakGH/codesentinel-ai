@@ -1,0 +1,799 @@
+{
+  "id": "aceternity",
+  "name": "Aceternity UI",
+  "description": "Beautiful Tailwind CSS and Framer Motion components for React/Next.js, designed for modern, animated landing pages.",
+  "type": "animated-components",
+  "website": "https://ui.aceternity.com",
+  "installMethod": "copy-paste",
+  "dependencies": [
+    "react",
+    "framer-motion",
+    "tailwindcss"
+  ],
+  "categories": [
+    "interactive",
+    "overlay",
+    "backgrounds",
+    "layout",
+    "navigation",
+    "hero",
+    "effects",
+    "text",
+    "data-display"
+  ],
+  "components": [
+    {
+      "name": "3d-card",
+      "category": "interactive",
+      "description": "Card with 3D tilt and parallax effect on mouse hover.",
+      "dependencies": ["framer-motion"],
+      "props": {
+        "className": {
+          "type": "string",
+          "description": "Tailwind classes for the inner card container."
+        },
+        "containerClassName": {
+          "type": "string",
+          "description": "Tailwind classes for the outer container/wrapper."
+        }
+      },
+      "usage": "import { CardContainer, CardBody } from \"@/components/aceternity/3d-card\"",
+      "examples": [
+        {
+          "title": "3D Product Card",
+          "code": "<CardContainer className=\"w-full max-w-sm\">\n  <CardBody className=\"rounded-2xl border bg-card p-6 shadow-lg\">\n    <h3 className=\"text-lg font-semibold\">Pro Plan</h3>\n    <p className=\"mt-2 text-sm text-muted-foreground\">Perfect for growing teams.</p>\n  </CardBody>\n</CardContainer>"
+        }
+      ]
+    },
+    {
+      "name": "3d-pin",
+      "category": "interactive",
+      "description": "3D animated gradient pin used to highlight links or cards.",
+      "dependencies": ["framer-motion"],
+      "props": {
+        "href": {
+          "type": "string",
+          "description": "Optional link for the pinned item."
+        },
+        "title": {
+          "type": "string",
+          "description": "Label shown inside or near the pin."
+        }
+      },
+      "usage": "import { PinContainer } from \"@/components/aceternity/3d-pin\"",
+      "examples": [
+        {
+          "title": "Pinned Product Link",
+          "code": "<PinContainer href=\"/product\" title=\"View product\">\n  <img src=\"/images/product.png\" alt=\"Product\" className=\"h-32 w-32 rounded-xl object-cover\" />\n</PinContainer>"
+        }
+      ]
+    },
+    {
+      "name": "animated-modal",
+      "category": "overlay",
+      "description": "Accessible modal dialog with Framer Motion entrance and exit animations.",
+      "dependencies": ["framer-motion"],
+      "props": {
+        "open": {
+          "type": "boolean",
+          "required": true,
+          "description": "Controls whether the modal is visible."
+        },
+        "onOpenChange": {
+          "type": "function",
+          "description": "Callback fired when open state changes."
+        },
+        "initial": {
+          "type": "object",
+          "default": "{ opacity: 0, y: 16 }",
+          "description": "Initial motion state for the modal content."
+        },
+        "animate": {
+          "type": "object",
+          "default": "{ opacity: 1, y: 0 }",
+          "description": "Target motion state when the modal is open."
+        },
+        "exit": {
+          "type": "object",
+          "default": "{ opacity: 0, y: 16 }",
+          "description": "Exit motion state when closing."
+        },
+        "backdropClassName": {
+          "type": "string",
+          "description": "Tailwind classes for the fullscreen backdrop."
+        },
+        "className": {
+          "type": "string",
+          "description": "Tailwind classes for the modal panel container."
+        }
+      },
+      "usage": "import { AnimatedModal } from \"@/components/aceternity/animated-modal\"",
+      "examples": [
+        {
+          "title": "Controlled Animated Modal",
+          "code": "const [open, setOpen] = useState(false);\n\n<>\n  <button\n    onClick={() => setOpen(true)}\n    className=\"rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground\"\n  >\n    Open modal\n  </button>\n\n  <AnimatedModal\n    open={open}\n    onOpenChange={setOpen}\n    className=\"w-full max-w-md rounded-2xl bg-background p-6 shadow-xl\"\n  >\n    <h2 className=\"text-lg font-semibold\">Aceternity Modal</h2>\n    <p className=\"mt-2 text-sm text-muted-foreground\">\n      Smooth entrance and exit animations using Framer Motion.\n    </p>\n  </AnimatedModal>\n</>"
+        }
+      ]
+    },
+    {
+      "name": "animated-tabs",
+      "category": "navigation",
+      "description": "Tabs with animated underline and smooth content transitions.",
+      "dependencies": ["framer-motion"],
+      "props": {
+        "tabs": {
+          "type": "Array<{ title:string; value?:string; content:ReactNode }>",
+          "required": true,
+          "description": "Tabs configuration array."
+        },
+        "defaultTab": {
+          "type": "string",
+          "description": "Initial active tab value or title."
+        }
+      },
+      "usage": "import { AnimatedTabs } from \"@/components/aceternity/animated-tabs\"",
+      "examples": [
+        {
+          "title": "Basic Animated Tabs",
+          "code": "<AnimatedTabs\n  tabs={[\n    { title: \"Overview\", value: \"overview\", content: <div>Overview content</div> },\n    { title: \"Details\", value: \"details\", content: <div>Details content</div> }\n  ]}\n/>"
+        }
+      ]
+    },
+    {
+      "name": "animated-tooltip",
+      "category": "overlay",
+      "description": "Tooltip with entrance animation that follows the mouse pointer.",
+      "dependencies": ["framer-motion"],
+      "props": {
+        "content": {
+          "type": "string | ReactNode",
+          "required": true
+        }
+      },
+      "usage": "import { AnimatedTooltip } from \"@/components/aceternity/animated-tooltip\"",
+      "examples": [
+        {
+          "title": "Button Tooltip",
+          "code": "<AnimatedTooltip content=\"Tooltip text\">\n  <button className=\"rounded-md border px-3 py-1 text-sm\">Hover</button>\n</AnimatedTooltip>"
+        }
+      ]
+    },
+    {
+      "name": "aurora-background",
+      "category": "backgrounds",
+      "description": "Animated aurora / northern lights gradient background.",
+      "dependencies": [],
+      "props": {
+        "className": {
+          "type": "string",
+          "description": "Tailwind classes for the wrapper."
+        }
+      },
+      "usage": "import { AuroraBackground } from \"@/components/aceternity/aurora-background\"",
+      "examples": [
+        {
+          "title": "Hero With Aurora",
+          "code": "<section className=\"relative overflow-hidden rounded-3xl border\">\n  <AuroraBackground className=\"absolute inset-0\" />\n  <div className=\"relative z-10 px-8 py-16\">\n    <h1 className=\"text-4xl font-bold\">Ship animated UIs.</h1>\n  </div>\n</section>"
+        }
+      ]
+    },
+    {
+      "name": "background-beams",
+      "category": "backgrounds",
+      "description": "Animated beams that move in the background, ideal for hero sections.",
+      "dependencies": [],
+      "props": {
+        "className": {
+          "type": "string"
+        }
+      },
+      "usage": "import { BackgroundBeams } from \"@/components/aceternity/background-beams\"",
+      "examples": [
+        {
+          "title": "Beams Behind Hero",
+          "code": "<div className=\"relative overflow-hidden rounded-3xl border\">\n  <BackgroundBeams className=\"absolute inset-0\" />\n  <div className=\"relative z-10 p-10\">\n    <h2 className=\"text-3xl font-bold\">Background Beams</h2>\n  </div>\n</div>"
+        }
+      ]
+    },
+    {
+      "name": "background-boxes",
+      "category": "backgrounds",
+      "description": "Animated grid of boxes background.",
+      "dependencies": ["framer-motion"],
+      "props": {},
+      "usage": "import { BackgroundBoxes } from \"@/components/aceternity/background-boxes\"",
+      "examples": [
+        {
+          "title": "Boxes Background",
+          "code": "<BackgroundBoxes />"
+        }
+      ]
+    },
+    {
+      "name": "background-gradient",
+      "category": "backgrounds",
+      "description": "Animated gradient background wrapper.",
+      "dependencies": [],
+      "props": {},
+      "usage": "import { BackgroundGradient } from \"@/components/aceternity/background-gradient\"",
+      "examples": [
+        {
+          "title": "Gradient Card",
+          "code": "<BackgroundGradient>\n  <div className=\"rounded-2xl bg-background p-6\">\n    <h3 className=\"text-lg font-semibold\">Gradient Card</h3>\n  </div>\n</BackgroundGradient>"
+        }
+      ]
+    },
+    {
+      "name": "bento-grid",
+      "category": "layout",
+      "description": "Bento box style grid layout for marketing sections.",
+      "dependencies": [],
+      "props": {},
+      "usage": "import { BentoGrid, BentoGridItem } from \"@/components/aceternity/bento-grid\"",
+      "examples": [
+        {
+          "title": "Feature Bento Grid",
+          "code": "<BentoGrid>\n  <BentoGridItem title=\"Fast\" description=\"Optimized for performance\" />\n  <BentoGridItem title=\"Beautiful\" description=\"Thoughtful motion design\" />\n</BentoGrid>"
+        }
+      ]
+    },
+    {
+      "name": "card-hover-effect",
+      "category": "interactive",
+      "description": "Card with parallax hover effect for lists of links or features.",
+      "dependencies": ["framer-motion"],
+      "props": {
+        "items": {
+          "type": "Array<{ title:string; description:string }>",
+          "required": true
+        }
+      },
+      "usage": "import { HoverEffect } from \"@/components/aceternity/card-hover-effect\"",
+      "examples": [
+        {
+          "title": "Hover Effect Grid",
+          "code": "<HoverEffect\n  items={[\n    { title: \"Card\", description: \"Text\" },\n    { title: \"Another\", description: \"More text\" }\n  ]}\n/>"
+        }
+      ]
+    },
+    {
+      "name": "card-stack",
+      "category": "interactive",
+      "description": "Stack of cards that auto-rotate, good for testimonials or reviews.",
+      "dependencies": ["framer-motion"],
+      "props": {
+        "items": {
+          "type": "Array<{ id:string | number; content:ReactNode }>",
+          "required": true
+        }
+      },
+      "usage": "import { CardStack } from \"@/components/aceternity/card-stack\"",
+      "examples": [
+        {
+          "title": "Testimonial Stack",
+          "code": "<CardStack\n  items={[\n    { id: 1, content: <div>Card 1</div> },\n    { id: 2, content: <div>Card 2</div> }\n  ]}\n/>"
+        }
+      ]
+    },
+    {
+      "name": "compare",
+      "category": "interactive",
+      "description": "Before/after image comparison slider.",
+      "dependencies": [],
+      "props": {
+        "before": {
+          "type": "string",
+          "required": true
+        },
+        "after": {
+          "type": "string",
+          "required": true
+        }
+      },
+      "usage": "import { Compare } from \"@/components/aceternity/compare\"",
+      "examples": [
+        {
+          "title": "Image Comparison",
+          "code": "<Compare before=\"/images/before.jpg\" after=\"/images/after.jpg\" />"
+        }
+      ]
+    },
+    {
+      "name": "cover-image",
+      "category": "effects",
+      "description": "Image with animated cover/reveal effect.",
+      "dependencies": ["framer-motion"],
+      "props": {
+        "src": {
+          "type": "string",
+          "required": true
+        },
+        "alt": {
+          "type": "string"
+        }
+      },
+      "usage": "import { CoverImage } from \"@/components/aceternity/cover-image\"",
+      "examples": [
+        {
+          "title": "Reveal Image",
+          "code": "<CoverImage src=\"/images/hero.jpg\" alt=\"Hero\" />"
+        }
+      ]
+    },
+    {
+      "name": "direction-aware-hover",
+      "category": "interactive",
+      "description": "Hover effect aware of mouse enter direction.",
+      "dependencies": ["framer-motion"],
+      "props": {},
+      "usage": "import { DirectionAwareHover } from \"@/components/aceternity/direction-aware-hover\"",
+      "examples": [
+        {
+          "title": "Direction Hover Card",
+          "code": "<DirectionAwareHover>\n  <div className=\"rounded-xl border bg-card p-6\">Content</div>\n</DirectionAwareHover>"
+        }
+      ]
+    },
+    {
+      "name": "evervault-card",
+      "category": "effects",
+      "description": "Card with encrypted text hover effect inspired by Evervault.",
+      "dependencies": [],
+      "props": {
+        "text": {
+          "type": "string",
+          "required": true
+        }
+      },
+      "usage": "import { EvervaultCard } from \"@/components/aceternity/evervault-card\"",
+      "examples": [
+        {
+          "title": "Encrypted Card",
+          "code": "<EvervaultCard text=\"Hover to reveal\" />"
+        }
+      ]
+    },
+    {
+      "name": "floating-dock",
+      "category": "navigation",
+      "description": "macOS-style floating dock used as a navigation bar.",
+      "dependencies": ["framer-motion"],
+      "props": {
+        "items": {
+          "type": "Array<{ icon:ReactNode; title:string; href?:string }>",
+          "required": true
+        }
+      },
+      "usage": "import { FloatingDock } from \"@/components/aceternity/floating-dock\"",
+      "examples": [
+        {
+          "title": "Bottom Nav Dock",
+          "code": "<FloatingDock\n  items={[\n    { icon: HomeIcon, title: \"Home\" },\n    { icon: StarIcon, title: \"Features\" }\n  ]}\n/>"
+        }
+      ]
+    },
+    {
+      "name": "focus-cards",
+      "category": "interactive",
+      "description": "Card gallery where hovered card is focused and others blur.",
+      "dependencies": ["framer-motion"],
+      "props": {
+        "cards": {
+          "type": "Array<{ title:string; src:string }>",
+          "required": true
+        }
+      },
+      "usage": "import { FocusCards } from \"@/components/aceternity/focus-cards\"",
+      "examples": [
+        {
+          "title": "Gallery Focus Cards",
+          "code": "<FocusCards\n  cards={[\n    { title: \"Card 1\", src: \"/images/1.jpg\" },\n    { title: \"Card 2\", src: \"/images/2.jpg\" }\n  ]}\n/>"
+        }
+      ]
+    },
+    {
+      "name": "following-pointer",
+      "category": "effects",
+      "description": "Element that follows the mouse pointer.",
+      "dependencies": [],
+      "props": {},
+      "usage": "import { FollowingPointer } from \"@/components/aceternity/following-pointer\"",
+      "examples": [
+        {
+          "title": "Pointer Highlight",
+          "code": "<FollowingPointer />"
+        }
+      ]
+    },
+    {
+      "name": "glare-card",
+      "category": "effects",
+      "description": "Card with interactive glare/reflection effect.",
+      "dependencies": [],
+      "props": {},
+      "usage": "import { GlareCard } from \"@/components/aceternity/glare-card\"",
+      "examples": [
+        {
+          "title": "Glare Card",
+          "code": "<GlareCard>\n  <div>Content</div>\n</GlareCard>"
+        }
+      ]
+    },
+    {
+      "name": "globe",
+      "category": "interactive",
+      "description": "Interactive 3D globe with markers.",
+      "dependencies": ["three", "@react-three/fiber"],
+      "props": {
+        "markers": {
+          "type": "Array<{ lat:number; lng:number; label?:string }>"
+        }
+      },
+      "usage": "import { Globe } from \"@/components/aceternity/globe\"",
+      "examples": [
+        {
+          "title": "Marker Globe",
+          "code": "<Globe markers={[{ lat: 40, lng: -74, label: \"NYC\" }]} />"
+        }
+      ]
+    },
+    {
+      "name": "google-gemini-effect",
+      "category": "effects",
+      "description": "Gemini-style animated text effect.",
+      "dependencies": ["framer-motion"],
+      "props": {
+        "text": {
+          "type": "string",
+          "required": true
+        }
+      },
+      "usage": "import { GeminiEffect } from \"@/components/aceternity/google-gemini-effect\"",
+      "examples": [
+        {
+          "title": "Gemini Text",
+          "code": "<GeminiEffect text=\"Animated text\" />"
+        }
+      ]
+    },
+    {
+      "name": "hero-highlight",
+      "category": "hero",
+      "description": "Hero section with animated background and text highlight component.",
+      "dependencies": ["framer-motion"],
+      "props": {},
+      "usage": "import { HeroHighlight, Highlight } from \"@/components/aceternity/hero-highlight\"",
+      "examples": [
+        {
+          "title": "Highlighted Hero",
+          "code": "<HeroHighlight>\n  Your <Highlight>highlighted</Highlight> text\n</HeroHighlight>"
+        }
+      ]
+    },
+    {
+      "name": "hero-parallax",
+      "category": "hero",
+      "description": "Parallax hero section with scroll-based rotation and translation animations.",
+      "dependencies": ["framer-motion"],
+      "props": {
+        "products": {
+          "type": "Array<{ title:string; link:string; thumbnail:string }>",
+          "required": true,
+          "description": "Array of product objects with title, link, and thumbnail fields."
+        }
+      },
+      "usage": "import { HeroParallax } from \"@/components/aceternity/hero-parallax\"",
+      "examples": [
+        {
+          "title": "Product Gallery Hero",
+          "code": "<HeroParallax\n  products={[\n    { title: \"Dashboard\", link: \"/dashboard\", thumbnail: \"/images/dashboard.png\" },\n    { title: \"Analytics\", link: \"/analytics\", thumbnail: \"/images/analytics.png\" }\n  ]}\n/>"
+        }
+      ]
+    },
+    {
+      "name": "images-slider",
+      "category": "interactive",
+      "description": "Fullscreen image slider with overlay content.",
+      "dependencies": ["framer-motion"],
+      "props": {
+        "images": {
+          "type": "string[]",
+          "required": true
+        }
+      },
+      "usage": "import { ImagesSlider } from \"@/components/aceternity/images-slider\"",
+      "examples": [
+        {
+          "title": "Hero Image Slider",
+          "code": "<ImagesSlider images={[\"/images/hero-1.jpg\", \"/images/hero-2.jpg\"]} />"
+        }
+      ]
+    },
+    {
+      "name": "infinite-moving-cards",
+      "category": "animations",
+      "description": "Horizontal, infinitely scrolling card strip for testimonials or quotes.",
+      "dependencies": ["framer-motion"],
+      "props": {
+        "items": {
+          "type": "Array<{ quote:string; name:string }>",
+          "required": true
+        }
+      },
+      "usage": "import { InfiniteMovingCards } from \"@/components/aceternity/infinite-moving-cards\"",
+      "examples": [
+        {
+          "title": "Testimonial Strip",
+          "code": "<InfiniteMovingCards\n  items={[\n    { quote: \"Text\", name: \"Author\" },\n    { quote: \"More text\", name: \"Another\" }\n  ]}\n/>"
+        }
+      ]
+    },
+    {
+      "name": "lamp",
+      "category": "effects",
+      "description": "Lamp/spotlight effect that highlights centered content.",
+      "dependencies": ["framer-motion"],
+      "props": {},
+      "usage": "import { LampContainer } from \"@/components/aceternity/lamp\"",
+      "examples": [
+        {
+          "title": "Lamp Hero",
+          "code": "<LampContainer>\n  <h1 className=\"text-4xl font-bold\">Let your product shine.</h1>\n</LampContainer>"
+        }
+      ]
+    },
+    {
+      "name": "lens",
+      "category": "effects",
+      "description": "Magnifying lens effect for images or other content.",
+      "dependencies": [],
+      "props": {},
+      "usage": "import { Lens } from \"@/components/aceternity/lens\"",
+      "examples": [
+        {
+          "title": "Zoom Image",
+          "code": "<Lens>\n  <img src=\"/images/zoom.jpg\" alt=\"Zoom\" />\n</Lens>"
+        }
+      ]
+    },
+    {
+      "name": "moving-border",
+      "category": "effects",
+      "description": "Animated moving border effect around elements.",
+      "dependencies": ["framer-motion"],
+      "props": {},
+      "usage": "import { MovingBorder } from \"@/components/aceternity/moving-border\"",
+      "examples": [
+        {
+          "title": "Animated Button Border",
+          "code": "<MovingBorder>\n  <button className=\"rounded-md px-4 py-2\">Hover</button>\n</MovingBorder>"
+        }
+      ]
+    },
+    {
+      "name": "parallax-scroll",
+      "category": "effects",
+      "description": "Parallax scrolling effect for image grids or galleries.",
+      "dependencies": ["framer-motion"],
+      "props": {
+        "images": {
+          "type": "string[]",
+          "required": true
+        }
+      },
+      "usage": "import { ParallaxScroll } from \"@/components/aceternity/parallax-scroll\"",
+      "examples": [
+        {
+          "title": "Parallax Image Grid",
+          "code": "<ParallaxScroll images={[\"/images/1.jpg\", \"/images/2.jpg\"]} />"
+        }
+      ]
+    },
+    {
+      "name": "shooting-stars",
+      "category": "backgrounds",
+      "description": "Shooting stars animated background.",
+      "dependencies": [],
+      "props": {},
+      "usage": "import { ShootingStars } from \"@/components/aceternity/shooting-stars\"",
+      "examples": [
+        {
+          "title": "Night Sky Background",
+          "code": "<ShootingStars />"
+        }
+      ]
+    },
+    {
+      "name": "sidebar",
+      "category": "navigation",
+      "description": "Animated sidebar navigation with icons.",
+      "dependencies": ["framer-motion"],
+      "props": {
+        "links": {
+          "type": "Array<{ label:string; icon:ReactNode; href:string }>",
+          "required": true
+        }
+      },
+      "usage": "import { Sidebar } from \"@/components/aceternity/sidebar\"",
+      "examples": [
+        {
+          "title": "App Sidebar",
+          "code": "<Sidebar\n  links={[\n    { label: \"Home\", icon: HomeIcon, href: \"/\" },\n    { label: \"Docs\", icon: BookIcon, href: \"/docs\" }\n  ]}\n/>"
+        }
+      ]
+    },
+    {
+      "name": "sparkles",
+      "category": "effects",
+      "description": "Sparkle animation effect.",
+      "dependencies": [],
+      "props": {},
+      "usage": "import { SparklesCore } from \"@/components/aceternity/sparkles\"",
+      "examples": [
+        {
+          "title": "Sparkles Background",
+          "code": "<SparklesCore />"
+        }
+      ]
+    },
+    {
+      "name": "spotlight",
+      "category": "effects",
+      "description": "Mouse-following spotlight glow.",
+      "dependencies": [],
+      "props": {
+        "className": {
+          "type": "string"
+        },
+        "fill": {
+          "type": "string",
+          "default": "white"
+        }
+      },
+      "usage": "import { Spotlight } from \"@/components/aceternity/spotlight\"",
+      "examples": [
+        {
+          "title": "Spotlight Hero",
+          "code": "<Spotlight className=\"top-40 left-0\" fill=\"white\" />"
+        }
+      ]
+    },
+    {
+      "name": "sticky-scroll-reveal",
+      "category": "effects",
+      "description": "Content reveals on scroll with sticky animation.",
+      "dependencies": ["framer-motion"],
+      "props": {
+        "content": {
+          "type": "Array<{ title:string; description:string }>",
+          "required": true
+        }
+      },
+      "usage": "import { StickyScroll } from \"@/components/aceternity/sticky-scroll-reveal\"",
+      "examples": [
+        {
+          "title": "Story Scroll",
+          "code": "<StickyScroll\n  content={[\n    { title: \"Title\", description: \"Text\" },\n    { title: \"More\", description: \"More text\" }\n  ]}\n/>"
+        }
+      ]
+    },
+    {
+      "name": "tabs",
+      "category": "navigation",
+      "description": "Animated tabs with smooth transitions.",
+      "dependencies": ["framer-motion"],
+      "props": {
+        "tabs": {
+          "type": "Array<{ title:string; value:string; content:ReactNode }>",
+          "required": true
+        }
+      },
+      "usage": "import { Tabs } from \"@/components/aceternity/tabs\"",
+      "examples": [
+        {
+          "title": "Tabs Example",
+          "code": "<Tabs\n  tabs={[\n    { title: \"Tab 1\", value: \"tab1\", content: <div>Content</div> }\n  ]}\n/>"
+        }
+      ]
+    },
+    {
+      "name": "text-generate-effect",
+      "category": "text",
+      "description": "Text that appears word by word with a type-like animation.",
+      "dependencies": ["framer-motion"],
+      "props": {
+        "words": {
+          "type": "string",
+          "required": true
+        }
+      },
+      "usage": "import { TextGenerateEffect } from \"@/components/aceternity/text-generate-effect\"",
+      "examples": [
+        {
+          "title": "Generated Text",
+          "code": "<TextGenerateEffect words=\"Generate this text\" />"
+        }
+      ]
+    },
+    {
+      "name": "timeline",
+      "category": "data-display",
+      "description": "Animated timeline for events or steps.",
+      "dependencies": ["framer-motion"],
+      "props": {
+        "data": {
+          "type": "Array<{ title:string; content:ReactNode }>",
+          "required": true
+        }
+      },
+      "usage": "import { Timeline } from \"@/components/aceternity/timeline\"",
+      "examples": [
+        {
+          "title": "Project Timeline",
+          "code": "<Timeline\n  data={[\n    { title: \"Event\", content: <div>Details</div> }\n  ]}\n/>"
+        }
+      ]
+    },
+    {
+      "name": "tracing-beam",
+      "category": "effects",
+      "description": "Vertical tracing beam that follows the scroll and highlights content.",
+      "dependencies": ["framer-motion"],
+      "props": {},
+      "usage": "import { TracingBeam } from \"@/components/aceternity/tracing-beam\"",
+      "examples": [
+        {
+          "title": "Beam Layout",
+          "code": "<TracingBeam>\n  <div>Content</div>\n</TracingBeam>"
+        }
+      ]
+    },
+    {
+      "name": "vortex",
+      "category": "backgrounds",
+      "description": "Vortex/spiral animated background for sections.",
+      "dependencies": [],
+      "props": {},
+      "usage": "import { Vortex } from \"@/components/aceternity/vortex\"",
+      "examples": [
+        {
+          "title": "Vortex Section",
+          "code": "<Vortex>\n  <div>Content</div>\n</Vortex>"
+        }
+      ]
+    },
+    {
+      "name": "wavy-background",
+      "category": "backgrounds",
+      "description": "Wavy animated background for hero and sections.",
+      "dependencies": [],
+      "props": {},
+      "usage": "import { WavyBackground } from \"@/components/aceternity/wavy-background\"",
+      "examples": [
+        {
+          "title": "Wavy Hero",
+          "code": "<WavyBackground>\n  <h1>Title</h1>\n</WavyBackground>"
+        }
+      ]
+    },
+    {
+      "name": "world-map",
+      "category": "interactive",
+      "description": "Interactive world map with animated connection dots.",
+      "dependencies": [],
+      "props": {
+        "dots": {
+          "type": "Array<{ start:{lat:number; lng:number}; end:{lat:number; lng:number} }>",
+          "required": true
+        }
+      },
+      "usage": "import { WorldMap } from \"@/components/aceternity/world-map\"",
+      "examples": [
+        {
+          "title": "Connections Map",
+          "code": "<WorldMap\n  dots={[\n    { start: { lat: 40, lng: -74 }, end: { lat: 51, lng: 0 } }\n  ]}\n/>"
+        }
+      ]
+    }
+  ]
+}
