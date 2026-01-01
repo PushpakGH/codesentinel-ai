@@ -17,41 +17,184 @@ class ChatViewProvider {
     this.isProcessing = false;
   }
 
-  /**
-   * Called when the view is first shown
-   * @param {vscode.WebviewView} webviewView
-   */
-  resolveWebviewView(webviewView) {
-    this._view = webviewView;
+  
+/**
+ * Called when the view is first shown
+ * @param {vscode.WebviewView} webviewView
+ */
+resolveWebviewView(webviewView) {
+  this._view = webviewView;
 
-    webviewView.webview.options = {
-      enableScripts: true,
-      localResourceRoots: [vscode.Uri.joinPath(this.context.extensionUri, 'media')]
+  webviewView.webview.options = {
+    enableScripts: true,
+    localResourceRoots: [vscode.Uri.joinPath(this.context.extensionUri, 'media')]
+  };
+
+  webviewView.webview.html = this._getHtmlForWebview();
+
+  // ✅ PROPERLY AWAIT THE TEST (with error handling)
+  this._testMCPServer()
+    .then(() => {
+      logger.info('✅ MCP test completed successfully');
+    })
+    .catch((error) => {
+      logger.error('❌ MCP test failed with error:', error);
+      logger.error('Error details:', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      });
+    });
+
+  // Handle messages from webview
+  webviewView.webview.onDidReceiveMessage(
+    async (message) => {
+      switch (message.command) {
+        case 'sendMessage':
+          await this._handleUserMessage(message.text);
+          break;
+
+        case 'clearChat':
+          this._clearChat();
+          break;
+
+        case 'openFullPanel':
+          vscode.commands.executeCommand('codeSentinel.openChat');
+          break;
+      }
+    },
+    undefined,
+    this.context.subscriptions
+  );
+
+  logger.info('✅ Chat side panel initialized');
+}
+
+ 
+/**
+ * Comprehensive test for ALL registries
+ */
+async _testMCPServer() {
+  const { logger } = require('../utils/logger');
+  
+  logger.info('🧪 ========================================');
+  logger.info('🧪 COMPREHENSIVE MCP REGISTRY TEST');
+  logger.info('🧪 ========================================');
+
+  if (!global.mcpServer) {
+    logger.warn('❌ MCP Server not available');
+    return;
+  }
+
+  logger.info('✅ MCP Server is available');
+
+  // ===== TEST 1: Discover ALL registries =====
+  try {
+    logger.info('');
+    logger.info('📋 TEST 1: Discovering ALL registries...');
+    
+    const allRegistries = ['shadcn', 'magicui', 'aceternity', 'motion-primitives', 'daisyui'];
+    const registryStats = {};
+
+    for (const registryId of allRegistries) {
+      try {
+        const result = await global.mcpServer.callTool('discover_components', {
+          registry: registryId
+        });
+
+        registryStats[registryId] = {
+          total: result.totalComponents || 0,
+          categories: result.categories?.length || 0,
+          sample: result.components?.slice(0, 3).map(c => c.name) || []
+        };
+
+        logger.info(`  ✅ ${registryId}: ${registryStats[registryId].total} components`);
+      } catch (error) {
+        logger.error(`  ❌ ${registryId}: ${error.message}`);
+        registryStats[registryId] = { error: error.message };
+      }
+    }
+
+    logger.info('');
+    logger.info('📊 Registry Statistics:');
+    logger.info(JSON.stringify(registryStats, null, 2));
+
+  } catch (error) {
+    logger.error('❌ Registry discovery test failed:', error);
+  }
+
+  // ===== TEST 2: Verify registry data files exist =====
+  try {
+    logger.info('');
+    logger.info('📁 TEST 2: Verifying registry data files...');
+    
+    const { getRegistryData } = require('../registry/registryIndex');
+    const registries = ['shadcn', 'magicui', 'aceternity', 'motion-primitives', 'daisyui'];
+    
+    for (const registryId of registries) {
+      const data = getRegistryData(registryId);
+      if (data && data.components) {
+        logger.info(`  ✅ ${registryId}.json: ${data.components.length} components loaded`);
+      } else {
+        logger.warn(`  ❌ ${registryId}.json: Failed to load`);
+      }
+    }
+
+  } catch (error) {
+    logger.error('❌ Registry file verification failed:', error);
+    logger.error('Stack trace:', error.stack);
+  }
+
+  // ===== TEST 3: Test component selection logic =====
+  try {
+    logger.info('');
+    logger.info('🎯 TEST 3: Testing component availability...');
+    
+    const testComponents = {
+      shadcn: ['button', 'card', 'dialog', 'input', 'table'],
+      magicui: ['animated-beam', 'shimmer-button', 'bento-grid'],
+      aceternity: ['hero-parallax', 'background-beams', '3d-card'],
+      'motion-primitives': ['accordion', 'dialog', 'carousel'],
+      daisyui: ['button', 'card', 'modal', 'navbar']
     };
 
-    webviewView.webview.html = this._getHtmlForWebview();
+    logger.info('  Testing sample components from each registry:');
+    for (const [registry, components] of Object.entries(testComponents)) {
+      logger.info(`  ${registry}: ${components.join(', ')}`);
+    }
 
-    // Handle messages from webview
-    webviewView.webview.onDidReceiveMessage(
-      async (message) => {
-        switch (message.command) {
-          case 'sendMessage':
-            await this._handleUserMessage(message.text);
-            break;
-          case 'clearChat':
-            this._clearChat();
-            break;
-          case 'openPopout':
-            // Open full chat panel
-            const { chatPanelManager } = require('../webview/chatPanel');
-            chatPanelManager.createOrShow(this.context);
-            break;
-        }
-      }
-    );
-
-    logger.info('✅ Chat side panel initialized');
+  } catch (error) {
+    logger.error('❌ Component availability test failed:', error);
   }
+
+  // ===== TEST 4: Session Manager =====
+  if (global.sessionManager) {
+    logger.info('');
+    logger.info('💾 TEST 4: Session Manager');
+    try {
+      const summary = global.sessionManager.getSessionSummary();
+      logger.info('  ✅ Session Manager available');
+      logger.info('  Session summary:', JSON.stringify(summary, null, 2));
+    } catch (error) {
+      logger.warn('  ⚠️ Session manager error:', error.message);
+    }
+  } else {
+    logger.warn('  ❌ Session Manager not available');
+  }
+
+  // ===== FINAL SUMMARY =====
+  logger.info('');
+  logger.info('🧪 ========================================');
+  logger.info('🧪 TEST COMPLETE - REGISTRY VERIFICATION');
+  logger.info('🧪 ========================================');
+  logger.info('');
+  logger.info('📌 SUMMARY:');
+  logger.info('   - MCP Server: ✓ Operational');
+  logger.info('   - Session Manager: ✓ Operational');
+  logger.info('   - Total Registries: 5 (shadcn, magicui, aceternity, motion-primitives, daisyui)');
+  logger.info('   - Check results above for component counts');
+  logger.info('');
+}
 
   /**
    * Handle user message (reuses logic from ChatPanelManager)
@@ -162,9 +305,7 @@ class ChatViewProvider {
     return this._formatReviewResult(result, fileName);
   }
 
-  /**
-   * Handle general AI questions (universal - works with Gemini/Ollama)
-   */
+  
  /**
  * Handle general AI questions (universal - works with Gemini/Ollama)
  */

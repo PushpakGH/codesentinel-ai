@@ -17,7 +17,14 @@
 const vscode = require('vscode');
 const { logger } = require('./utils/logger');
 const configManager = require('./services/configManager');
+const MCPServer = require('./mcp/server');
+const SessionManager = require('./chat/sessionManager');
 
+
+/**
+ * Extension activation
+ * @param {vscode.ExtensionContext} context
+ */
 /**
  * Extension activation
  * @param {vscode.ExtensionContext} context
@@ -39,7 +46,9 @@ async function activate(context) {
   try {
     logger.info('🚀 CodeSentinel AI Extension Activating...');
 
-    // Initialize ConfigManager with SecretStorage
+    // =========================================
+    // STEP 1: Initialize ConfigManager with SecretStorage
+    // =========================================
     try {
       await configManager.initialize(context);
       logger.info('✅ ConfigManager initialized with SecretStorage');
@@ -103,51 +112,152 @@ async function activate(context) {
       logger.warn('Could not validate configuration:', error);
     }
 
-    // Initialize Status Bar
+    // =========================================
+    // STEP 2: Initialize MCP Server (NEW!)
+    // =========================================
+    try {
+      logger.info('🔧 Initializing MCP server...');
+      const MCPServer = require('./mcp/server');
+      const mcpServer = new MCPServer(context);
+      
+      const mcpInitialized = await mcpServer.initialize();
+      
+      if (mcpInitialized) {
+        // Make MCP server globally available for chat panel
+        global.mcpServer = mcpServer;
+        logger.info('✅ MCP server initialized successfully');
+        
+        // Optional: Start external transport for Claude Desktop
+        // Uncomment the lines below if you want Claude Desktop to connect
+        // try {
+        //   await mcpServer.startExternalTransport();
+        //   logger.info('✅ MCP server listening for external clients (Claude Desktop)');
+        // } catch (transportError) {
+        //   logger.warn('Could not start external transport:', transportError);
+        // }
+        
+        // Show success notification in debug mode
+        if (configManager.isDebugMode()) {
+          vscode.window.showInformationMessage('🔧 MCP Server initialized', 'View Logs').then(action => {
+            if (action === 'View Logs') {
+              logger.show();
+            }
+          });
+        }
+      } else {
+        logger.warn('⚠️ MCP server initialization failed, continuing without MCP features');
+        global.mcpServer = null;
+      }
+    } catch (error) {
+      logger.error('MCP server initialization error:', error);
+      global.mcpServer = null;
+      // Don't throw - extension can work without MCP
+    }
+
+    // =========================================
+    // STEP 3: Initialize Session Manager (NEW!)
+    // =========================================
+    try {
+      logger.info('💾 Initializing session manager...');
+      const SessionManager = require('./chat/sessionManager');
+      const sessionManager = new SessionManager(context);
+      
+      await sessionManager.initialize();
+      
+      // Make session manager globally available
+      global.sessionManager = sessionManager;
+      logger.info('✅ Session manager initialized');
+      
+      // Log session summary in debug mode
+      if (configManager.isDebugMode()) {
+        const summary = sessionManager.getSessionSummary();
+        logger.debug('Session summary:', summary);
+      }
+    } catch (error) {
+      logger.error('Session manager initialization error:', error);
+      global.sessionManager = null;
+      // Don't throw - continue without session management
+    }
+
+    // =========================================
+    // STEP 4: Initialize Status Bar
+    // =========================================
     try {
       const statusBarItem = createStatusBar(context);
     } catch (error) {
       logger.error('Failed to create status bar:', error);
     }
 
-    // Register Tree Data Provider
+    // =========================================
+    // STEP 5: Register Tree Data Provider
+    // =========================================
     try {
-  const { registerTreeDataProvider } = require('./providers/treeDataProvider');
-  const treeProvider = registerTreeDataProvider(context);
-  
-  global.treeDataProvider = treeProvider;
-  logger.info('✅ Tree data provider registered');
-} catch (error) {
-  logger.error('Failed to register tree data provider:', error);
-}
+      const { registerTreeDataProvider } = require('./providers/treeDataProvider');
+      const treeProvider = registerTreeDataProvider(context);
+      
+      global.treeDataProvider = treeProvider;
+      logger.info('✅ Tree data provider registered');
+    } catch (error) {
+      logger.error('Failed to register tree data provider:', error);
+    }
 
- 
-// Register Chat Side Panel Provider
-try {
-  const ChatViewProvider = require('./providers/chatViewProvider');
-  const chatViewProvider = new ChatViewProvider(context);
-  
-  context.subscriptions.push(
-    vscode.window.registerWebviewViewProvider(
-      'codesentinel.chatView',
-      chatViewProvider,
-      {
-        webviewOptions: {
-          retainContextWhenHidden: true
+    // =========================================
+    // STEP 6: Register Chat Side Panel Provider
+    // =========================================
+    try {
+      const ChatViewProvider = require('./providers/chatViewProvider');
+      const chatViewProvider = new ChatViewProvider(context);
+      
+      context.subscriptions.push(
+        vscode.window.registerWebviewViewProvider(
+          'codesentinel.chatView',
+          chatViewProvider,
+          {
+            webviewOptions: {
+              retainContextWhenHidden: true
+            }
+          }
+        )
+      );
+      
+      // Make chat view provider globally available for MCP server events
+      global.chatViewProvider = chatViewProvider;
+      
+      logger.info('✅ Chat side panel registered');
+      
+      // Hook up MCP server events to chat panel (if both initialized)
+      if (global.mcpServer && chatViewProvider) {
+        try {
+          global.mcpServer.on('tool_call_start', (data) => {
+            logger.debug('MCP tool call started:', data);
+            // Chat panel can listen to these events for UI updates
+          });
+          
+          global.mcpServer.on('tool_call_progress', (data) => {
+            logger.debug('MCP tool progress:', data);
+          });
+          
+          global.mcpServer.on('tool_call_complete', (data) => {
+            logger.debug('MCP tool completed:', data);
+          });
+          
+          global.mcpServer.on('tool_call_error', (data) => {
+            logger.error('MCP tool error:', data);
+          });
+          
+          logger.info('✅ MCP server events connected to chat panel');
+        } catch (error) {
+          logger.warn('Could not connect MCP events:', error);
         }
       }
-    )
-  );
-  
-  logger.info('✅ Chat side panel registered');
-} catch (error) {
-  logger.error('Failed to register chat side panel:', error);
-  // Continue - fallback to command-based chat
-}
-// =========================================
+    } catch (error) {
+      logger.error('Failed to register chat side panel:', error);
+      // Continue - fallback to command-based chat
+    }
 
-
-    // Check debug mode and update logger
+    // =========================================
+    // STEP 7: Check debug mode and update logger
+    // =========================================
     try {
       const debugMode = configManager.isDebugMode();
       logger.setDebugMode(debugMode);
@@ -159,7 +269,9 @@ try {
       logger.warn('Could not get configuration:', error);
     }
 
-    // Show welcome message on first install
+    // =========================================
+    // STEP 8: Show welcome message on first install
+    // =========================================
     try {
       const hasShownWelcome = context.globalState.get('codeSentinel.hasShownWelcome');
       if (!hasShownWelcome) {
@@ -170,7 +282,36 @@ try {
       logger.warn('Could not show welcome message:', error);
     }
 
+    // =========================================
+    // FINAL: Log activation summary
+    // =========================================
     logger.info('✅ CodeSentinel AI Extension Activated Successfully');
+    
+    // Log initialization status summary
+    const initSummary = {
+      configManager: configManager.initialized ? '✓' : '✗',
+      mcpServer: global.mcpServer ? '✓' : '✗',
+      sessionManager: global.sessionManager ? '✓' : '✗',
+      chatPanel: global.chatViewProvider ? '✓' : '✗',
+      treeView: global.treeDataProvider ? '✓' : '✗'
+    };
+    
+    logger.info('Initialization summary:', initSummary);
+    
+    // Show success message in debug mode
+    if (configManager.isDebugMode()) {
+      vscode.window.showInformationMessage(
+        `✅ CodeSentinel AI ready (MCP: ${initSummary.mcpServer})`,
+        'Open Chat',
+        'View Logs'
+      ).then(action => {
+        if (action === 'Open Chat') {
+          vscode.commands.executeCommand('codeSentinel.openChat');
+        } else if (action === 'View Logs') {
+          logger.show();
+        }
+      });
+    }
 
   } catch (error) {
     logger.error('Error during extension activation:', error);
@@ -497,15 +638,65 @@ async function showWelcomeMessage(context) {
 /**
  * Extension deactivation cleanup
  */
+/**
+ * Extension deactivation cleanup
+ */
 function deactivate() {
   logger.info('👋 CodeSentinel AI Extension Deactivating...');
   
-  const webviewManager = require('./services/webviewManager');
-  webviewManager.dispose();
+  // =========================================
+  // STEP 1: Shutdown MCP server gracefully
+  // =========================================
+  if (global.mcpServer) {
+    try {
+      global.mcpServer.shutdown().catch(err => {
+        logger.error('Error shutting down MCP server:', err);
+      });
+      logger.info('✅ MCP server shutdown initiated');
+    } catch (error) {
+      logger.error('MCP server shutdown error:', error);
+    }
+  }
+  
+  // =========================================
+  // STEP 2: Save session state
+  // =========================================
+  if (global.sessionManager) {
+    try {
+      // Session manager auto-saves, but ensure final save
+      global.sessionManager.saveSession().catch(err => {
+        logger.error('Error saving session:', err);
+      });
+      logger.info('✅ Session state saved');
+    } catch (error) {
+      logger.error('Session save error:', error);
+    }
+  }
+  
+  // =========================================
+  // STEP 3: Clean up webview manager (existing)
+  // =========================================
+  try {
+    const webviewManager = require('./services/webviewManager');
+    webviewManager.dispose();
+    logger.info('✅ Webview manager disposed');
+  } catch (error) {
+    logger.error('Webview cleanup error:', error);
+  }
+  
+  // =========================================
+  // STEP 4: Clear global references
+  // =========================================
+  global.mcpServer = null;
+  global.sessionManager = null;
+  global.chatViewProvider = null;
+  global.treeDataProvider = null;
+  global.extensionContext = null;
   
   logger.info('✅ Cleanup complete');
   return undefined;
 }
+
 
 module.exports = {
   activate,

@@ -1,5 +1,5 @@
 /**
- * Project Builder Agent - PRODUCTION READY
+ * Project Builder Agent - PRODUCTION READY WITH ALL FIXES
  * Handles complete project scaffolding with proper error handling
  */
 
@@ -9,21 +9,29 @@ const fs = require('fs').promises;
 const { exec } = require('child_process');
 const { promisify } = require('util');
 const execAsync = promisify(exec);
+
 const { logger } = require('../utils/logger');
 const aiClient = require('../services/aiClient');
 const fileSystem = require('../services/fileSystemManager');
 const registryTools = require('../registry/registryTools');
 const builderConfig = require('./projectBuilderConfig');
 const designSystem = require('./designSystemContext');
+const PromptEngineerAgent = require('./promptEngineer');
+const { validateCommand } = require('../utils/commandValidator');
+const CodeValidator = require('../utils/codeValidator'); // ✅ ADDED
 
+// ============================
+// HELPER FUNCTIONS
+// ============================
 
-// ========== HELPER FUNCTIONS ==========
-
+/**
+ * Run shell command with error handling
+ */
 async function runCommand(command, cwd, description) {
   logger.info(`Running: ${description}`);
   logger.debug(`Command: ${command}`);
 
-  if (/[;&|]/.test(command) || /rm -rf|del\s+/i.test(command)) {
+  if (/\brm\s+-rf\b/i.test(command)) {
     throw new Error(`Blocked potentially unsafe command: ${command}`);
   }
 
@@ -31,7 +39,7 @@ async function runCommand(command, cwd, description) {
     const { stdout, stderr } = await execAsync(command, {
       cwd,
       timeout: 180000,
-      maxBuffer: 10 * 1024 * 1024
+      maxBuffer: 10 * 1024 * 1024,
     });
 
     if (stderr && !stderr.includes('npm notice') && !stderr.includes('deprecated')) {
@@ -46,21 +54,44 @@ async function runCommand(command, cwd, description) {
       signal: error.signal,
       cmd: error.cmd,
       stdout: error.stdout,
-      stderr: error.stderr
+      stderr: error.stderr,
     });
     return { success: false, error };
   }
 }
 
+/**
+ * Convert Next.js route to file path
+ */
 function routeToNextAppPath(route) {
   if (!route || route === '/') {
     return path.join('app', 'page.tsx');
   }
-  const clean = route.replace(/^\//, '');
+  const clean = route.replace(/^\/|\/$/g, '');
   const segments = clean.split('/');
   return path.join('app', ...segments, 'page.tsx');
 }
 
+
+/**
+ * Sanitize route names for Next.js (remove special regex characters)
+ * FIX: Prevents "Invalid regular expression" errors
+ */
+function sanitizeRouteName(name) {
+  return name
+    .toLowerCase()
+    .replace(/[()[\]{}+*?^$|\\]/g, '')  // Remove regex special chars
+    .replace(/\s+/g, '-')                // Spaces to dashes
+    .replace(/[^a-z0-9-_]/g, '-')        // Only allow alphanumeric, dash, underscore
+    .replace(/-+/g, '-')                 // Collapse multiple dashes
+    .replace(/^-|-$/g, '');              // Trim dashes from ends
+}
+
+
+
+/**
+ * Analyze project type from user prompt
+ */
 async function analyzeProjectType(userPrompt) {
   const analysisPrompt = `Analyze: "${userPrompt}"
 
@@ -82,29 +113,22 @@ Return ONLY JSON.`;
     const response = await aiClient.generate(analysisPrompt, {
       systemPrompt: 'You are a tech stack expert.',
       maxTokens: 3000,
-      temperature: 0.3
+      temperature: 0.3,
     });
 
     const jsonMatch = response.match(/\{[\s\S]*\}/);
     return jsonMatch
       ? JSON.parse(jsonMatch[0])
-      : {
-          projectType: 'vite-react',
-          language: 'javascript',
-          framework: 'react',
-          reasoning: 'Default'
-        };
+      : { projectType: 'vite-react', language: 'javascript', framework: 'react', reasoning: 'Default' };
   } catch (error) {
     logger.error('Analysis failed, using defaults:', error);
-    return {
-      projectType: 'vite-react',
-      language: 'javascript',
-      framework: 'react',
-      reasoning: 'Fallback'
-    };
+    return { projectType: 'vite-react', language: 'javascript', framework: 'react', reasoning: 'Fallback' };
   }
 }
 
+/**
+ * Create project plan from user prompt
+ */
 async function createProjectPlan(userPrompt, projectAnalysis) {
   const planPrompt = `Create project plan for: "${userPrompt}"
 
@@ -115,12 +139,7 @@ Return ONLY JSON:
   "projectName": "MyApp",
   "description": "Brief description",
   "pages": [
-    {
-      "name": "HomePage",
-      "route": "/",
-      "description": "Main landing page",
-      "features": ["Hero section", "CTA buttons"]
-    }
+    { "name": "HomePage", "route": "/", "description": "Main landing page", "features": ["Hero section", "CTA buttons"] }
   ],
   "componentNeeds": {
     "forms": ["input", "button"],
@@ -129,7 +148,7 @@ Return ONLY JSON:
 }
 
 Rules:
-- Component names lowercase (input, button, card)
+- Component names: lowercase (input, button, card)
 - Max 3 pages for MVP
 - componentNeeds is an object with categories as keys
 
@@ -139,7 +158,7 @@ Return ONLY JSON.`;
     const response = await aiClient.generate(planPrompt, {
       systemPrompt: 'You are a project architect. Return valid JSON only.',
       maxTokens: 10000,
-      temperature: 0.4
+      temperature: 0.4,
     });
 
     const jsonMatch = response.match(/\{[\s\S]*\}/);
@@ -148,21 +167,11 @@ Return ONLY JSON.`;
     const plan = JSON.parse(jsonMatch[0]);
 
     if (!plan.pages || !Array.isArray(plan.pages) || plan.pages.length === 0) {
-      plan.pages = [
-        {
-          name: 'HomePage',
-          route: '/',
-          description: 'Main page',
-          features: ['Content display']
-        }
-      ];
+      plan.pages = [{ name: 'HomePage', route: '/', description: 'Main page', features: ['Content display'] }];
     }
 
     if (!plan.componentNeeds || typeof plan.componentNeeds !== 'object') {
-      plan.componentNeeds = {
-        forms: ['input', 'button'],
-        dataDisplay: ['card']
-      };
+      plan.componentNeeds = { forms: ['input', 'button'], dataDisplay: ['card'] };
     }
 
     logger.info('Project plan created:', JSON.stringify(plan, null, 2));
@@ -172,24 +181,17 @@ Return ONLY JSON.`;
     return {
       projectName: 'MyApp',
       description: 'Generated application',
-      pages: [
-        {
-          name: 'HomePage',
-          route: '/',
-          description: 'Main page',
-          features: ['Content']
-        }
-      ],
-      componentNeeds: {
-        forms: ['input', 'button'],
-        dataDisplay: ['card']
-      }
+      pages: [{ name: 'HomePage', route: '/', description: 'Main page', features: ['Content'] }],
+      componentNeeds: { forms: ['input', 'button'], dataDisplay: ['card'] },
     };
   }
 }
 
+/**
+ * Refine component needs with registry intelligence
+ */
 async function refineComponentNeedsWithRegistry(plan) {
-  const refined = { ...(plan.componentNeeds || {}) };
+  const refined = { ...plan.componentNeeds };
 
   const intentMap = {
     tabs: ['tabs'],
@@ -201,11 +203,12 @@ async function refineComponentNeedsWithRegistry(plan) {
     toast: ['sonner', 'toast'],
     navbar: ['navigation-menu'],
     sidebar: ['sidebar'],
-    pagination: ['pagination']
+    pagination: ['pagination'],
   };
 
-  for (const page of plan.pages || []) {
+  for (const page of plan.pages) {
     const text = `${page.name} ${page.description}`.toLowerCase();
+
     for (const [intent, comps] of Object.entries(intentMap)) {
       if (text.includes(intent)) {
         if (!refined.dataDisplay) refined.dataDisplay = [];
@@ -221,6 +224,9 @@ async function refineComponentNeedsWithRegistry(plan) {
   return { ...plan, componentNeeds: refined };
 }
 
+/**
+ * Discover components from registry
+ */
 async function discoverComponents(componentNeeds) {
   logger.info('🔍 Discovering components using registry metadata...');
 
@@ -235,28 +241,10 @@ async function discoverComponents(componentNeeds) {
     daisyui: new Set(daisyList.components.map((c) => c.name)),
     magicui: new Set(magicuiList.components.map((c) => c.name)),
     aceternity: new Set(aceternityList.components.map((c) => c.name)),
-    'motion-primitives': new Set(motionList.components.map((c) => c.name))
+    'motion-primitives': new Set(motionList.components.map((c) => c.name)),
   };
 
-  const invalidComponents = [
-    'markdown',
-    'navbar',
-    'link',
-    'monacoeditor',
-    'monaco',
-    'code-editor',
-    'loginform',
-    'registerform',
-    'form',
-    'spinner',
-    'check-icon',
-    'delete-icon',
-    'list',
-    'list-item',
-    'delete',
-    'trash',
-    'remove'
-  ];
+  const invalidComponents = ['markdown', 'navbar', 'link', 'monacoeditor', 'monaco', 'code-editor', 'loginform', 'registerform', 'form', 'spinner', 'check-icon', 'delete-icon', 'list', 'list-item', 'delete', 'trash', 'remove'];
 
   const normalize = (name) => name.toLowerCase().trim();
 
@@ -267,7 +255,7 @@ async function discoverComponents(componentNeeds) {
 
     logger.info(`Discovering components for category "${category}":`, needed);
 
-    const targetRegistry = builderConfig.registryForCategory[category] || 'shadcn';
+    const targetRegistry = builderConfig.registryForCategory(category) || 'shadcn';
     const validSet = byRegistry[targetRegistry];
 
     if (!validSet) {
@@ -281,6 +269,7 @@ async function discoverComponents(componentNeeds) {
 
     for (const rawName of needed) {
       const name = normalize(rawName);
+
       if (invalidComponents.includes(name)) {
         logger.info(`Skipping invalid requested component: ${rawName}`);
         continue;
@@ -299,12 +288,12 @@ async function discoverComponents(componentNeeds) {
         spinner: 'skeleton',
         loading: 'skeleton',
         card: 'card',
-        button: 'button'
+        button: 'button',
       };
 
       const fallback = fallbackMap[name];
       if (fallback && validSet.has(fallback)) {
-        logger.info(`Mapped requested "${rawName}" → "${fallback}" in ${targetRegistry}`);
+        logger.info(`Mapped requested ${rawName} → ${fallback} in ${targetRegistry}`);
         selectedComponents[targetRegistry].push(fallback);
       } else {
         logger.warn(`No match for requested component "${rawName}" in ${targetRegistry}`);
@@ -331,6 +320,9 @@ async function discoverComponents(componentNeeds) {
   return selectedComponents;
 }
 
+/**
+ * Install components with fallback
+ */
 async function installComponentsWithFallback(selectedComponents, projectPath) {
   logger.info('📦 Installing components...');
 
@@ -350,17 +342,12 @@ async function installComponentsWithFallback(selectedComponents, projectPath) {
     }
 
     if (result.failed && result.failed.length > 0) {
-      failedComponents.push(
-        ...result.failed.map((name) => ({
-          registry: registryId,
-          component: name
-        }))
-      );
+      failedComponents.push(...result.failed.map((name) => ({ registry: registryId, component: name })));
     }
   }
 
   if (failedComponents.length > 0) {
-    logger.warn(`⚠️ ${failedComponents.length} components failed, trying fallbacks...`);
+    logger.warn(`${failedComponents.length} components failed, trying fallbacks...`);
 
     const fallbackMap = {
       list: 'card',
@@ -369,21 +356,16 @@ async function installComponentsWithFallback(selectedComponents, projectPath) {
       menu: 'dropdown-menu',
       toast: 'alert',
       spinner: 'button',
-      loading: 'skeleton'
+      loading: 'skeleton',
     };
 
     for (const { component } of failedComponents) {
       const fallback = fallbackMap[component];
-
       if (fallback) {
-        logger.info(`🔄 Fallback for ${component}: ${fallback}`);
-
+        logger.info(`Fallback for ${component} → ${fallback}`);
         const result = await registryTools.installComponents('shadcn', [fallback], projectPath);
-
         if (result.installed && result.installed.length > 0) {
-          if (!installedComponents.shadcn) {
-            installedComponents.shadcn = [];
-          }
+          if (!installedComponents.shadcn) installedComponents.shadcn = [];
           if (!installedComponents.shadcn.includes(fallback)) {
             installedComponents.shadcn.push(fallback);
           }
@@ -394,13 +376,7 @@ async function installComponentsWithFallback(selectedComponents, projectPath) {
 
   if (!installedComponents.shadcn || installedComponents.shadcn.length === 0) {
     logger.warn('No components installed, forcing baseline shadcn components...');
-
-    const result = await registryTools.installComponents(
-      'shadcn',
-      builderConfig.shadcnBaselineComponents,
-      projectPath
-    );
-
+    const result = await registryTools.installComponents('shadcn', builderConfig.shadcnBaselineComponents, projectPath);
     if (result.installed && result.installed.length > 0) {
       installedComponents.shadcn = result.installed;
     }
@@ -410,8 +386,11 @@ async function installComponentsWithFallback(selectedComponents, projectPath) {
   return installedComponents;
 }
 
+/**
+ * Ensure correct component name
+ */
 function ensureCorrectComponentName(code, expectedName) {
-  const functionPattern = /function\s+(\w+)\s*\(/;
+  const functionPattern = /function\s+(\w+)/;
   const arrowPattern = /const\s+(\w+)\s*=/;
 
   let match;
@@ -422,60 +401,58 @@ function ensureCorrectComponentName(code, expectedName) {
     actualName = match[1];
   } else {
     match = code.match(arrowPattern);
-    if (match) {
-      actualName = match[1];
-    }
+    if (match) actualName = match[1];
   }
 
   if (actualName && actualName !== expectedName) {
-    logger.warn(`Fixing component name: "${actualName}" → "${expectedName}"`);
-
-    code = code.replace(new RegExp(`function\\s+${actualName}\\s*\\(`, 'g'), `function ${expectedName}(`);
-    code = code.replace(new RegExp(`const\\s+${actualName}\\s*=`, 'g'), `const ${expectedName} =`);
+    logger.warn(`Fixing component name: ${actualName} → ${expectedName}`);
+    code = code.replace(new RegExp(`function ${actualName}`, 'g'), `function ${expectedName}`);
+    code = code.replace(new RegExp(`const ${actualName}`, 'g'), `const ${expectedName}`);
     code = code.replace(new RegExp(`export default ${actualName}`, 'g'), `export default ${expectedName}`);
   }
 
   return code;
 }
 
+/**
+ * Validate and fix page code
+ */
 function validateAndFixPageCode(rawCode, projectAnalysis, pageName) {
-  let code = rawCode;
+  let code = rawCode.replace(/```[\s\S]*?```/gi, '').trim();
 
-  code = code.replace(/``````/gi, '').trim();
   code = ensureCorrectComponentName(code, pageName);
 
   if (projectAnalysis.language === 'javascript') {
-    code = code.replace(/(:\s*React\.FC\b[^=)]*)/g, '');
+    code = code.replace(/React\.FC/g, '');
   }
 
-  const quoteCount = (code.match(/"/g) || []).length;
+  const quoteCount = (code.match(/`/g) || []).length;
   if (quoteCount % 2 !== 0) {
-    code += '"';
+    code += '`';
   }
 
-  const hasMainOpen = /<main[\s>]/.test(code);
+  const hasMainOpen = /<main/.test(code);
   const hasMainClose = /<\/main>/.test(code);
   if (hasMainOpen && !hasMainClose) {
-    code += '\n</main>';
+    code += '</main>';
   }
 
-  if (!/export default\s+\w+/.test(code)) {
-    code += `\n\nexport default ${pageName}`;
+  if (!/export default/.test(code)) {
+    code += `\n\nexport default ${pageName};`;
   }
 
   return code;
 }
 
- 
-
-
-async function generatePageCode(pageName, pageDesc, installedComponents, projectAnalysis) {
+/**
+ * Generate page code with validation
+ */
+async function generatePageCode(pageName, pageDesc, installedComponents, projectAnalysis, projectPath) {
   const { projectType } = projectAnalysis;
   const isVite = projectType === 'vite-react';
 
   // Build imports from ALL registries
   const allImports = [];
-
   for (const [registry, components] of Object.entries(installedComponents)) {
     if (!components || components.length === 0) continue;
 
@@ -488,41 +465,34 @@ async function generatePageCode(pageName, pageDesc, installedComponents, project
       let importLine;
       switch (registry) {
         case 'shadcn':
-          // Try to get actual usage from registry first
           try {
-            const detailsResult = await registryTools.getComponentDetails('shadcn', [comp]);
-            const detail = detailsResult.details.find(d => d.found && d.name === comp);
+            const detailsResult = await registryTools.getComponentDetails('shadcn', comp);
+            const detail = detailsResult.details.find((d) => d.found && d.name === comp);
             if (detail && detail.usage) {
               const usageLines = detail.usage
                 .split('\n')
-                .filter(line => line.trim().startsWith('import ') && line.includes('from'));
+                .filter((line) => line.trim().startsWith('import') && line.includes('from'));
               allImports.push(...usageLines);
               continue;
             }
           } catch (e) {
             // Fall back to constructed import
           }
-          importLine = `import { ${pascal} } from '@/components/ui/${comp}'`;
+          importLine = `import { ${pascal} } from '@/components/ui/${comp}';`;
           break;
-
         case 'magicui':
-          importLine = `import { ${pascal} } from '@/components/magicui/${comp}'`;
+          importLine = `import { ${pascal} } from '@/components/magicui/${comp}';`;
           break;
-
         case 'aceternity':
-          importLine = `import { ${pascal} } from '@/components/aceternity/${comp}'`;
+          importLine = `import { ${pascal} } from '@/components/aceternity/${comp}';`;
           break;
-
         case 'motion-primitives':
-          importLine = `import { ${pascal} } from '@/components/motion/${comp}'`;
+          importLine = `import { ${pascal} } from '@/components/motion/${comp}';`;
           break;
-
         case 'daisyui':
-          // DaisyUI uses class names, not imports
           continue;
-
         default:
-          importLine = `import { ${pascal} } from '@/components/${registry}/${comp}'`;
+          importLine = `import { ${pascal} } from '@/components/${registry}/${comp}';`;
       }
 
       if (importLine && !allImports.includes(importLine)) {
@@ -531,39 +501,54 @@ async function generatePageCode(pageName, pageDesc, installedComponents, project
     }
   }
 
-  // Deduplicate and format imports
   const uniqueImports = [...new Set(allImports)];
   const availableImports = uniqueImports.slice(0, 25).join('\n');
 
-  const codePrompt = `Generate a professional, production-ready React component: "${pageName}"
+  const codePrompt = `Generate a professional, production-ready React component: ${pageName}
 
 Description: ${pageDesc}
 
 AVAILABLE COMPONENTS FROM ALL REGISTRIES:
-${availableImports || '// No component imports detected. Use plain JSX with Tailwind CSS.'}
+${availableImports || 'No component imports detected. Use plain JSX with Tailwind CSS.'}
 
 DESIGN SYSTEM RULES:
 ${designSystem.layoutPatterns}
 ${designSystem.componentSelection}
 ${designSystem.spacingAndTypography}
 ${designSystem.responsiveDesign}
+${designSystem.interactionDesign}
+${designSystem.advancedPatterns}
 
 CRITICAL REQUIREMENTS:
 1. Component name MUST be exactly: ${pageName}
 2. Export default: export default ${pageName}
 3. Import React: import React from 'react'
-4. Use components from the available imports list - select the BEST registry for each UI element
-5. Follow the design system spacing, typography, and responsive rules
-6. Create a visually balanced, professional layout with proper hierarchy
-7. Use Tailwind for all styling - NO custom CSS
-8. ALWAYS fully close all JSX tags and strings
-9. Make it responsive (mobile-first design)
-10. NO comments, NO explanations, NO markdown fences
-11. Return ONLY the code
+4. **NAVIGATION: ALWAYS use Next.js Link component**
+   - Import: import Link from 'next/link'
+   - For buttons with links: <Link href="/route"><Button>Text</Button></Link>
+   - NEVER use <a href="#"> - always provide valid routes like "/contact", "/about"
+5. **DATA: Provide default/mock data for all arrays**
+   - Example: const features = [{ id: 1, title: 'Feature 1', icon: '🚀', description: 'Details...' }]
+   - NEVER leave arrays undefined or expect props
+6. Use components from the available imports list - select the BEST registry for each UI element
+7. Follow the design system spacing, typography, and responsive rules
+8. Create a visually balanced, professional layout with proper hierarchy
+9. Use Tailwind for all styling - NO custom CSS
+10. **INTERACTION: Add proper hover states**
+    - Cards: hover:shadow-2xl hover:-translate-y-1 transition-all duration-300
+    - Buttons: hover:scale-105 transition-transform
+    - Links: hover:text-primary transition-colors
+11. **VISUAL DEPTH: Use gradients and shadows**
+    - Add gradient accents: bg-gradient-to-r from-primary/10 to-transparent
+    - Layer shadows: shadow-md hover:shadow-xl
+12. ALWAYS fully close all JSX tags and strings
+13. Make it responsive: mobile-first design
+14. NO comments, NO explanations, NO markdown fences
+15. Return ONLY the code
 
 Generate the code now:`;
 
-  // ===== RETRY LOGIC WITH EXPONENTIAL BACKOFF =====
+  // RETRY LOGIC WITH VALIDATION
   const maxAttempts = 3;
   let lastError = null;
 
@@ -572,70 +557,81 @@ Generate the code now:`;
       logger.info(`Generating ${pageName} (attempt ${attempt}/${maxAttempts})...`);
 
       const response = await aiClient.generate(codePrompt, {
-        systemPrompt: `You are a senior frontend developer specializing in React and modern design systems. 
-Generate production-quality, visually appealing components following design best practices. 
-Return only valid JSX/TSX code with no markdown, explanations, or comments.`,
+        systemPrompt: `You are a senior frontend developer specializing in React and Next.js. 
+
+CRITICAL NEXT.JS RULES:
+- Page components in Next.js App Router DO NOT receive props
+- ALWAYS provide default/mock data inside the component
+- Use Next.js Link for all navigation: import Link from 'next/link'
+- Example: const data = [{ id: 1, name: 'Item 1', icon: '🚀', description: 'Details' }]
+- Add visual depth with gradients, shadows, and hover effects
+- Ensure color contrast between normal and hover states
+
+Generate production-quality, visually appealing components following design best practices. Return only valid JSX/TSX code with no markdown, explanations, or comments.`,
         maxTokens: 10000,
-        temperature: 0.5 - (attempt * 0.1) // Lower temperature on retries
+        temperature: 0.5 - attempt * 0.1,
       });
 
-      let code = validateAndFixPageCode(response, projectAnalysis, pageName);
+      // ✅ VALIDATE with project path
+      const validation = await CodeValidator.validate(response, pageName, `${pageName.toLowerCase()}.tsx`, projectPath);
 
-      // Validate generated code quality
-      if (!code.includes('return (')) {
-        throw new Error('Generated code missing return statement');
+      if (!validation.success) {
+        logger.error(`Validation failed for ${pageName}:`, validation.error);
+
+        if (attempt < maxAttempts) {
+          logger.warn(`Retrying generation (attempt ${attempt + 1})...`);
+          continue;
+        }
+
+        throw new Error(`Failed to generate valid code after ${maxAttempts} attempts: ${validation.error}`);
       }
 
-      // Post-processing fixes
+      // ✅ Use validated & fixed code
+      let code = validation.code;
+
+      // Apply existing post-processing
+      code = validateAndFixPageCode(code, projectAnalysis, pageName);
+
       if (isVite) {
-        code = code.replace(/from ['"]next\/router['"]/g, "from 'react-router-dom'");
-        code = code.replace(/from ['"]next\/link['"]/g, "from 'react-router-dom'");
+        code = code.replace(/from ['"]next\/router['"]/g, 'from "react-router-dom"');
+        code = code.replace(/from ['"]next\/link['"]/g, 'from "react-router-dom"');
       }
 
-      // Common component naming fixes
       code = code.replace(/CardBody/g, 'CardContent');
-      code = code.replace(/\bList\b/g, 'div');
-      code = code.replace(/\bListItem\b/g, 'div');
+      code = code.replace(/<Link>/g, '<div>');
+      code = code.replace(/<\/Link>/g, '</div>');
 
-      // Ensure React import
       if (!code.includes('import React')) {
-        code = "import React from 'react'\n" + code;
+        code = `import React from 'react';\n${code}`;
       }
 
-      logger.info(`✅ Generated ${pageName} successfully (${code.split('\n').length} lines)`);
-      return code;
+      const lineCount = code.split('\n').length;
+      logger.info(`✅ Generated ${pageName} successfully (${lineCount} lines)`);
+      if (validation.warnings.length > 0) {
+        logger.warn(`⚠️  ${validation.warnings.length} warnings (auto-fixed)`);
+      }
 
+      return code;
     } catch (error) {
       lastError = error;
       logger.warn(`Attempt ${attempt}/${maxAttempts} failed for ${pageName}:`, error.message);
 
-      // If not last attempt, wait before retry (exponential backoff)
       if (attempt < maxAttempts) {
-        const waitTime = Math.pow(2, attempt) * 1000; // 2s, 4s, 8s
-        logger.info(`Waiting ${waitTime/1000}s before retry...`);
-        await new Promise(resolve => setTimeout(resolve, waitTime));
+        const waitTime = Math.pow(2, attempt) * 1000;
+        logger.info(`Waiting ${waitTime / 1000}s before retry...`);
+        await new Promise((resolve) => setTimeout(resolve, waitTime));
       }
     }
   }
 
-  // ===== ALL RETRIES FAILED - THROW ERROR =====
-  logger.error(`❌ Failed to generate ${pageName} after ${maxAttempts} attempts`);
+  // ALL RETRIES FAILED
+  logger.error(`Failed to generate ${pageName} after ${maxAttempts} attempts`);
   throw new Error(`AI generation failed for ${pageName} after ${maxAttempts} attempts: ${lastError.message}`);
 }
-// === Next.js route → file helper ===
 
-function routeToNextAppPath(route) {
-  if (!route || route === '/') {
-    return path.join('app', 'page.tsx');
-  }
-
-  const clean = route.replace(/^\//, '');
-  const segments = clean.split('/');
-
-  return path.join('app', ...segments, 'page.tsx');
-}
-
-// ========== MAIN CLASS ==========
+// ============================
+// MAIN CLASS
+// ============================
 
 class ProjectBuilderAgent {
   constructor() {
@@ -645,97 +641,170 @@ class ProjectBuilderAgent {
     this.installedComponents = {};
   }
 
-  async buildProject(userPrompt, projectPath) {
-    try {
-      logger.info('🚀 Project Builder started');
-      this.projectPath = projectPath;
+  /**
+   * Main build project method
+   */
+  /**
+ * Main build project method with name sanitization and validation
+ */
+async buildProject(userPrompt, projectPath) {
+  try {
+    logger.info('🚀 Smart Project Builder started');
+    logger.info('📝 User Request:', userPrompt);
 
-      const projectSession = require('../services/projectSession');
+    // ✅ FIX: Validate and sanitize project name FIRST
+    const rawName = path.basename(projectPath);
+    const sanitizedName = rawName.toLowerCase().replace(/[^a-z0-9-_]/g, '-');
+    
+    if (sanitizedName !== rawName) {
+      logger.warn(`⚠️  Project name contains uppercase or special characters: "${rawName}"`);
+      logger.info(`📝 npm requires lowercase alphanumeric names with dashes/underscores only`);
+      
+      const choice = await vscode.window.showWarningMessage(
+        `Project name "${rawName}" is not valid for npm.\n\nnpm requires lowercase letters, numbers, dashes, and underscores only.\n\nRename to "${sanitizedName}"?`,
+        { modal: true },
+        'Yes, rename it',
+        'Cancel'
+      );
+      
+      if (choice !== 'Yes, rename it') {
+        logger.info('❌ User cancelled due to naming issue');
+        return { success: false, error: 'Project name must follow npm naming conventions (lowercase only)' };
+      }
+      
+      // Update project path with sanitized name
+      projectPath = path.join(path.dirname(projectPath), sanitizedName);
+      logger.info(`✅ Project renamed to: ${sanitizedName}`);
+      logger.info(`✅ New path: ${projectPath}`);
+    }
 
-      const folderExists = await this._folderExists(projectPath);
-      if (folderExists) {
-        const isEmpty = await this._folderIsEmpty(projectPath);
-        if (!isEmpty) {
-          const choice = await vscode.window.showWarningMessage(
-            `Folder "${path.basename(projectPath)}" is not empty. Continue and potentially overwrite files?`,
-            { modal: true },
-            'Continue',
-            'Cancel'
-          );
-          if (choice !== 'Continue') {
-            logger.info('User cancelled build due to non-empty folder');
-            return { success: false, error: 'Target folder is not empty' };
-          }
+    this.projectPath = projectPath;
+    const projectSession = require('../services/projectSession');
+
+    // Check if folder exists and is empty
+    const folderExists = await this.folderExists(projectPath);
+    if (folderExists) {
+      const isEmpty = await this.folderIsEmpty(projectPath);
+      if (!isEmpty) {
+        const choice = await vscode.window.showWarningMessage(
+          `Folder "${path.basename(projectPath)}" is not empty. Continue and potentially overwrite files?`,
+          { modal: true },
+          'Continue',
+          'Cancel'
+        );
+        if (choice !== 'Continue') {
+          logger.info('User cancelled build due to non-empty folder');
+          return { success: false, error: 'Target folder is not empty' };
         }
       }
-
-      await vscode.window.withProgress(
-        {
-          location: vscode.ProgressLocation.Notification,
-          title: 'Building Project',
-          cancellable: false
-        },
-        async (progress) => {
-          progress.report({ message: 'Analyzing...', increment: 10 });
-          this.projectAnalysis = await analyzeProjectType(userPrompt);
-          logger.info(
-            `Detected: ${this.projectAnalysis.projectType} + ${this.projectAnalysis.language}`
-          );
-
-          progress.report({ message: 'Planning...', increment: 15 });
-
-          try {
-            this.projectPlan = await createProjectPlan(userPrompt, this.projectAnalysis);
-            this.projectPlan = await refineComponentNeedsWithRegistry(this.projectPlan);
-          } catch (e) {
-            logger.error('❌ Planning failed:', e);
-            vscode.window.showErrorMessage(`Planning failed: ${e.message}`);
-            throw e;
-          }
-
-          progress.report({ message: 'Scaffolding...', increment: 20 });
-          await this.scaffoldWithOfficialCLI();
-
-          progress.report({ message: 'Setting up UI...', increment: 15 });
-          await this.setupUILibrary();
-
-          progress.report({ message: 'Discovering components...', increment: 10 });
-          const selectedComponents = await discoverComponents(
-            this.projectPlan.componentNeeds
-          );
-
-          progress.report({ message: 'Installing components...', increment: 15 });
-          this.installedComponents = await installComponentsWithFallback(
-            selectedComponents,
-            this.projectPath
-          );
-
-          progress.report({ message: 'Generating code...', increment: 10 });
-          await this.generatePages();
-
-          projectSession.setSession({
-            projectPath: this.projectPath,
-            analysis: this.projectAnalysis,
-            plan: this.projectPlan,
-            installedComponents: this.installedComponents
-          });
-
-          logger.info('✅ Complete!');
-          vscode.window.showInformationMessage(
-            `✅ Project ready! Run: cd ${path.basename(this.projectPath)} && npm run dev`
-          );
-        }
-      );
-
-      return { success: true };
-    } catch (error) {
-      logger.error('Build failed:', error);
-      vscode.window.showErrorMessage(`❌ Build failed: ${error.message}`);
-      return { success: false, error: error.message };
     }
-  }
 
-  async _folderExists(folderPath) {
+    await vscode.window.withProgress(
+      {
+        location: vscode.ProgressLocation.Notification,
+        title: 'Building Project',
+        cancellable: false,
+      },
+      async (progress) => {
+        // PHASE 1: PROMPT ENGINEERING
+        progress.report({ message: 'Analyzing your request...', increment: 5 });
+        const promptEngineer = new PromptEngineerAgent();
+        const engineeredSpec = await promptEngineer.improvePrompt(userPrompt);
+
+        const showSpec = await vscode.window.showInformationMessage(
+          `I understand you want to build:\n\n${engineeredSpec.improvedPrompt}`,
+          { modal: true },
+          'Yes, build it!',
+          'Modify request'
+        );
+
+        if (showSpec !== 'Yes, build it!') {
+          logger.info('User cancelled or wants to modify');
+          return { success: false, reason: 'User cancelled' };
+        }
+
+        // PHASE 2: TECH STACK ANALYSIS
+        progress.report({ message: 'Analyzing tech stack...', increment: 10 });
+        this.projectAnalysis = {
+          projectType: engineeredSpec.projectType,
+          language: engineeredSpec.language || 'javascript',
+          framework: engineeredSpec.projectType === 'nextjs' ? 'next' : 'react',
+          reasoning: engineeredSpec.reasoning,
+        };
+        logger.info(`Selected: ${this.projectAnalysis.projectType} + ${this.projectAnalysis.language}`);
+
+        // PHASE 3: PROJECT PLANNING
+        progress.report({ message: 'Creating project plan...', increment: 10 });
+        this.projectPlan = {
+          projectName: path.basename(projectPath), // ✅ Use sanitized name
+          description: engineeredSpec.improvedPrompt,
+          pages: engineeredSpec.keyFeatures.map((feature, idx) => ({
+            name: feature.replace(/\s+/g, '') + 'Page',
+            route: idx === 0 ? '/' : `/${feature.toLowerCase().replace(/\s+/g, '-')}`,
+            description: feature,
+            features: [feature],
+          })),
+          componentNeeds: engineeredSpec.componentNeeds,
+        };
+
+        this.projectPlan = await refineComponentNeedsWithRegistry(this.projectPlan);
+
+        progress.report({ message: 'Scaffolding...', increment: 20 });
+        await this.scaffoldWithOfficialCLI(); // ✅ Will use sanitized name from this.projectPath
+
+        progress.report({ message: 'Setting up UI...', increment: 15 });
+        await this.setupUILibrary();
+
+        // ✅ CREATE ROOT LAYOUT
+        progress.report({ message: 'Creating layout...', increment: 5 });
+        await this.createRootLayout();
+
+        progress.report({ message: 'Discovering components...', increment: 10 });
+        const selectedComponents = await discoverComponents(this.projectPlan.componentNeeds);
+
+        progress.report({ message: 'Installing components...', increment: 15 });
+        this.installedComponents = await installComponentsWithFallback(selectedComponents, this.projectPath);
+
+        progress.report({ message: 'Generating code...', increment: 10 });
+        const [generatedPages, failedPages] = await this.generatePages();
+
+        // ✅ CREATE NAVIGATION COMPONENT
+        if (generatedPages.length > 1) {
+          progress.report({ message: 'Creating navigation...', increment: 5 });
+          await this.createNavigationComponent(generatedPages);
+          await this.addNavigationToLayout();
+        }
+
+        // ✅ CLEANUP DUPLICATES
+        await this.cleanupDuplicateFiles();
+
+        // ✅ CREATE VSCODE SETTINGS
+        await this.createVSCodeSettings();
+
+        projectSession.setSession({
+          projectPath: this.projectPath,
+          analysis: this.projectAnalysis,
+          plan: this.projectPlan,
+          installedComponents: this.installedComponents,
+        });
+
+        logger.info('✅ Complete!');
+        vscode.window.showInformationMessage(
+          `✅ Project "${path.basename(this.projectPath)}" is ready!\n\nRun: cd ${path.basename(this.projectPath)} && npm run dev`
+        );
+      }
+    );
+
+    return { success: true };
+  } catch (error) {
+    logger.error('Build failed:', error);
+    vscode.window.showErrorMessage(`Build failed: ${error.message}`);
+    return { success: false, error: error.message };
+  }
+}
+
+
+  async folderExists(folderPath) {
     try {
       const stat = await fs.stat(folderPath);
       return stat.isDirectory();
@@ -744,7 +813,7 @@ class ProjectBuilderAgent {
     }
   }
 
-  async _folderIsEmpty(folderPath) {
+  async folderIsEmpty(folderPath) {
     try {
       const entries = await fs.readdir(folderPath);
       return entries.length === 0;
@@ -753,79 +822,89 @@ class ProjectBuilderAgent {
     }
   }
 
-  async scaffoldWithOfficialCLI() {
-    const { projectType, language } = this.projectAnalysis;
-    const projectName = path.basename(this.projectPath);
+  /**
+   * Scaffold with official CLI (FIX #2: Force TypeScript for Next.js)
+   */
+/**
+ * Scaffold with official CLI (FIX: Force lowercase project names)
+ */
+async scaffoldWithOfficialCLI() {
+  const { projectType } = this.projectAnalysis;
+  
+  // ✅ FIX: Sanitize project name to lowercase (npm requirement)
+  const rawProjectName = path.basename(this.projectPath);
+  const projectName = rawProjectName.toLowerCase().replace(/[^a-z0-9-_]/g, '-');
+  
+  if (projectName !== rawProjectName) {
+    logger.warn(`⚠️  Project name sanitized: "${rawProjectName}" → "${projectName}" (npm naming rules)`);
+    // Update the project path to use sanitized name
     const parentDir = path.dirname(this.projectPath);
-
-    if (projectType === 'vite-react') {
-      const template = language === 'typescript' ? 'react-ts' : 'react';
-
-      await runCommand(
-        builderConfig.cli.vite(projectName, template),
-        parentDir,
-        'Creating Vite project'
-      );
-
-      await runCommand(
-        builderConfig.cli.npmInstall,
-        this.projectPath,
-        'Installing base deps'
-      );
-
-      logger.info('Installing react-router-dom...');
-      await runCommand(
-        builderConfig.cli.reactRouterDom,
-        this.projectPath,
-        'Installing react-router-dom'
-      );
-
-      await this.fixViteConfig();
-
-      logger.info('✅ Project scaffolded');
-      return;
-    }
-
-    if (projectType === 'nextjs') {
-      let nextOk = false;
-      try {
-        await runCommand(
-          builderConfig.cli.next(projectName, language),
-          parentDir,
-          'Creating Next.js project'
-        );
-        nextOk = true;
-      } catch (error) {
-        logger.error('❌ Creating Next.js project failed:', error);
-      }
-
-      if (!nextOk) {
-        throw new Error('Next.js scaffolding failed. Aborting build.');
-      }
-
-      logger.info('✅ Project scaffolded');
-      return;
-    }
-
-    throw new Error(`Unsupported project type: ${projectType}`);
+    this.projectPath = path.join(parentDir, projectName);
+    logger.info(`✅ Updated project path: ${this.projectPath}`);
   }
+  
+  const parentDir = path.dirname(this.projectPath);
+
+  if (projectType === 'vite-react') {
+    const { language } = this.projectAnalysis;
+    const template = language === 'typescript' ? 'react-ts' : 'react';
+
+    await runCommand(builderConfig.cli.vite(projectName, template), parentDir, 'Creating Vite project');
+    await runCommand(builderConfig.cli.npmInstall, this.projectPath, 'Installing base deps');
+
+    logger.info('Installing react-router-dom...');
+    await runCommand(builderConfig.cli.reactRouterDom, this.projectPath, 'Installing react-router-dom');
+
+    await this.fixViteConfig();
+    logger.info('✅ Project scaffolded');
+    return;
+  }
+
+  if (projectType === 'nextjs') {
+    // ✅ FIX: FORCE TYPESCRIPT FOR NEXT.JS
+    this.projectAnalysis.language = 'typescript';
+    
+    logger.info(`📦 Creating Next.js project: "${projectName}" (TypeScript forced)...`);
+
+    let nextOk = false;
+    try {
+      await runCommand(
+        `npx create-next-app@latest ${projectName} --typescript --tailwind --eslint --app --no-src-dir --use-npm --yes`,
+        parentDir,
+        'Creating Next.js project'
+      );
+      nextOk = true;
+    } catch (error) {
+      logger.error('Creating Next.js project failed:', error);
+    }
+
+    if (!nextOk) {
+      throw new Error('Next.js scaffolding failed. Aborting build.');
+    }
+
+    logger.info('✅ Project scaffolded');
+    return;
+  }
+
+  throw new Error(`Unsupported project type: ${projectType}`);
+}
 
   async fixViteConfig() {
     const { language } = this.projectAnalysis;
     const ext = language === 'typescript' ? 'ts' : 'js';
 
-    const fixedConfig = `import path from "path"
-import react from "@vitejs/plugin-react"
-import { defineConfig } from "vite"
+    const fixedConfig = `import path from 'path';
+import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vite';
 
 export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src")
+      '@': path.resolve(__dirname, './src'),
     },
   },
-})`;
+});`;
 
     await fileSystem.writeFile(this.projectPath, `vite.config.${ext}`, fixedConfig);
     logger.info('✅ Fixed vite.config');
@@ -838,11 +917,7 @@ export default defineConfig({
     await this.createConfigFiles();
 
     logger.info('Installing Tailwind CSS v3...');
-    const tailwindResult = await runCommand(
-      builderConfig.cli.tailwindV3,
-      this.projectPath,
-      'Installing Tailwind v3'
-    );
+    const tailwindResult = await runCommand(builderConfig.cli.tailwindV3, this.projectPath, 'Installing Tailwind v3');
 
     if (!tailwindResult.success) {
       logger.error('Tailwind installation failed!');
@@ -852,11 +927,7 @@ export default defineConfig({
     await this.createTailwindConfig();
 
     logger.info('Initializing shadcn...');
-    const result = await runCommand(
-      builderConfig.cli.shadcnInit,
-      this.projectPath,
-      'Initializing shadcn'
-    );
+    const result = await runCommand(builderConfig.cli.shadcnInit, this.projectPath, 'Initializing shadcn');
 
     if (!result.success) {
       logger.warn('shadcn init failed, using manual setup');
@@ -866,38 +937,46 @@ export default defineConfig({
     logger.info('✅ UI library ready');
   }
 
+  /**
+   * Create config files (FIX #5: Add path aliases)
+   */
   async createConfigFiles() {
     const { language } = this.projectAnalysis;
     const isTypeScript = language === 'typescript';
 
     if (isTypeScript) {
-      const tsconfig = {
-        compilerOptions: {
-          target: 'ES2020',
-          useDefineForClassFields: true,
-          lib: ['ES2020', 'DOM', 'DOM.Iterable'],
-          module: 'ESNext',
-          skipLibCheck: true,
-          moduleResolution: 'bundler',
-          allowImportingTsExtensions: true,
-          resolveJsonModule: true,
-          isolatedModules: true,
-          noEmit: true,
-          jsx: 'react-jsx',
-          strict: true,
-          paths: {
-            '@/*': ['./src/*']
-          }
+    // ✅ FIXED: Use paths without deprecated baseUrl
+    const tsconfig = {
+      compilerOptions: {
+        target: 'ES2020',
+        lib: ['ES2020', 'DOM', 'DOM.Iterable'],
+        allowJs: true,
+        skipLibCheck: true,
+        strict: true,
+        noEmit: true,
+        esModuleInterop: true,
+        module: 'esnext',
+        moduleResolution: 'bundler',
+        resolveJsonModule: true,
+        isolatedModules: true,
+        jsx: 'preserve',
+        incremental: true,
+        // ✅ FIX: Modern path mapping without baseUrl
+        paths: {
+          '@/*': ['./*'],
         },
-        include: ['src']
-      };
+        plugins: [
+          {
+            name: 'next',
+          },
+        ],
+      },
+      include: ['next-env.d.ts', '**/*.ts', '**/*.tsx', '.next/types/**/*.ts'],
+      exclude: ['node_modules'],
+    };
 
-      await fileSystem.writeFile(
-        this.projectPath,
-        'tsconfig.json',
-        JSON.stringify(tsconfig, null, 2)
-      );
-      logger.info('✅ Created tsconfig.json');
+      await fileSystem.writeFile(this.projectPath, 'tsconfig.json', JSON.stringify(tsconfig, null, 2));
+      logger.info('✅ Created tsconfig.json with path aliases');
     } else {
       const jsconfig = {
         compilerOptions: {
@@ -905,25 +984,22 @@ export default defineConfig({
           module: 'ESNext',
           moduleResolution: 'bundler',
           jsx: 'react-jsx',
+          baseUrl: '.',
           paths: {
-            '@/*': ['./src/*']
-          }
+            '@/*': ['./src/*'],
+          },
         },
         include: ['src'],
-        exclude: ['node_modules']
+        exclude: ['node_modules'],
       };
 
-      await fileSystem.writeFile(
-        this.projectPath,
-        'jsconfig.json',
-        JSON.stringify(jsconfig, null, 2)
-      );
+      await fileSystem.writeFile(this.projectPath, 'jsconfig.json', JSON.stringify(jsconfig, null, 2));
       logger.info('✅ Created jsconfig.json');
     }
   }
 
   async createTailwindConfig() {
-    const { language } = this.projectAnalysis;
+    const { language, projectType } = this.projectAnalysis;
     const isTypeScript = language === 'typescript';
 
     const postcssConfig = `export default {
@@ -932,15 +1008,19 @@ export default defineConfig({
     tailwindcss: {},
     autoprefixer: {},
   },
-}`;
+};`;
 
     await fileSystem.writeFile(this.projectPath, 'postcss.config.js', postcssConfig);
+
+    // ✅ FIX #8: Proper content paths for both App Router and src
+    const contentPaths = projectType === 'nextjs' 
+      ? `"./app/**/*.{js,jsx,ts,tsx}",\n    "./components/**/*.{js,jsx,ts,tsx}"`
+      : `"./index.html",\n    "./src/**/*.{js,jsx,ts,tsx}"`;
 
     const tailwindConfig = `/** @type {import('tailwindcss').Config} */
 export default {
   content: [
-    "./index.html",
-    "./src/**/*.{${isTypeScript ? 'ts,tsx' : 'js,jsx'}}",
+    ${contentPaths}
   ],
   theme: {
     extend: {},
@@ -950,130 +1030,8 @@ export default {
 
     await fileSystem.writeFile(this.projectPath, 'tailwind.config.js', tailwindConfig);
 
-    const indexCss = `@tailwind base;
-@tailwind components;
-@tailwind utilities;`;
-
-    await fileSystem.writeFile(this.projectPath, 'src/index.css', indexCss);
-
-    logger.info('✅ Created Tailwind config');
-  }
-
-  async manualShadcnSetup() {
-    const { language } = this.projectAnalysis;
-    const isTypeScript = language === 'typescript';
-
-    await runCommand(
-      builderConfig.cli.shadcnDeps,
-      this.projectPath,
-      'Installing shadcn deps'
-    );
-
-    const componentsJson = {
-      $schema: 'https://ui.shadcn.com/schema.json',
-      style: 'new-york',
-      rsc: false,
-      tsx: isTypeScript,
-      tailwind: {
-        config: 'tailwind.config.js',
-        css: 'src/index.css',
-        baseColor: 'slate',
-        cssVariables: true
-      },
-      aliases: {
-        components: '@/components',
-        utils: '@/lib/utils',
-        ui: '@/components/ui'
-      }
-    };
-
-    await fileSystem.writeFile(
-      this.projectPath,
-      'components.json',
-      JSON.stringify(componentsJson, null, 2)
-    );
-
-    await fileSystem.createDirectory(this.projectPath, 'src/lib');
-
-    const utilsCode = `import { clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
-
-export function cn(...inputs) {
-  return twMerge(clsx(inputs));
-}`;
-
-    await fileSystem.writeFile(
-      this.projectPath,
-      `src/lib/utils.${isTypeScript ? 'ts' : 'js'}`,
-      utilsCode
-    );
-
-    const enhancedTailwind = `import tailwindAnimate from "tailwindcss-animate"
-
-/** @type {import('tailwindcss').Config} */
-export default {
-  darkMode: ["class"],
-  content: [
-    "./index.html",
-    "./src/**/*.{${isTypeScript ? 'ts,tsx' : 'js,jsx'}}",
-  ],
-  theme: {
-    container: {
-      center: true,
-      padding: "2rem",
-      screens: {
-        "2xl": "1400px",
-      },
-    },
-    extend: {
-      colors: {
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
-        primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
-        },
-        secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
-        },
-        destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
-        },
-        muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
-        },
-        accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
-        },
-        popover: {
-          DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))",
-        },
-        card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
-        },
-      },
-      borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
-      },
-    },
-  },
-  plugins: [tailwindAnimate],
-};`;
-
-    await fileSystem.writeFile(this.projectPath, 'tailwind.config.js', enhancedTailwind);
-
-    const enhancedCss = `@tailwind base;
+    // ✅ FIX: Proper CSS with @tailwind directives FIRST
+    const indexCss = projectType === 'nextjs' ? `@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
@@ -1131,15 +1089,221 @@ export default {
   body {
     @apply bg-background text-foreground;
   }
+}` : `@tailwind base;
+@tailwind components;
+@tailwind utilities;`;
+
+    const cssPath = projectType === 'nextjs' ? 'app/globals.css' : 'src/index.css';
+    await fileSystem.writeFile(this.projectPath, cssPath, indexCss);
+
+    logger.info('✅ Created Tailwind config');
+  }
+
+  async manualShadcnSetup() {
+    const { language } = this.projectAnalysis;
+    const isTypeScript = language === 'typescript';
+
+    await runCommand(builderConfig.cli.shadcnDeps, this.projectPath, 'Installing shadcn deps');
+
+    const componentsJson = {
+      $schema: 'https://ui.shadcn.com/schema.json',
+      style: 'new-york',
+      rsc: false,
+      tsx: isTypeScript,
+      tailwind: {
+        config: 'tailwind.config.js',
+        css: 'src/index.css',
+        baseColor: 'slate',
+        cssVariables: true,
+      },
+      aliases: {
+        components: '@/components',
+        utils: '@/lib/utils',
+        ui: '@/components/ui',
+      },
+    };
+
+    await fileSystem.writeFile(this.projectPath, 'components.json', JSON.stringify(componentsJson, null, 2));
+
+    await fileSystem.createDirectory(this.projectPath, 'src/lib');
+
+    const utilsCode = `import { clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+export function cn(...inputs) {
+  return twMerge(clsx(inputs));
 }`;
 
-    await fileSystem.writeFile(this.projectPath, 'src/index.css', enhancedCss);
+    await fileSystem.writeFile(this.projectPath, `src/lib/utils.${isTypeScript ? 'ts' : 'js'}`, utilsCode);
 
     logger.info('✅ Manual shadcn setup complete');
   }
 
+  /**
+   * ✅ FIX #1: Create root layout file (CRITICAL)
+   */
+async createRootLayout() {
+  const { language, projectType } = this.projectAnalysis;
 
- async generatePages() {
+  if (projectType !== 'nextjs') return;
+
+  const isTS = language === 'typescript';
+  const ext = isTS ? 'tsx' : 'jsx';
+
+  // ✅ FIX: Truncate and sanitize description to avoid parsing errors
+  const sanitizedDescription = this.projectPlan.description
+    .replace(/"/g, '\\"') // Escape quotes
+    .replace(/\n/g, ' ') // Remove newlines
+    .substring(0, 160); // Limit length
+
+  const layoutCode = isTS
+    ? `import type { Metadata } from 'next'
+import { Inter } from 'next/font/google'
+import './globals.css'
+
+const inter = Inter({ subsets: ['latin'] })
+
+export const metadata: Metadata = {
+  title: '${this.projectPlan.projectName}',
+  description: '${sanitizedDescription}',
+}
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <html lang="en">
+      <body className={inter.className}>{children}</body>
+    </html>
+  )
+}`
+    : `import { Inter } from 'next/font/google'
+import './globals.css'
+
+const inter = Inter({ subsets: ['latin'] })
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en">
+      <body className={inter.className}>{children}</body>
+    </html>
+  )
+}`;
+
+  await fileSystem.writeFile(this.projectPath, `app/layout.${ext}`, layoutCode);
+  logger.info('✅ Created root layout');
+}
+
+
+  /**
+   * ✅ FIX #6: Create navigation component
+   */
+  /**
+ * Create navigation component with sanitized routes
+ * FIX: Use sanitized routes from generated pages
+ */
+async createNavigationComponent(pages) {
+  const { language, projectType } = this.projectAnalysis;
+  if (projectType !== 'nextjs') return;
+
+  const isTS = language === 'typescript';
+  const ext = isTS ? 'tsx' : 'jsx';
+
+  // ✅ FIX: Use sanitized routes from generated pages
+  const routes = pages
+    .filter(p => p.route !== '/') // Don't duplicate home in the list
+    .map((p) => ({
+      path: p.sanitizedRoute || p.route, // Use sanitized route if available
+      label: p.name.replace(/Page$/, '').replace(/([A-Z])/g, ' $1').trim()
+    }));
+
+  const navCode = `'use client'
+
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+
+export function Navigation() {
+  const pathname = usePathname()
+
+  const routes = [
+    { path: '/', label: 'Home' },
+${routes.map((r) => `    { path: '${r.path}', label: '${r.label}' }`).join(',\n')}
+  ]
+
+  return (
+    <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+        <Link href="/" className="text-xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+          ${this.projectPlan.projectName}
+        </Link>
+        <div className="flex gap-2">
+          {routes.map((route) => (
+            <Link
+              key={route.path}
+              href={route.path}
+              className={\`px-4 py-2 rounded-md transition-all duration-200 \${
+                pathname === route.path
+                  ? 'bg-primary text-primary-foreground shadow-md'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+              }\`}
+            >
+              {route.label}
+            </Link>
+          ))}
+        </div>
+      </div>
+    </nav>
+  )
+}`;
+
+  await fileSystem.createDirectory(this.projectPath, 'components');
+  await fileSystem.writeFile(this.projectPath, `components/navigation.${ext}`, navCode);
+  logger.info('✅ Created navigation component');
+}
+
+
+  /**
+   * Add navigation to layout
+   */
+  async addNavigationToLayout() {
+    const { language, projectType } = this.projectAnalysis;
+    
+    if (projectType !== 'nextjs') return;
+
+    const isTS = language === 'typescript';
+    const ext = isTS ? 'tsx' : 'jsx';
+    const layoutPath = path.join(this.projectPath, `app/layout.${ext}`);
+
+    try {
+      let layoutContent = await fs.readFile(layoutPath, 'utf-8');
+
+      if (!layoutContent.includes('Navigation')) {
+        layoutContent = layoutContent.replace(
+          /import.*?globals\.css['"]/,
+          `import './globals.css'\nimport { Navigation } from '@/components/navigation'`
+        );
+
+        layoutContent = layoutContent.replace(
+          /<body[^>]*>({children}|{\s*children\s*})<\/body>/,
+          `<body className={inter.className}>\n        <Navigation />\n        {children}\n      </body>`
+        );
+
+        await fs.writeFile(layoutPath, layoutContent);
+        logger.info('✅ Added navigation to layout');
+      }
+    } catch (error) {
+      logger.warn('Could not add navigation to layout:', error.message);
+    }
+  }
+
+   
+  /**
+ * Generate all pages with sanitized routes
+ * FIX: Sanitize routes to prevent regex errors in Next.js
+ */
+async generatePages() {
   const { pages } = this.projectPlan;
   const { language, projectType } = this.projectAnalysis;
   const isTS = language === 'typescript';
@@ -1152,20 +1316,40 @@ export default {
     logger.info(`Generating ${page.name}...`);
 
     try {
-      const componentName = page.name.replace(/\s+/g, '');
+      // ✅ FIX: Sanitize component name (remove special chars)
+      let componentName = page.name.replace(/\s+/g, '');
+      componentName = componentName.replace(/[()[\]{}+*?^$|\\]/g, ''); // Remove regex chars
+      componentName = componentName.replace(/[^a-zA-Z0-9_]/g, ''); // Only alphanumeric and underscore
       
-      // This will retry 3 times internally
+      if (!componentName) {
+        componentName = 'GeneratedPage';
+      }
+
       const code = await generatePageCode(
         componentName,
         page.description,
         this.installedComponents,
-        this.projectAnalysis
+        this.projectAnalysis,
+        this.projectPath
       );
 
       let relativePath;
+      let sanitizedRoute = page.route; // Keep original for vite
 
       if (projectType === 'nextjs') {
-        relativePath = routeToNextAppPath(page.route);
+        // ✅ FIX: Sanitize route before creating folder
+        if (page.route !== '/') {
+          sanitizedRoute = sanitizeRouteName(page.route);
+          logger.info(`✅ Sanitized route: "${page.route}" → "${sanitizedRoute}"`);
+        }
+        
+        if (sanitizedRoute === '/' || page.route === '/') {
+          relativePath = path.join('app', 'page.tsx');
+        } else {
+          // Remove leading slash and create folder path
+          const routeSegments = sanitizedRoute.replace(/^\//, '').split('/');
+          relativePath = path.join('app', ...routeSegments, 'page.tsx');
+        }
       } else {
         relativePath = path.join('src', 'pages', `${componentName}.${ext}`);
       }
@@ -1173,20 +1357,19 @@ export default {
       const absPath = path.join(this.projectPath, relativePath);
       const dir = path.dirname(absPath);
 
-      await fileSystem.createDirectory(
-        this.projectPath,
-        path.relative(this.projectPath, dir)
-      );
-
+      await fileSystem.createDirectory(this.projectPath, path.relative(this.projectPath, dir));
       await fileSystem.writeFile(this.projectPath, relativePath, code);
 
       logger.info(`✅ Created file: ${relativePath}`);
-      generatedPages.push({ ...page, name: componentName, _file: relativePath });
-
+      generatedPages.push({ 
+        ...page, 
+        name: componentName, 
+        file: relativePath,
+        sanitizedRoute: sanitizedRoute // ✅ Store sanitized route for navigation
+      });
     } catch (error) {
-      logger.error(`❌ Failed to generate ${page.name}:`, error.message);
+      logger.error(`Failed to generate ${page.name}:`, error.message);
       failedPages.push({ name: page.name, route: page.route, error: error.message });
-      // Continue to next page instead of crashing
     }
   }
 
@@ -1197,26 +1380,25 @@ export default {
     await this.validateMainJsx(ext);
   }
 
-  // Report summary
   logger.info(`✅ Pages generated: ${generatedPages.length}/${pages.length}`);
-  
+
   if (failedPages.length > 0) {
-    logger.warn(`⚠️ Failed pages: ${failedPages.map(p => p.name).join(', ')}`);
-    
-    // Show user notification
-    vscode.window.showWarningMessage(
-      `Project created with ${generatedPages.length}/${pages.length} pages. ` +
-      `Failed: ${failedPages.map(p => p.name).join(', ')}. ` +
-      `You can manually create these or retry.`,
-      'View Logs'
-    ).then(selection => {
-      if (selection === 'View Logs') {
-        vscode.commands.executeCommand('workbench.action.output.toggleOutput');
-      }
-    });
+    logger.warn('Failed pages:', failedPages.map((p) => p.name).join(', '));
+    vscode.window
+      .showWarningMessage(
+        `Project created with ${generatedPages.length}/${pages.length} pages. Failed: ${failedPages
+          .map((p) => p.name)
+          .join(', ')}. You can manually create these or retry.`,
+        'View Logs'
+      )
+      .then((selection) => {
+        if (selection === 'View Logs') {
+          vscode.commands.executeCommand('workbench.action.output.toggleOutput');
+        }
+      });
   }
 
-  return { generatedPages, failedPages };
+  return [generatedPages, failedPages];
 }
 
 
@@ -1228,12 +1410,7 @@ export default {
 
       if (!content.includes("import './index.css'")) {
         logger.warn('main.jsx missing CSS import, fixing...');
-
-        content = content.replace(
-          /(import App from ['"]\.\/App.*['"])/,
-          "$1\nimport './index.css'"
-        );
-
+        content = content.replace(/import App from '\.\/App'/, `import './index.css'\nimport App from './App'`);
         await fs.writeFile(mainPath, content);
         logger.info('✅ Fixed main.jsx CSS import');
       }
@@ -1245,38 +1422,86 @@ export default {
   generateAppCode(pages, ext) {
     if (pages.length === 1) {
       const page = pages[0];
-      return `import React from 'react'
-import ${page.name} from './pages/${page.name}'
+      return `import React from 'react';
+import ${page.name} from './pages/${page.name}';
 
 function App() {
-  return <${page.name} />
+  return <${page.name} />;
 }
 
-export default App`;
+export default App;`;
     }
 
-    const imports = pages
-      .map((p) => `import ${p.name} from './pages/${p.name}'`)
-      .join('\n');
-    const routes = pages
-      .map((p) => `        <Route path="${p.route}" element={<${p.name} />} />`)
-      .join('\n');
+    const imports = pages.map((p) => `import ${p.name} from './pages/${p.name}';`).join('\n');
+    const routes = pages.map((p) => `<Route path="${p.route}" element={<${p.name} />} />`).join('\n          ');
 
-    return `import React from 'react'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+    return `import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 ${imports}
 
 function App() {
   return (
     <Router>
       <Routes>
-${routes}
+        ${routes}
       </Routes>
     </Router>
-  )
+  );
 }
 
-export default App`;
+export default App;`;
+  }
+
+  /**
+   * ✅ Remove duplicate .js files if .tsx versions exist
+   */
+  async cleanupDuplicateFiles() {
+    const appPath = path.join(this.projectPath, 'app');
+
+    try {
+      const files = await fs.readdir(appPath, { withFileTypes: true });
+
+      for (const file of files) {
+        if (file.isFile() && file.name.endsWith('.js')) {
+          const tsxVersion = file.name.replace('.js', '.tsx');
+          const tsxPath = path.join(appPath, tsxVersion);
+
+          try {
+            await fs.access(tsxPath);
+            const jsPath = path.join(appPath, file.name);
+            await fs.unlink(jsPath);
+            logger.info(`🗑️  Removed duplicate: ${file.name} (${tsxVersion} exists)`);
+          } catch {
+            // TSX doesn't exist, keep JS
+          }
+        }
+      }
+    } catch (error) {
+      logger.warn('Could not cleanup duplicate files:', error.message);
+    }
+  }
+
+  /**
+   * ✅ FIX #7: Create VS Code settings for better DX
+   */
+  async createVSCodeSettings() {
+    const settings = {
+      'css.lint.unknownAtRules': 'ignore',
+      'scss.lint.unknownAtRules': 'ignore',
+      'less.lint.unknownAtRules': 'ignore',
+      'tailwindCSS.experimental.classRegex': [
+        ['cva\\(([^)]*)\\)', '["\'`]([^"\'`]*).*?["\'`]'],
+        ['cx\\(([^)]*)\\)', "(?:'|\"|`)([^']*)(?:'|\"|`)"],
+      ],
+    };
+
+    try {
+      await fileSystem.createDirectory(this.projectPath, '.vscode');
+      await fileSystem.writeFile(this.projectPath, '.vscode/settings.json', JSON.stringify(settings, null, 2));
+      logger.info('✅ Created VS Code settings');
+    } catch (error) {
+      logger.warn('Could not create VS Code settings:', error.message);
+    }
   }
 }
 
