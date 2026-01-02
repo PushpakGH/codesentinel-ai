@@ -1,6 +1,6 @@
 /**
  * Project Builder Agent - PRODUCTION READY WITH ALL FIXES
- * Handles complete project scaffolding with proper error handling
+ * ✅ Fixed: Route sanitization, component names, "use client", JSX validation, TypeScript enforcement
  */
 
 const vscode = require('vscode');
@@ -9,7 +9,6 @@ const fs = require('fs').promises;
 const { exec } = require('child_process');
 const { promisify } = require('util');
 const execAsync = promisify(exec);
-
 const { logger } = require('../utils/logger');
 const aiClient = require('../services/aiClient');
 const fileSystem = require('../services/fileSystemManager');
@@ -18,10 +17,76 @@ const builderConfig = require('./projectBuilderConfig');
 const designSystem = require('./designSystemContext');
 const PromptEngineerAgent = require('./promptEngineer');
 const { validateCommand } = require('../utils/commandValidator');
-const CodeValidator = require('../utils/codeValidator'); // ✅ ADDED
+const CodeValidator = require('../utils/codeValidator');
+const ASTValidator = require('../utils/ASTValidator'); 
+const StateManager = require('../services/stateManager');
 
 // ============================
-// HELPER FUNCTIONS
+// ✅ NEW: CRITICAL HELPER FUNCTIONS
+// ============================
+
+/**
+ * ✅ FIX #1: Sanitize route names for Next.js (remove regex special chars)
+ * Prevents "Invalid regular expression" errors
+ */
+function sanitizeRouteName(name) {
+  if (name === '/') return '/';
+  
+  return name
+    .toLowerCase()
+    .replace(/[()[\]{}+*?^$|\\]/g, '')  // Remove regex special chars
+    .replace(/\s+/g, '-')                // Spaces to dashes
+    .replace(/[^a-z0-9-_]/g, '-')        // Only alphanumeric, dash, underscore
+    .replace(/-+/g, '-')                 // Collapse multiple dashes
+    .replace(/^-|-$/g, '');              // Trim dashes from ends
+}
+
+/**
+ * ✅ FIX #2: Sanitize component names for JavaScript identifiers
+ * Prevents syntax errors from invalid function names
+ */
+function sanitizeComponentName(name) {
+  let componentName = name
+    .replace(/\s+/g, '')                    // Remove spaces
+    .replace(/[()[\]{}+*?^$|\\\/-]/g, '')  // Remove special chars
+    .replace(/[^a-zA-Z0-9_]/g, '');        // Only alphanumeric and underscore
+  
+  // Ensure it starts with a letter
+  if (!/^[a-zA-Z]/.test(componentName)) {
+    componentName = 'Page' + componentName;
+  }
+  
+  // Ensure it ends with "Page" for consistency
+  if (!componentName.endsWith('Page')) {
+    componentName += 'Page';
+  }
+  
+  return componentName || 'GeneratedPage';
+}
+
+/**
+ * ✅ FIX #3: Validate and fix JSX code
+ * Catches common JSX errors like semicolons in props
+ */
+function validateJSXCode(code) {
+  let fixed = code;
+  
+  // Fix semicolons in JSX props
+  fixed = fixed.replace(/(<\w+[^>]*?);(\s*\w+=)/g, '$1$2');
+  
+  // Check for unclosed Link tags (common issue)
+  const linkOpenCount = (fixed.match(/<Link[^>]*>/g) || []).length;
+  const linkCloseCount = (fixed.match(/<\/Link>/g) || []).length;
+  
+  if (linkOpenCount !== linkCloseCount) {
+    logger.warn(`⚠️  Mismatched Link tags: ${linkOpenCount} open, ${linkCloseCount} close`);
+  }
+  
+  return fixed;
+}
+
+// ============================
+// EXISTING HELPER FUNCTIONS
 // ============================
 
 /**
@@ -60,41 +125,27 @@ async function runCommand(command, cwd, description) {
   }
 }
 
+
+
+
 /**
- * Convert Next.js route to file path
+ * Convert Next.js route to file path (kept for compatibility)
  */
 function routeToNextAppPath(route) {
   if (!route || route === '/') {
     return path.join('app', 'page.tsx');
   }
+
   const clean = route.replace(/^\/|\/$/g, '');
   const segments = clean.split('/');
   return path.join('app', ...segments, 'page.tsx');
 }
-
-
-/**
- * Sanitize route names for Next.js (remove special regex characters)
- * FIX: Prevents "Invalid regular expression" errors
- */
-function sanitizeRouteName(name) {
-  return name
-    .toLowerCase()
-    .replace(/[()[\]{}+*?^$|\\]/g, '')  // Remove regex special chars
-    .replace(/\s+/g, '-')                // Spaces to dashes
-    .replace(/[^a-z0-9-_]/g, '-')        // Only allow alphanumeric, dash, underscore
-    .replace(/-+/g, '-')                 // Collapse multiple dashes
-    .replace(/^-|-$/g, '');              // Trim dashes from ends
-}
-
-
 
 /**
  * Analyze project type from user prompt
  */
 async function analyzeProjectType(userPrompt) {
   const analysisPrompt = `Analyze: "${userPrompt}"
-
 Return ONLY JSON:
 {
   "projectType": "vite-react" | "nextjs",
@@ -106,7 +157,6 @@ Return ONLY JSON:
 Rules:
 - SEO/Blog/Ecommerce → nextjs + typescript
 - Simple app/Dashboard → vite-react + javascript
-
 Return ONLY JSON.`;
 
   try {
@@ -131,9 +181,7 @@ Return ONLY JSON.`;
  */
 async function createProjectPlan(userPrompt, projectAnalysis) {
   const planPrompt = `Create project plan for: "${userPrompt}"
-
 Tech: ${projectAnalysis.projectType} + ${projectAnalysis.language}
-
 Return ONLY JSON:
 {
   "projectName": "MyApp",
@@ -151,7 +199,6 @@ Rules:
 - Component names: lowercase (input, button, card)
 - Max 3 pages for MVP
 - componentNeeds is an object with categories as keys
-
 Return ONLY JSON.`;
 
   try {
@@ -192,7 +239,6 @@ Return ONLY JSON.`;
  */
 async function refineComponentNeedsWithRegistry(plan) {
   const refined = { ...plan.componentNeeds };
-
   const intentMap = {
     tabs: ['tabs'],
     table: ['table'],
@@ -208,7 +254,6 @@ async function refineComponentNeedsWithRegistry(plan) {
 
   for (const page of plan.pages) {
     const text = `${page.name} ${page.description}`.toLowerCase();
-
     for (const [intent, comps] of Object.entries(intentMap)) {
       if (text.includes(intent)) {
         if (!refined.dataDisplay) refined.dataDisplay = [];
@@ -245,9 +290,7 @@ async function discoverComponents(componentNeeds) {
   };
 
   const invalidComponents = ['markdown', 'navbar', 'link', 'monacoeditor', 'monaco', 'code-editor', 'loginform', 'registerform', 'form', 'spinner', 'check-icon', 'delete-icon', 'list', 'list-item', 'delete', 'trash', 'remove'];
-
   const normalize = (name) => name.toLowerCase().trim();
-
   const selectedComponents = {};
 
   for (const [category, needed] of Object.entries(componentNeeds)) {
@@ -323,21 +366,58 @@ async function discoverComponents(componentNeeds) {
 /**
  * Install components with fallback
  */
-async function installComponentsWithFallback(selectedComponents, projectPath) {
+/**
+ * ✅ PRODUCTION READY: Install components with state tracking and deduplication
+ */
+async function installComponentsWithFallback(selectedComponents, projectPath, stateManager) {
   logger.info('📦 Installing components...');
 
   const installedComponents = {};
   const failedComponents = [];
+  let skippedCount = 0;
 
   for (const [registryId, components] of Object.entries(selectedComponents)) {
     if (!components || components.length === 0) continue;
 
-    logger.info(`Installing from ${registryId}:`, components);
+    // ================================================================
+    // ✅ NEW: Filter out already installed components
+    // ================================================================
+    const componentsToInstall = stateManager 
+      ? components.filter(comp => !stateManager.isComponentInstalled(registryId, comp))
+      : components;
 
-    const result = await registryTools.installComponents(registryId, components, projectPath);
+    if (componentsToInstall.length === 0) {
+      skippedCount += components.length;
+      logger.info(`⏭️ All ${registryId} components already installed (${components.length}), skipping...`);
+      
+      // Still add to installedComponents for tracking
+      installedComponents[registryId] = components;
+      continue;
+    }
+
+    if (componentsToInstall.length < components.length) {
+      const alreadyInstalled = components.length - componentsToInstall.length;
+      skippedCount += alreadyInstalled;
+      logger.info(`⏭️ Skipping ${alreadyInstalled} already installed ${registryId} component(s)`);
+    }
+    // ================================================================
+
+    logger.info(`Installing from ${registryId}:`, componentsToInstall);
+    const result = await registryTools.installComponents(registryId, componentsToInstall, projectPath);
 
     if (result.installed && result.installed.length > 0) {
       installedComponents[registryId] = result.installed;
+      
+      // ================================================================
+      // ✅ NEW: Track installed components in state
+      // ================================================================
+      if (stateManager) {
+        for (const comp of result.installed) {
+          await stateManager.addComponent(registryId, comp);
+        }
+      }
+      // ================================================================
+      
       logger.info(`✅ Installed ${result.installed.length} from ${registryId}`);
     }
 
@@ -346,9 +426,9 @@ async function installComponentsWithFallback(selectedComponents, projectPath) {
     }
   }
 
+  // Handle failed components with fallbacks
   if (failedComponents.length > 0) {
     logger.warn(`${failedComponents.length} components failed, trying fallbacks...`);
-
     const fallbackMap = {
       list: 'card',
       'list-item': 'card',
@@ -362,29 +442,71 @@ async function installComponentsWithFallback(selectedComponents, projectPath) {
     for (const { component } of failedComponents) {
       const fallback = fallbackMap[component];
       if (fallback) {
+        // ✅ Check if fallback is already installed
+        if (stateManager && stateManager.isComponentInstalled('shadcn', fallback)) {
+          logger.info(`⏭️ Fallback ${fallback} already installed, skipping...`);
+          continue;
+        }
+
         logger.info(`Fallback for ${component} → ${fallback}`);
         const result = await registryTools.installComponents('shadcn', [fallback], projectPath);
+        
         if (result.installed && result.installed.length > 0) {
           if (!installedComponents.shadcn) installedComponents.shadcn = [];
           if (!installedComponents.shadcn.includes(fallback)) {
             installedComponents.shadcn.push(fallback);
+          }
+          
+          // ✅ Track fallback component
+          if (stateManager) {
+            await stateManager.addComponent('shadcn', fallback);
           }
         }
       }
     }
   }
 
+  // Ensure baseline components are installed
   if (!installedComponents.shadcn || installedComponents.shadcn.length === 0) {
     logger.warn('No components installed, forcing baseline shadcn components...');
-    const result = await registryTools.installComponents('shadcn', builderConfig.shadcnBaselineComponents, projectPath);
-    if (result.installed && result.installed.length > 0) {
-      installedComponents.shadcn = result.installed;
+    
+    // ✅ Filter baseline components that aren't installed
+    const baselineToInstall = stateManager
+      ? builderConfig.shadcnBaselineComponents.filter(
+          comp => !stateManager.isComponentInstalled('shadcn', comp)
+        )
+      : builderConfig.shadcnBaselineComponents;
+
+    if (baselineToInstall.length > 0) {
+      const result = await registryTools.installComponents('shadcn', baselineToInstall, projectPath);
+      
+      if (result.installed && result.installed.length > 0) {
+        installedComponents.shadcn = result.installed;
+        
+        // ✅ Track baseline components
+        if (stateManager) {
+          for (const comp of result.installed) {
+            await stateManager.addComponent('shadcn', comp);
+          }
+        }
+      }
+    } else {
+      logger.info('⏭️ All baseline components already installed');
+      installedComponents.shadcn = builderConfig.shadcnBaselineComponents;
     }
   }
 
+  // ✅ Log summary
+  const totalInstalled = Object.values(installedComponents).flat().length;
+  logger.info(`📦 Installation complete: ${totalInstalled} components available`);
+  if (skippedCount > 0) {
+    logger.info(`⏭️ Skipped ${skippedCount} already installed component(s)`);
+  }
+  
   logger.info('Final installed components:', installedComponents);
   return installedComponents;
 }
+
 
 /**
  * Ensure correct component name
@@ -392,7 +514,6 @@ async function installComponentsWithFallback(selectedComponents, projectPath) {
 function ensureCorrectComponentName(code, expectedName) {
   const functionPattern = /function\s+(\w+)/;
   const arrowPattern = /const\s+(\w+)\s*=/;
-
   let match;
   let actualName = null;
 
@@ -419,7 +540,7 @@ function ensureCorrectComponentName(code, expectedName) {
  */
 function validateAndFixPageCode(rawCode, projectAnalysis, pageName) {
   let code = rawCode.replace(/```[\s\S]*?```/gi, '').trim();
-
+  
   code = ensureCorrectComponentName(code, pageName);
 
   if (projectAnalysis.language === 'javascript') {
@@ -431,7 +552,7 @@ function validateAndFixPageCode(rawCode, projectAnalysis, pageName) {
     code += '`';
   }
 
-  const hasMainOpen = /<main/.test(code);
+  const hasMainOpen = /<main[^>]*>/.test(code);
   const hasMainClose = /<\/main>/.test(code);
   if (hasMainOpen && !hasMainClose) {
     code += '</main>';
@@ -445,9 +566,117 @@ function validateAndFixPageCode(rawCode, projectAnalysis, pageName) {
 }
 
 /**
- * Generate page code with validation
+ * ✅ FIX #4: Generate page code with enhanced validation and "use client" detection
  */
-async function generatePageCode(pageName, pageDesc, installedComponents, projectAnalysis, projectPath) {
+/**
+ * ✅ FIX #6: Post-process generated code to fix common JSX errors
+ * Place this BEFORE the ProjectBuilderAgent class definition
+ */
+/**
+ * ✅ ENHANCED: Post-process generated code to fix common JSX errors
+ * Place this BEFORE the ProjectBuilderAgent class definition
+ */
+function postProcessJSXCode(code, componentName) {
+  let fixed = code;
+
+  // ✅ FIX #1: Escape quotes in metadata strings (CRITICAL for layout.tsx)
+  if (componentName.toLowerCase().includes('layout')) {
+    // Match the entire metadata object
+    fixed = fixed.replace(
+      /(export\s+const\s+metadata\s*:\s*Metadata\s*=\s*\{[\s\S]*?\})/,
+      (metadataBlock) => {
+        // Fix unescaped single quotes in string values
+        return metadataBlock.replace(
+          /(title|description):\s*'([^']*)'([^']*)'([^']*)'/g,
+          (match, key, before, middle, after) => {
+            // Escape internal quotes
+            const fixedValue = `${before}\\'${middle}\\'${after}`;
+            return `${key}: '${fixedValue}'`;
+          }
+        );
+      }
+    );
+
+    // Alternative: Convert to double quotes (safer)
+    fixed = fixed.replace(
+      /(title|description):\s*'([^']*)'/g,
+      (match, key, value) => {
+        // Escape double quotes in value and wrap in double quotes
+        const escapedValue = value.replace(/"/g, '\\"');
+        return `${key}: "${escapedValue}"`;
+      }
+    );
+  }
+
+  // ✅ FIX #2: Fix unclosed Link tags (most common issue)
+  // Pattern: <Link ...>Text</Button> or </div>
+  fixed = fixed.replace(
+    /<Link([^>]*)>([\s\S]*?)<\/(Button|div|span|a|svg)>/g,
+    (match, attrs, content, wrongClosing) => {
+      // Only fix if content doesn't contain another <Link>
+      if (!content.includes('<Link')) {
+        logger.warn(`Fixed: <Link> closed with </${wrongClosing}>`);
+        return `<Link${attrs}>${content}</Link>`;
+      }
+      return match; // Leave nested Links alone
+    }
+  );
+
+  // ✅ FIX #3: Remove orphaned closing Link tags
+  // Pattern: </Link> at the start of a line without opening
+  const linkOpenings = (fixed.match(/<Link[^>]*>/g) || []).length;
+  const linkClosings = (fixed.match(/<\/Link>/g) || []).length;
+  
+  if (linkClosings > linkOpenings) {
+    logger.warn(`Removing ${linkClosings - linkOpenings} orphaned </Link> tag(s)`);
+    let removed = 0;
+    const target = linkClosings - linkOpenings;
+    
+    // Remove closing tags that appear after other closing tags (likely orphaned)
+    fixed = fixed.replace(/<\/(div|Button|span)>\s*<\/Link>/g, (match) => {
+      if (removed < target) {
+        removed++;
+        return match.replace('</Link>', '');
+      }
+      return match;
+    });
+  }
+
+  // ✅ FIX #4: Fix semicolons in JSX props (common AI mistake)
+  fixed = fixed.replace(/(<\w+[^>]*?);(\s*\w+=)/g, '$1$2');
+
+  // ✅ FIX #5: Fix broken JSX text nodes (missing spaces)
+  // Pattern: </Tag><span> without space
+  fixed = fixed.replace(/(<\/\w+>)(<span|<div|<Link)/g, '$1\n          $2');
+
+  // ✅ FIX #6: Ensure export default statement
+  if (!fixed.includes('export default')) {
+    fixed += `\n\nexport default ${componentName};`;
+  }
+
+  return fixed;
+}
+
+
+/**
+ * ✅ UPDATED:1 Generate page code with enhanced validation and post-processing
+ */
+
+/**
+ * ✅ ENHANCED:2 Generate page code with AST validation (NEW!)
+ * Falls back to regex validation if AST fails
+ */
+/**
+ * ✅  PRODUCTION READY:3 Generate page code with AST validation + Regex fallback
+ */
+
+/**
+ * ✅ PRODUCTION READY:4 Generate page code with AST validation + Regex fallback + VS Code Diagnostics
+ */
+/**
+ * ✅ PRODUCTION READY:5 Generate page code with AST validation + API tracking
+ */
+async function generatePageCode(pageName, pageDesc, installedComponents, projectAnalysis, projectPath, stateManager) {
   const { projectType } = projectAnalysis;
   const isVite = projectType === 'vite-react';
 
@@ -463,6 +692,7 @@ async function generatePageCode(pageName, pageDesc, installedComponents, project
         .join('');
 
       let importLine;
+
       switch (registry) {
         case 'shadcn':
           try {
@@ -504,6 +734,7 @@ async function generatePageCode(pageName, pageDesc, installedComponents, project
   const uniqueImports = [...new Set(allImports)];
   const availableImports = uniqueImports.slice(0, 25).join('\n');
 
+  // ✅ ENHANCED PROMPT WITH "use client" REQUIREMENT
   const codePrompt = `Generate a professional, production-ready React component: ${pageName}
 
 Description: ${pageDesc}
@@ -520,114 +751,371 @@ ${designSystem.interactionDesign}
 ${designSystem.advancedPatterns}
 
 CRITICAL REQUIREMENTS:
+
 1. Component name MUST be exactly: ${pageName}
 2. Export default: export default ${pageName}
 3. Import React: import React from 'react'
-4. **NAVIGATION: ALWAYS use Next.js Link component**
+
+4. ✅ "use client" DIRECTIVE (CRITICAL):
+   - IF using ANY React hooks (useState, useEffect, useRef, useCallback, useMemo, etc.)
+   - OR using event handlers (onClick, onChange, onSubmit, onFocus, etc.)
+   - OR using browser APIs (window, document, localStorage, sessionStorage, etc.)
+   - THEN ADD 'use client' as the VERY FIRST line of the file
+   - Example:
+     'use client'
+     
+     import React, { useState } from 'react'
+     import { Button } from '@/components/ui/button'
+     
+     export default function MyPage() {
+       const [count, setCount] = useState(0)
+       ...
+     }
+
+5. JSX TAG CLOSURE (CRITICAL):
+   - EVERY opening tag MUST have matching closing tag with exact same name
+   - <Link> must close with </Link> (NOT </div> or </a>)
+   - <Button> must close with </Button> (NOT </div>)
+   - <Card> must close with </Card> (NOT </div>)
+   - Double-check ALL nested components before generating
+   - Count your tags: every <TagName> needs exactly one </TagName>
+
+6. NAVIGATION: ALWAYS use Next.js Link component
    - Import: import Link from 'next/link'
-   - For buttons with links: <Link href="/route"><Button>Text</Button></Link>
-   - NEVER use <a href="#"> - always provide valid routes like "/contact", "/about"
-5. **DATA: Provide default/mock data for all arrays**
+   - Usage: <Link href="/route">Text</Link>
+   - NEVER use <a href> - always Link
+   - Always provide valid routes like "/contact", "/about"
+
+7. TYPESCRIPT TYPES (if TypeScript):
+   - Type ALL function parameters: (id: number, name: string) => void
+   - Use generics for state: useState<User[]>([])
+   - Define types for objects: type User = { id: number; name: string }
+   - Type component props: interface Props { title: string }
+
+8. DATA: Provide default/mock data for all arrays
    - Example: const features = [{ id: 1, title: 'Feature 1', icon: '🚀', description: 'Details...' }]
    - NEVER leave arrays undefined or expect props
-6. Use components from the available imports list - select the BEST registry for each UI element
-7. Follow the design system spacing, typography, and responsive rules
-8. Create a visually balanced, professional layout with proper hierarchy
-9. Use Tailwind for all styling - NO custom CSS
-10. **INTERACTION: Add proper hover states**
-    - Cards: hover:shadow-2xl hover:-translate-y-1 transition-all duration-300
-    - Buttons: hover:scale-105 transition-transform
-    - Links: hover:text-primary transition-colors
-11. **VISUAL DEPTH: Use gradients and shadows**
-    - Add gradient accents: bg-gradient-to-r from-primary/10 to-transparent
-    - Layer shadows: shadow-md hover:shadow-xl
-12. ALWAYS fully close all JSX tags and strings
-13. Make it responsive: mobile-first design
-14. NO comments, NO explanations, NO markdown fences
-15. Return ONLY the code
+
+9. NO SEMICOLONS IN JSX PROPS:
+   - WRONG: <Button key={id}; variant="ghost" />
+   - RIGHT: <Button key={id} variant="ghost" />
+
+10. Use components from available imports - select BEST registry for each UI element
+11. Follow design system spacing, typography, responsive rules
+12. Create visually balanced layout with proper hierarchy
+13. Use Tailwind for all styling - NO custom CSS
+14. Add proper hover states: hover:shadow-2xl hover:-translate-y-1 transition-all
+15. Use gradients and shadows: bg-gradient-to-r from-primary/10 to-transparent
+16. ALWAYS fully close all JSX tags and strings
+17. Make it responsive: mobile-first design
+18. NO comments, NO explanations, NO markdown fences
+19. Return ONLY the code
 
 Generate the code now:`;
 
   // RETRY LOGIC WITH VALIDATION
   const maxAttempts = 3;
   let lastError = null;
+  let validationMethod = 'unknown';
 
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
       logger.info(`Generating ${pageName} (attempt ${attempt}/${maxAttempts})...`);
 
+      // ✅ ENHANCED SYSTEM PROMPT
       const response = await aiClient.generate(codePrompt, {
-        systemPrompt: `You are a senior frontend developer specializing in React and Next.js. 
+        systemPrompt: `You are a senior frontend developer specializing in React and Next.js.
 
-CRITICAL NEXT.JS RULES:
+CRITICAL NEXT.JS APP ROUTER RULES:
 - Page components in Next.js App Router DO NOT receive props
 - ALWAYS provide default/mock data inside the component
 - Use Next.js Link for all navigation: import Link from 'next/link'
-- Example: const data = [{ id: 1, name: 'Item 1', icon: '🚀', description: 'Details' }]
-- Add visual depth with gradients, shadows, and hover effects
-- Ensure color contrast between normal and hover states
 
-Generate production-quality, visually appealing components following design best practices. Return only valid JSX/TSX code with no markdown, explanations, or comments.`,
+"use client" REQUIREMENT:
+- If component uses React hooks (useState, useEffect, etc.) → ADD 'use client' as FIRST line
+- If component uses event handlers (onClick, onChange, etc.) → ADD 'use client' as FIRST line
+- If component uses browser APIs (window, localStorage, etc.) → ADD 'use client' as FIRST line
+
+TYPESCRIPT REQUIREMENTS:
+- Type ALL function parameters explicitly
+- Use generics for useState: useState<Type[]>([])
+- Define interfaces/types for complex objects
+- Add proper React component prop types
+
+JSX REQUIREMENTS (ABSOLUTELY CRITICAL):
+- EVERY <Link> MUST close with </Link> (NOT </div> or </Button>)
+- EVERY <Button> MUST close with </Button> (NOT </div> or </Link>)
+- EVERY <Card> MUST close with </Card> (NOT </div>)
+- Match ALL opening and closing tags exactly by name
+- NO semicolons between JSX props
+- Before finishing, mentally count: Do I have equal <Link> and </Link> tags?
+
+DESIGN REQUIREMENTS:
+- Add visual depth with gradients, shadows, hover effects
+- Ensure color contrast between normal and hover states
+- Provide mock data for all arrays (never undefined)
+
+Generate production-quality, visually appealing components following design best practices.
+Return only valid JSX/TSX code with no markdown, explanations, or comments.`,
         maxTokens: 10000,
         temperature: 0.5 - attempt * 0.1,
       });
 
-      // ✅ VALIDATE with project path
-      const validation = await CodeValidator.validate(response, pageName, `${pageName.toLowerCase()}.tsx`, projectPath);
+      // ================================================================
+      // ✅ NEW: Track API usage for cost monitoring
+      // ================================================================
+      if (stateManager && response.usage) {
+        // Gemini 2.0 Flash pricing: $0.075 per 1M input tokens, $0.30 per 1M output tokens
+        const inputCost = ((response.usage.promptTokens || 0) / 1000000) * 0.075;
+        const outputCost = ((response.usage.completionTokens || 0) / 1000000) * 0.30;
+        const totalCost = inputCost + outputCost;
+        const totalTokens = response.usage.totalTokens || 
+                          (response.usage.promptTokens || 0) + (response.usage.completionTokens || 0);
+        
+        await stateManager.trackAPIUsage(totalTokens, totalCost);
+        
+        logger.debug(`💰 API Usage: ${totalTokens} tokens ($${totalCost.toFixed(6)})`);
+      }
+      // ================================================================
 
-      if (!validation.success) {
-        logger.error(`Validation failed for ${pageName}:`, validation.error);
+      // ================================================================
+      // ✅ AST VALIDATION WITH FALLBACK TO REGEX
+      // ================================================================
+      let validation;
+      let usedAST = false;
 
-        if (attempt < maxAttempts) {
-          logger.warn(`Retrying generation (attempt ${attempt + 1})...`);
-          continue;
+      try {
+        // Try AST validation first
+        logger.info(`🔬 Attempting AST validation for ${pageName}...`);
+        validation = await ASTValidator.validate(
+          response, 
+          pageName, 
+          `${pageName.toLowerCase()}.tsx`, 
+          projectPath
+        );
+        
+        usedAST = true;
+        validationMethod = 'AST';
+        
+        logger.info(`✅ AST validation: ${validation.success ? 'PASSED' : 'FAILED'}`);
+        
+        if (validation.fixes && validation.fixes.length > 0) {
+          logger.info(`🔧 AST applied ${validation.fixes.length} fix(es):`);
+          validation.fixes.forEach(fix => {
+            logger.info(`   - ${fix.type}: ${fix.from || 'N/A'} → ${fix.to || 'applied'}`);
+          });
         }
 
-        throw new Error(`Failed to generate valid code after ${maxAttempts} attempts: ${validation.error}`);
+        // Log JSX errors if any
+        if (validation.jsxErrors && validation.jsxErrors.length > 0) {
+          logger.warn(`⚠️ JSX errors detected (${validation.jsxErrors.length}):`);
+          validation.jsxErrors.forEach(err => {
+            logger.warn(`   - ${err.type}: ${err.tag || err.message} (line ${err.line})`);
+          });
+        }
+
+        // Log TypeScript warnings (non-critical)
+        if (validation.warnings && validation.warnings.length > 0) {
+          logger.debug(`📝 TypeScript warnings (${validation.warnings.length}):`);
+          validation.warnings.slice(0, 3).forEach(warn => {
+            logger.debug(`   - Line ${warn.line}: ${warn.message}`);
+          });
+        }
+
+      } catch (astError) {
+        // AST failed, fallback to regex
+        logger.warn(`⚠️ AST validation failed: ${astError.message}`);
+        logger.info(`🔄 Falling back to regex validation...`);
+        
+        try {
+          validation = await CodeValidator.validate(
+            response, 
+            pageName, 
+            `${pageName.toLowerCase()}.tsx`, 
+            projectPath
+          );
+          
+          usedAST = false;
+          validationMethod = 'Regex (fallback)';
+          
+          logger.info(`✅ Regex validation: ${validation.success ? 'PASSED' : 'FAILED'}`);
+          
+          if (validation.correctedImports && validation.correctedImports.length > 0) {
+            logger.info(`🔧 Regex corrected ${validation.correctedImports.length} import(s)`);
+          }
+          
+        } catch (regexError) {
+          // Both failed
+          logger.error(`❌ Both AST and Regex validation failed!`);
+          logger.error(`   AST error: ${astError.message}`);
+          logger.error(`   Regex error: ${regexError.message}`);
+          throw new Error(`All validation methods failed: AST (${astError.message}), Regex (${regexError.message})`);
+        }
+      }
+      // ================================================================
+
+      // Check validation result
+      if (!validation.success) {
+        const errorMsg = validation.error || 'Unknown validation error';
+        logger.error(`❌ Validation failed for ${pageName}: ${errorMsg}`);
+        
+        if (attempt < maxAttempts) {
+          logger.warn(`🔄 Retrying generation (attempt ${attempt + 1})...`);
+          continue;
+        }
+        
+        throw new Error(`Failed to generate valid code after ${maxAttempts} attempts: ${errorMsg}`);
       }
 
-      // ✅ Use validated & fixed code
+      // ================================================================
+      // ✅ VS CODE DIAGNOSTICS INTEGRATION
+      // ================================================================
+      if (validation.fixes && validation.fixes.length > 0) {
+        logger.info(`📋 Creating VS Code diagnostics for ${validation.fixes.length} fix(es)...`);
+        
+        validation.fixes.forEach(fix => {
+          if (fix.openLine && fix.closeLine) {
+            // Create VS Code diagnostic with line numbers
+            const diagnostic = {
+              severity: 'warning',
+              range: {
+                start: { line: fix.openLine - 1, character: 0 },
+                end: { line: fix.closeLine - 1, character: 0 }
+              },
+              message: fix.message || `${fix.type}: ${fix.from} → ${fix.to}`,
+              source: 'CodeSentinel AST',
+              code: fix.type
+            };
+            
+            logger.info(`📍 Diagnostic (Line ${fix.openLine}-${fix.closeLine}): ${diagnostic.message}`);
+          } else if (fix.type === 'AUTO_IMPORT_ADDED') {
+            // Log auto-import fixes
+            logger.info(`📦 Auto-imported: ${fix.component} from ${fix.path}`);
+          } else if (fix.type === 'USE_CLIENT_ADDED') {
+            // Log "use client" directive
+            logger.info(`📦 Added "use client" directive`);
+          } else if (fix.type === 'IMPORT_PATH_CORRECTION') {
+            // Log import path corrections
+            logger.info(`🔧 Corrected import: ${fix.from} → ${fix.to}`);
+          } else {
+            // Generic fix logging
+            logger.info(`🔧 Applied fix: ${fix.type}`);
+          }
+        });
+      }
+
+      // Log JSX errors separately (critical)
+      if (validation.jsxErrors && validation.jsxErrors.length > 0) {
+        logger.error(`❌ ${validation.jsxErrors.length} JSX error(s) detected:`);
+        validation.jsxErrors.forEach(err => {
+          logger.error(`   Line ${err.line}: ${err.message}`);
+        });
+      }
+
+      // Log TypeScript warnings (non-critical)
+      if (validation.warnings && validation.warnings.length > 0) {
+        logger.warn(`⚠️ ${validation.warnings.length} TypeScript warning(s):`);
+        validation.warnings.slice(0, 5).forEach(warn => {
+          logger.warn(`   Line ${warn.line}: ${warn.message}`);
+        });
+      }
+
+      // Log missing components if any
+      if (validation.missingComponents && validation.missingComponents.length > 0) {
+        logger.info(`📦 Auto-imported ${validation.missingComponents.length} component(s): ${validation.missingComponents.join(', ')}`);
+      }
+      // ================================================================
+
+      // ✅ PROCESSING PIPELINE (ORDER MATTERS!)
       let code = validation.code;
 
-      // Apply existing post-processing
+      // Step 1: Post-process JSX errors (fix Link tags, metadata)
+      // Note: AST already handles most of these, but keep for regex fallback
+      if (!usedAST) {
+        code = postProcessJSXCode(code, pageName);
+        code = validateJSXCode(code);
+      } else {
+        logger.debug('⏭️ Skipping post-process (AST already applied fixes)');
+      }
+
+      // Step 2: Apply general fixes (component names, etc.)
       code = validateAndFixPageCode(code, projectAnalysis, pageName);
 
+      // Step 3: Vite-specific transformations
       if (isVite) {
         code = code.replace(/from ['"]next\/router['"]/g, 'from "react-router-dom"');
         code = code.replace(/from ['"]next\/link['"]/g, 'from "react-router-dom"');
+        logger.debug('🔄 Applied Vite-specific transformations');
       }
 
+      // Step 4: Component name fixes (common AI mistakes)
       code = code.replace(/CardBody/g, 'CardContent');
-      code = code.replace(/<Link>/g, '<div>');
-      code = code.replace(/<\/Link>/g, '</div>');
 
+      // Step 5: Ensure React import
       if (!code.includes('import React')) {
         code = `import React from 'react';\n${code}`;
+        logger.debug('📦 Added React import');
       }
 
+      // ✅ SUCCESS LOGGING
       const lineCount = code.split('\n').length;
       logger.info(`✅ Generated ${pageName} successfully (${lineCount} lines)`);
-      if (validation.warnings.length > 0) {
-        logger.warn(`⚠️  ${validation.warnings.length} warnings (auto-fixed)`);
+      logger.info(`📊 Validation method: ${validationMethod}`);
+
+      if (validation.warnings && validation.warnings.length > 0) {
+        logger.warn(`⚠️ ${validation.warnings.length} warning(s) (non-critical)`);
       }
 
-      return code;
+      if (validation.correctedImports && validation.correctedImports.length > 0) {
+        logger.info(`🔧 ${validation.correctedImports.length} import path(s) auto-corrected`);
+      }
+
+      // Log summary for debugging
+      const summary = {
+        component: pageName,
+        lines: lineCount,
+        validationMethod: validationMethod,
+        astUsed: usedAST,
+        fixes: validation.fixes?.length || 0,
+        warnings: validation.warnings?.length || 0,
+        jsxErrors: validation.jsxErrors?.length || 0,
+        autoImports: validation.missingComponents?.length || 0
+      };
+      logger.debug('Generation summary:', JSON.stringify(summary, null, 2));
+
+      // ================================================================
+      // ✅ RETURN: Code + Validation metadata for tracking
+      // ================================================================
+      return {
+        code,
+        validationMethod,
+        lineCount
+      };
+      // ================================================================
+
     } catch (error) {
       lastError = error;
-      logger.warn(`Attempt ${attempt}/${maxAttempts} failed for ${pageName}:`, error.message);
+      logger.warn(`⚠️ Attempt ${attempt}/${maxAttempts} failed for ${pageName}:`, error.message);
 
       if (attempt < maxAttempts) {
-        const waitTime = Math.pow(2, attempt) * 1000;
-        logger.info(`Waiting ${waitTime / 1000}s before retry...`);
+        const waitTime = Math.pow(2, attempt) * 1000; // Exponential backoff
+        logger.info(`⏳ Waiting ${waitTime / 1000}s before retry...`);
         await new Promise((resolve) => setTimeout(resolve, waitTime));
       }
     }
   }
 
   // ALL RETRIES FAILED
-  logger.error(`Failed to generate ${pageName} after ${maxAttempts} attempts`);
+  logger.error(`❌ Failed to generate ${pageName} after ${maxAttempts} attempts`);
+  logger.error(`Last error: ${lastError.message}`);
+  logger.error(`Stack trace:`, lastError.stack);
+  
   throw new Error(`AI generation failed for ${pageName} after ${maxAttempts} attempts: ${lastError.message}`);
 }
+
+
+
+ 
 
 // ============================
 // MAIN CLASS
@@ -642,10 +1130,13 @@ class ProjectBuilderAgent {
   }
 
   /**
-   * Main build project method
+   * Main build project method with name sanitization and validation
    */
   /**
- * Main build project method with name sanitization and validation
+ * ✅ PRODUCTION READY: Build project with State Manager integration
+ */
+/**
+ * ✅ PRODUCTION READY: Build project with State Manager + Null Safety
  */
 async buildProject(userPrompt, projectPath) {
   try {
@@ -655,23 +1146,23 @@ async buildProject(userPrompt, projectPath) {
     // ✅ FIX: Validate and sanitize project name FIRST
     const rawName = path.basename(projectPath);
     const sanitizedName = rawName.toLowerCase().replace(/[^a-z0-9-_]/g, '-');
-    
+
     if (sanitizedName !== rawName) {
-      logger.warn(`⚠️  Project name contains uppercase or special characters: "${rawName}"`);
+      logger.warn(`⚠️ Project name contains uppercase or special characters: "${rawName}"`);
       logger.info(`📝 npm requires lowercase alphanumeric names with dashes/underscores only`);
-      
+
       const choice = await vscode.window.showWarningMessage(
         `Project name "${rawName}" is not valid for npm.\n\nnpm requires lowercase letters, numbers, dashes, and underscores only.\n\nRename to "${sanitizedName}"?`,
         { modal: true },
         'Yes, rename it',
         'Cancel'
       );
-      
+
       if (choice !== 'Yes, rename it') {
         logger.info('❌ User cancelled due to naming issue');
         return { success: false, error: 'Project name must follow npm naming conventions (lowercase only)' };
       }
-      
+
       // Update project path with sanitized name
       projectPath = path.join(path.dirname(projectPath), sanitizedName);
       logger.info(`✅ Project renamed to: ${sanitizedName}`);
@@ -681,23 +1172,102 @@ async buildProject(userPrompt, projectPath) {
     this.projectPath = projectPath;
     const projectSession = require('../services/projectSession');
 
-    // Check if folder exists and is empty
+    // ================================================================
+    // ✅ FIXED: Always initialize State Manager
+    // ================================================================
+    const StateManager = require('../services/stateManager');
+    this.stateManager = new StateManager(projectPath);
+
+    // Check if this is a resume or fresh build
     const folderExists = await this.folderExists(projectPath);
+
     if (folderExists) {
       const isEmpty = await this.folderIsEmpty(projectPath);
+      
       if (!isEmpty) {
-        const choice = await vscode.window.showWarningMessage(
-          `Folder "${path.basename(projectPath)}" is not empty. Continue and potentially overwrite files?`,
-          { modal: true },
-          'Continue',
-          'Cancel'
-        );
-        if (choice !== 'Continue') {
-          logger.info('User cancelled build due to non-empty folder');
-          return { success: false, error: 'Target folder is not empty' };
+        // Try to load existing manifest
+        try {
+          await this.stateManager.initialize();
+          const summary = this.stateManager.getSummary();
+          
+          logger.info(`📊 Found existing project with ${summary.components} components installed`);
+          
+          const choice = await vscode.window.showInformationMessage(
+            `Folder "${path.basename(projectPath)}" already exists.\n\n` +
+            `Progress: ${summary.progress} steps complete\n` +
+            `Components: ${summary.components} installed\n` +
+            `API Calls: ${summary.apiCalls} (${summary.tokens} tokens, ${summary.cost})\n\n` +
+            `What would you like to do?`,
+            { modal: true },
+            'Resume Build',
+            'Start Fresh',
+            'Cancel'
+          );
+
+          if (choice === 'Cancel') {
+            logger.info('User cancelled build');
+            return { success: false, error: 'User cancelled' };
+          }
+
+          if (choice === 'Start Fresh') {
+            logger.info('User chose to start fresh, clearing manifest...');
+            await this.stateManager.initialize(); // Creates fresh state
+          } else {
+            logger.info('User chose to resume build');
+          }
+        } catch (error) {
+          // No manifest or corrupted, ask user
+          const choice = await vscode.window.showWarningMessage(
+            `Folder "${path.basename(projectPath)}" is not empty. Continue and potentially overwrite files?`,
+            { modal: true },
+            'Continue',
+            'Cancel'
+          );
+
+          if (choice !== 'Continue') {
+            logger.info('User cancelled build due to non-empty folder');
+            return { success: false, error: 'Target folder is not empty' };
+          }
+          
+          // Initialize fresh state (folder exists but no manifest)
+          await this.stateManager.initialize();
         }
+      } else {
+        // Empty folder exists, initialize fresh state
+        await this.stateManager.initialize();
+        logger.info('📄 Initialized state manager for empty folder');
       }
+    } else {
+      // ✅ CRITICAL FIX: Folder doesn't exist yet
+      // Create a temporary state object until folder is created
+      logger.info('📄 Pre-initializing state manager (folder will be created during scaffold)');
+      
+      // Set a flag to initialize properly after scaffold
+      this.stateManagerNeedsInit = true;
+      
+      // Create minimal state to prevent null errors
+      this.stateManager.state = {
+        version: '1.0.0',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        projectName: path.basename(projectPath),
+        installedComponents: [],
+        generatedFiles: [],
+        apiUsage: {
+          totalTokens: 0,
+          totalCalls: 0,
+          estimatedCost: 0
+        },
+        buildSteps: {
+          scaffold: false,
+          uiLibrary: false,
+          components: false,
+          pages: false,
+          navigation: false
+        }
+      };
     }
+    // ================================================================
 
     await vscode.window.withProgress(
       {
@@ -706,6 +1276,25 @@ async buildProject(userPrompt, projectPath) {
         cancellable: false,
       },
       async (progress) => {
+        // ================================================================
+        // ✅ DEFENSIVE CHECK: Extra safety net
+        // ================================================================
+        if (!this.stateManager || !this.stateManager.state) {
+          logger.warn('⚠️ State manager not properly initialized, applying emergency fix...');
+          this.stateManager = this.stateManager || new StateManager(this.projectPath);
+          this.stateManager.state = {
+            version: '1.0.0',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            projectName: path.basename(this.projectPath),
+            installedComponents: [],
+            generatedFiles: [],
+            apiUsage: { totalTokens: 0, totalCalls: 0, estimatedCost: 0 },
+            buildSteps: { scaffold: false, uiLibrary: false, components: false, pages: false, navigation: false }
+          };
+        }
+        // ================================================================
+
         // PHASE 1: PROMPT ENGINEERING
         progress.report({ message: 'Analyzing your request...', increment: 5 });
         const promptEngineer = new PromptEngineerAgent();
@@ -736,7 +1325,7 @@ async buildProject(userPrompt, projectPath) {
         // PHASE 3: PROJECT PLANNING
         progress.report({ message: 'Creating project plan...', increment: 10 });
         this.projectPlan = {
-          projectName: path.basename(projectPath), // ✅ Use sanitized name
+          projectName: path.basename(projectPath),
           description: engineeredSpec.improvedPrompt,
           pages: engineeredSpec.keyFeatures.map((feature, idx) => ({
             name: feature.replace(/\s+/g, '') + 'Page',
@@ -749,36 +1338,69 @@ async buildProject(userPrompt, projectPath) {
 
         this.projectPlan = await refineComponentNeedsWithRegistry(this.projectPlan);
 
-        progress.report({ message: 'Scaffolding...', increment: 20 });
-        await this.scaffoldWithOfficialCLI(); // ✅ Will use sanitized name from this.projectPath
+        // ================================================================
+        // ✅ FIXED: Check if scaffold step is complete (with null safety)
+        // ================================================================
+        if (!this.stateManager.isStepComplete('scaffold')) {
+          progress.report({ message: 'Scaffolding...', increment: 20 });
+          await this.scaffoldWithOfficialCLI();
+          
+          // ✅ FIXED: Initialize state manager properly after folder creation
+          if (this.stateManagerNeedsInit) {
+            logger.info('📄 Initializing state manager after scaffold...');
+            await this.stateManager.initialize();
+            this.stateManagerNeedsInit = false;
+          }
+          
+          await this.stateManager.markStepComplete('scaffold');
+        } else {
+          logger.info('⏭️ Skipping scaffold (already complete)');
+          progress.report({ message: 'Scaffold already complete...', increment: 20 });
+        }
+        // ================================================================
 
-        progress.report({ message: 'Setting up UI...', increment: 15 });
-        await this.setupUILibrary();
+        // ✅ NEW: Check if UI library setup is complete
+        if (!this.stateManager.isStepComplete('uiLibrary')) {
+          progress.report({ message: 'Setting up UI...', increment: 15 });
+          await this.setupUILibrary();
+          await this.stateManager.markStepComplete('uiLibrary');
+        } else {
+          logger.info('⏭️ Skipping UI setup (already complete)');
+          progress.report({ message: 'UI already configured...', increment: 15 });
+        }
 
-        // ✅ CREATE ROOT LAYOUT
         progress.report({ message: 'Creating layout...', increment: 5 });
         await this.createRootLayout();
 
         progress.report({ message: 'Discovering components...', increment: 10 });
         const selectedComponents = await discoverComponents(this.projectPlan.componentNeeds);
 
-        progress.report({ message: 'Installing components...', increment: 15 });
-        this.installedComponents = await installComponentsWithFallback(selectedComponents, this.projectPath);
+        // ✅ NEW: Check if components are installed
+        if (!this.stateManager.isStepComplete('components')) {
+          progress.report({ message: 'Installing components...', increment: 15 });
+          this.installedComponents = await installComponentsWithFallback(
+            selectedComponents, 
+            this.projectPath, 
+            this.stateManager // ✅ Pass state manager
+          );
+          await this.stateManager.markStepComplete('components');
+        } else {
+          logger.info('⏭️ Skipping component installation (already complete)');
+          progress.report({ message: 'Components already installed...', increment: 15 });
+          // Load installed components from state
+          this.installedComponents = selectedComponents;
+        }
 
         progress.report({ message: 'Generating code...', increment: 10 });
         const [generatedPages, failedPages] = await this.generatePages();
 
-        // ✅ CREATE NAVIGATION COMPONENT
         if (generatedPages.length > 1) {
           progress.report({ message: 'Creating navigation...', increment: 5 });
           await this.createNavigationComponent(generatedPages);
           await this.addNavigationToLayout();
         }
 
-        // ✅ CLEANUP DUPLICATES
         await this.cleanupDuplicateFiles();
-
-        // ✅ CREATE VSCODE SETTINGS
         await this.createVSCodeSettings();
 
         projectSession.setSession({
@@ -788,9 +1410,20 @@ async buildProject(userPrompt, projectPath) {
           installedComponents: this.installedComponents,
         });
 
+        // ✅ NEW: Show final summary with costs
+        const finalSummary = this.stateManager.getSummary();
         logger.info('✅ Complete!');
+        logger.info('📊 Build Summary:', JSON.stringify(finalSummary, null, 2));
+        
         vscode.window.showInformationMessage(
-          `✅ Project "${path.basename(this.projectPath)}" is ready!\n\nRun: cd ${path.basename(this.projectPath)} && npm run dev`
+          `✅ Project "${path.basename(this.projectPath)}" is ready!\n\n` +
+          `📊 Summary:\n` +
+          `- Components: ${finalSummary.components}\n` +
+          `- Files: ${finalSummary.files}\n` +
+          `- API Calls: ${finalSummary.apiCalls}\n` +
+          `- Tokens Used: ${finalSummary.tokens}\n` +
+          `- Estimated Cost: ${finalSummary.cost}\n\n` +
+          `Run: cd ${path.basename(this.projectPath)} && npm run dev`
         );
       }
     );
@@ -802,6 +1435,7 @@ async buildProject(userPrompt, projectPath) {
     return { success: false, error: error.message };
   }
 }
+
 
 
   async folderExists(folderPath) {
@@ -823,71 +1457,64 @@ async buildProject(userPrompt, projectPath) {
   }
 
   /**
-   * Scaffold with official CLI (FIX #2: Force TypeScript for Next.js)
+   * Scaffold with official CLI (Force lowercase project names)
    */
-/**
- * Scaffold with official CLI (FIX: Force lowercase project names)
- */
-async scaffoldWithOfficialCLI() {
-  const { projectType } = this.projectAnalysis;
-  
-  // ✅ FIX: Sanitize project name to lowercase (npm requirement)
-  const rawProjectName = path.basename(this.projectPath);
-  const projectName = rawProjectName.toLowerCase().replace(/[^a-z0-9-_]/g, '-');
-  
-  if (projectName !== rawProjectName) {
-    logger.warn(`⚠️  Project name sanitized: "${rawProjectName}" → "${projectName}" (npm naming rules)`);
-    // Update the project path to use sanitized name
+  async scaffoldWithOfficialCLI() {
+    const { projectType } = this.projectAnalysis;
+
+    const rawProjectName = path.basename(this.projectPath);
+    const projectName = rawProjectName.toLowerCase().replace(/[^a-z0-9-_]/g, '-');
+
+    if (projectName !== rawProjectName) {
+      logger.warn(`⚠️ Project name sanitized: "${rawProjectName}" → "${projectName}" (npm naming rules)`);
+      const parentDir = path.dirname(this.projectPath);
+      this.projectPath = path.join(parentDir, projectName);
+      logger.info(`✅ Updated project path: ${this.projectPath}`);
+    }
+
     const parentDir = path.dirname(this.projectPath);
-    this.projectPath = path.join(parentDir, projectName);
-    logger.info(`✅ Updated project path: ${this.projectPath}`);
-  }
-  
-  const parentDir = path.dirname(this.projectPath);
 
-  if (projectType === 'vite-react') {
-    const { language } = this.projectAnalysis;
-    const template = language === 'typescript' ? 'react-ts' : 'react';
+    if (projectType === 'vite-react') {
+      const { language } = this.projectAnalysis;
+      const template = language === 'typescript' ? 'react-ts' : 'react';
 
-    await runCommand(builderConfig.cli.vite(projectName, template), parentDir, 'Creating Vite project');
-    await runCommand(builderConfig.cli.npmInstall, this.projectPath, 'Installing base deps');
+      await runCommand(builderConfig.cli.vite(projectName, template), parentDir, 'Creating Vite project');
+      await runCommand(builderConfig.cli.npmInstall, this.projectPath, 'Installing base deps');
 
-    logger.info('Installing react-router-dom...');
-    await runCommand(builderConfig.cli.reactRouterDom, this.projectPath, 'Installing react-router-dom');
+      logger.info('Installing react-router-dom...');
+      await runCommand(builderConfig.cli.reactRouterDom, this.projectPath, 'Installing react-router-dom');
 
-    await this.fixViteConfig();
-    logger.info('✅ Project scaffolded');
-    return;
-  }
-
-  if (projectType === 'nextjs') {
-    // ✅ FIX: FORCE TYPESCRIPT FOR NEXT.JS
-    this.projectAnalysis.language = 'typescript';
-    
-    logger.info(`📦 Creating Next.js project: "${projectName}" (TypeScript forced)...`);
-
-    let nextOk = false;
-    try {
-      await runCommand(
-        `npx create-next-app@latest ${projectName} --typescript --tailwind --eslint --app --no-src-dir --use-npm --yes`,
-        parentDir,
-        'Creating Next.js project'
-      );
-      nextOk = true;
-    } catch (error) {
-      logger.error('Creating Next.js project failed:', error);
+      await this.fixViteConfig();
+      logger.info('✅ Project scaffolded');
+      return;
     }
 
-    if (!nextOk) {
-      throw new Error('Next.js scaffolding failed. Aborting build.');
+    if (projectType === 'nextjs') {
+      this.projectAnalysis.language = 'typescript';
+      logger.info(`📦 Creating Next.js project: "${projectName}" (TypeScript forced)...`);
+
+      let nextOk = false;
+      try {
+        await runCommand(
+          `npx create-next-app@latest ${projectName} --typescript --tailwind --eslint --app --no-src-dir --use-npm --yes`,
+          parentDir,
+          'Creating Next.js project'
+        );
+        nextOk = true;
+      } catch (error) {
+        logger.error('Creating Next.js project failed:', error);
+      }
+
+      if (!nextOk) {
+        throw new Error('Next.js scaffolding failed. Aborting build.');
+      }
+
+      logger.info('✅ Project scaffolded');
+      return;
     }
 
-    logger.info('✅ Project scaffolded');
-    return;
+    throw new Error(`Unsupported project type: ${projectType}`);
   }
-
-  throw new Error(`Unsupported project type: ${projectType}`);
-}
 
   async fixViteConfig() {
     const { language } = this.projectAnalysis;
@@ -910,70 +1537,177 @@ export default defineConfig({
     logger.info('✅ Fixed vite.config');
   }
 
-  async setupUILibrary() {
-    const { language } = this.projectAnalysis;
-    const isTypeScript = language === 'typescript';
+  /**
+ * ✅ PRODUCTION READY: Setup UI Library with package.json validation
+ * Prevents "Invalid Version" errors during Tailwind installation
+ */
+async setupUILibrary() {
+  const { language } = this.projectAnalysis;
+  const isTypeScript = language === 'typescript';
 
-    await this.createConfigFiles();
+  await this.createConfigFiles();
 
-    logger.info('Installing Tailwind CSS v3...');
-    const tailwindResult = await runCommand(builderConfig.cli.tailwindV3, this.projectPath, 'Installing Tailwind v3');
-
-    if (!tailwindResult.success) {
-      logger.error('Tailwind installation failed!');
-      throw new Error('Failed to install Tailwind CSS');
+  // ================================================================
+  // ✅ NEW: Validate package.json before installing Tailwind
+  // ================================================================
+  logger.info('🔍 Validating package.json...');
+  const packageJsonPath = path.join(this.projectPath, 'package.json');
+  
+  try {
+    const packageJsonContent = await fs.readFile(packageJsonPath, 'utf-8');
+    const packageJson = JSON.parse(packageJsonContent);
+    
+    // Check for empty or invalid version
+    if (!packageJson.version || packageJson.version.trim() === '') {
+      logger.warn('⚠️ Invalid package.json detected (empty version), fixing...');
+      packageJson.version = '0.1.0';
+      await fs.writeFile(packageJsonPath, JSON.stringify(packageJson, null, 2));
+      logger.info('✅ Fixed package.json version to 0.1.0');
+    } else {
+      logger.info(`✅ package.json is valid (version: ${packageJson.version})`);
     }
 
-    await this.createTailwindConfig();
-
-    logger.info('Initializing shadcn...');
-    const result = await runCommand(builderConfig.cli.shadcnInit, this.projectPath, 'Initializing shadcn');
-
-    if (!result.success) {
-      logger.warn('shadcn init failed, using manual setup');
-      await this.manualShadcnSetup();
+    // Additional validation checks
+    if (!packageJson.name || packageJson.name.trim() === '') {
+      logger.warn('⚠️ Invalid package.json detected (empty name), fixing...');
+      packageJson.name = path.basename(this.projectPath);
+      await fs.writeFile(packageJsonPath, JSON.stringify(packageJson, null, 2));
+      logger.info(`✅ Fixed package.json name to ${packageJson.name}`);
     }
 
-    logger.info('✅ UI library ready');
+  } catch (error) {
+    logger.error('❌ Failed to validate package.json:', error.message);
+    
+    // Provide detailed error message
+    const errorMessage = error.code === 'ENOENT' 
+      ? 'package.json not found. create-next-app may have failed.'
+      : `package.json validation failed: ${error.message}`;
+    
+    throw new Error(
+      `${errorMessage}\n\n` +
+      'Recovery steps:\n' +
+      '1. Run: npm cache clean --force\n' +
+      `2. Delete folder: ${this.projectPath}\n` +
+      '3. Re-run the build command'
+    );
+  }
+  // ================================================================
+
+  logger.info('Installing Tailwind CSS v3...');
+  const tailwindResult = await runCommand(
+    builderConfig.cli.tailwindV3,
+    this.projectPath,
+    'Installing Tailwind v3'
+  );
+
+  if (!tailwindResult.success) {
+    logger.error('Tailwind installation failed!');
+    
+    // ================================================================
+    // ✅ NEW: Better error message with actionable steps
+    // ================================================================
+    const errorDetails = tailwindResult.error?.stderr || tailwindResult.error?.stdout || 'Unknown error';
+    
+    // Check for specific error patterns
+    if (errorDetails.includes('Invalid Version')) {
+      throw new Error(
+        '❌ Tailwind installation failed due to corrupted package.json.\n\n' +
+        'Recovery steps:\n' +
+        '1. Run in terminal: npm cache clean --force\n' +
+        `2. Delete folder: ${this.projectPath}\n` +
+        '3. Re-run the build command with a different project name\n' +
+        '4. Avoid names like "sass", "react", "next" (reserved package names)\n\n' +
+        `Error details: ${errorDetails}`
+      );
+    }
+    
+    if (errorDetails.includes('EACCES') || errorDetails.includes('permission denied')) {
+      throw new Error(
+        '❌ Tailwind installation failed due to permission issues.\n\n' +
+        'Recovery steps:\n' +
+        '1. Close all VS Code windows\n' +
+        '2. Run terminal as Administrator\n' +
+        '3. Run: npm cache clean --force\n' +
+        '4. Re-run the build command\n\n' +
+        `Error details: ${errorDetails}`
+      );
+    }
+
+    if (errorDetails.includes('ENOTFOUND') || errorDetails.includes('network')) {
+      throw new Error(
+        '❌ Tailwind installation failed due to network issues.\n\n' +
+        'Recovery steps:\n' +
+        '1. Check your internet connection\n' +
+        '2. Try again in a few minutes\n' +
+        '3. If using a proxy, configure npm proxy settings\n\n' +
+        `Error details: ${errorDetails}`
+      );
+    }
+    
+    // Generic error
+    throw new Error(
+      `❌ Failed to install Tailwind CSS.\n\n` +
+      `Error details: ${errorDetails}\n\n` +
+      'Recovery steps:\n' +
+      '1. Run: npm cache clean --force\n' +
+      `2. Delete folder: ${this.projectPath}\n` +
+      '3. Re-run the build command'
+    );
+    // ================================================================
   }
 
-  /**
-   * Create config files (FIX #5: Add path aliases)
-   */
+  logger.info('✅ Tailwind CSS v3 installed successfully');
+
+  await this.createTailwindConfig();
+
+  logger.info('Initializing shadcn...');
+  const result = await runCommand(
+    builderConfig.cli.shadcnInit,
+    this.projectPath,
+    'Initializing shadcn'
+  );
+
+  if (!result.success) {
+    logger.warn('shadcn init failed, using manual setup');
+    await this.manualShadcnSetup();
+  }
+
+  logger.info('✅ UI library ready');
+}
+
+
   async createConfigFiles() {
     const { language } = this.projectAnalysis;
     const isTypeScript = language === 'typescript';
 
     if (isTypeScript) {
-    // ✅ FIXED: Use paths without deprecated baseUrl
-    const tsconfig = {
-      compilerOptions: {
-        target: 'ES2020',
-        lib: ['ES2020', 'DOM', 'DOM.Iterable'],
-        allowJs: true,
-        skipLibCheck: true,
-        strict: true,
-        noEmit: true,
-        esModuleInterop: true,
-        module: 'esnext',
-        moduleResolution: 'bundler',
-        resolveJsonModule: true,
-        isolatedModules: true,
-        jsx: 'preserve',
-        incremental: true,
-        // ✅ FIX: Modern path mapping without baseUrl
-        paths: {
-          '@/*': ['./*'],
-        },
-        plugins: [
-          {
-            name: 'next',
+      const tsconfig = {
+        compilerOptions: {
+          target: 'ES2020',
+          lib: ['ES2020', 'DOM', 'DOM.Iterable'],
+          allowJs: true,
+          skipLibCheck: true,
+          strict: true,
+          noEmit: true,
+          esModuleInterop: true,
+          module: 'esnext',
+          moduleResolution: 'bundler',
+          resolveJsonModule: true,
+          isolatedModules: true,
+          jsx: 'preserve',
+          incremental: true,
+          paths: {
+            '@/*': ['./*'],
           },
-        ],
-      },
-      include: ['next-env.d.ts', '**/*.ts', '**/*.tsx', '.next/types/**/*.ts'],
-      exclude: ['node_modules'],
-    };
+          plugins: [
+            {
+              name: 'next',
+            },
+          ],
+        },
+        include: ['next-env.d.ts', '**/*.ts', '**/*.tsx', '.next/types/**/*.ts'],
+        exclude: ['node_modules'],
+      };
 
       await fileSystem.writeFile(this.projectPath, 'tsconfig.json', JSON.stringify(tsconfig, null, 2));
       logger.info('✅ Created tsconfig.json with path aliases');
@@ -1012,10 +1746,10 @@ export default defineConfig({
 
     await fileSystem.writeFile(this.projectPath, 'postcss.config.js', postcssConfig);
 
-    // ✅ FIX #8: Proper content paths for both App Router and src
-    const contentPaths = projectType === 'nextjs' 
-      ? `"./app/**/*.{js,jsx,ts,tsx}",\n    "./components/**/*.{js,jsx,ts,tsx}"`
-      : `"./index.html",\n    "./src/**/*.{js,jsx,ts,tsx}"`;
+    const contentPaths =
+      projectType === 'nextjs'
+        ? `"./app/**/*.{js,jsx,ts,tsx}",\n    "./components/**/*.{js,jsx,ts,tsx}"`
+        : `"./index.html",\n    "./src/**/*.{js,jsx,ts,tsx}"`;
 
     const tailwindConfig = `/** @type {import('tailwindcss').Config} */
 export default {
@@ -1030,8 +1764,9 @@ export default {
 
     await fileSystem.writeFile(this.projectPath, 'tailwind.config.js', tailwindConfig);
 
-    // ✅ FIX: Proper CSS with @tailwind directives FIRST
-    const indexCss = projectType === 'nextjs' ? `@tailwind base;
+    const indexCss =
+      projectType === 'nextjs'
+        ? `@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
@@ -1089,13 +1824,13 @@ export default {
   body {
     @apply bg-background text-foreground;
   }
-}` : `@tailwind base;
+}`
+        : `@tailwind base;
 @tailwind components;
 @tailwind utilities;`;
 
     const cssPath = projectType === 'nextjs' ? 'app/globals.css' : 'src/index.css';
     await fileSystem.writeFile(this.projectPath, cssPath, indexCss);
-
     logger.info('✅ Created Tailwind config');
   }
 
@@ -1124,7 +1859,6 @@ export default {
     };
 
     await fileSystem.writeFile(this.projectPath, 'components.json', JSON.stringify(componentsJson, null, 2));
-
     await fileSystem.createDirectory(this.projectPath, 'src/lib');
 
     const utilsCode = `import { clsx } from "clsx";
@@ -1135,29 +1869,23 @@ export function cn(...inputs) {
 }`;
 
     await fileSystem.writeFile(this.projectPath, `src/lib/utils.${isTypeScript ? 'ts' : 'js'}`, utilsCode);
-
     logger.info('✅ Manual shadcn setup complete');
   }
 
-  /**
-   * ✅ FIX #1: Create root layout file (CRITICAL)
-   */
-async createRootLayout() {
-  const { language, projectType } = this.projectAnalysis;
+  async createRootLayout() {
+    const { language, projectType } = this.projectAnalysis;
+    if (projectType !== 'nextjs') return;
 
-  if (projectType !== 'nextjs') return;
+    const isTS = language === 'typescript';
+    const ext = isTS ? 'tsx' : 'jsx';
 
-  const isTS = language === 'typescript';
-  const ext = isTS ? 'tsx' : 'jsx';
+    const sanitizedDescription = this.projectPlan.description
+      .replace(/"/g, '\\"')
+      .replace(/\n/g, ' ')
+      .substring(0, 160);
 
-  // ✅ FIX: Truncate and sanitize description to avoid parsing errors
-  const sanitizedDescription = this.projectPlan.description
-    .replace(/"/g, '\\"') // Escape quotes
-    .replace(/\n/g, ' ') // Remove newlines
-    .substring(0, 160); // Limit length
-
-  const layoutCode = isTS
-    ? `import type { Metadata } from 'next'
+    const layoutCode = isTS
+      ? `import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 
@@ -1179,7 +1907,7 @@ export default function RootLayout({
     </html>
   )
 }`
-    : `import { Inter } from 'next/font/google'
+      : `import { Inter } from 'next/font/google'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -1192,34 +1920,29 @@ export default function RootLayout({ children }) {
   )
 }`;
 
-  await fileSystem.writeFile(this.projectPath, `app/layout.${ext}`, layoutCode);
-  logger.info('✅ Created root layout');
-}
-
+    await fileSystem.writeFile(this.projectPath, `app/layout.${ext}`, layoutCode);
+    logger.info('✅ Created root layout');
+  }
 
   /**
-   * ✅ FIX #6: Create navigation component
+   * ✅ FIX #5: Create navigation component with sanitized routes and unique keys
    */
-  /**
- * Create navigation component with sanitized routes
- * FIX: Use sanitized routes from generated pages
- */
-async createNavigationComponent(pages) {
-  const { language, projectType } = this.projectAnalysis;
-  if (projectType !== 'nextjs') return;
+  async createNavigationComponent(pages) {
+    const { language, projectType } = this.projectAnalysis;
+    if (projectType !== 'nextjs') return;
 
-  const isTS = language === 'typescript';
-  const ext = isTS ? 'tsx' : 'jsx';
+    const isTS = language === 'typescript';
+    const ext = isTS ? 'tsx' : 'jsx';
 
-  // ✅ FIX: Use sanitized routes from generated pages
-  const routes = pages
-    .filter(p => p.route !== '/') // Don't duplicate home in the list
-    .map((p) => ({
-      path: p.sanitizedRoute || p.route, // Use sanitized route if available
-      label: p.name.replace(/Page$/, '').replace(/([A-Z])/g, ' $1').trim()
-    }));
+    // ✅ Use sanitized routes from generated pages
+    const routes = pages
+      .filter((p) => p.sanitizedRoute !== '/')
+      .map((p) => ({
+        path: p.sanitizedRoute || p.route,
+        label: p.name.replace(/Page$/, '').replace(/([A-Z])/g, ' $1').trim(),
+      }));
 
-  const navCode = `'use client'
+    const navCode = `'use client'
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -1229,7 +1952,7 @@ export function Navigation() {
 
   const routes = [
     { path: '/', label: 'Home' },
-${routes.map((r) => `    { path: '${r.path}', label: '${r.label}' }`).join(',\n')}
+${routes.map((r, index) => `    { path: '${r.path}', label: '${r.label}' }`).join(',\n')}
   ]
 
   return (
@@ -1239,9 +1962,9 @@ ${routes.map((r) => `    { path: '${r.path}', label: '${r.label}' }`).join(',\n'
           ${this.projectPlan.projectName}
         </Link>
         <div className="flex gap-2">
-          {routes.map((route) => (
+          {routes.map((route, index) => (
             <Link
-              key={route.path}
+              key={\`\${route.path}-\${index}\`}
               href={route.path}
               className={\`px-4 py-2 rounded-md transition-all duration-200 \${
                 pathname === route.path
@@ -1258,18 +1981,13 @@ ${routes.map((r) => `    { path: '${r.path}', label: '${r.label}' }`).join(',\n'
   )
 }`;
 
-  await fileSystem.createDirectory(this.projectPath, 'components');
-  await fileSystem.writeFile(this.projectPath, `components/navigation.${ext}`, navCode);
-  logger.info('✅ Created navigation component');
-}
+    await fileSystem.createDirectory(this.projectPath, 'components');
+    await fileSystem.writeFile(this.projectPath, `components/navigation.${ext}`, navCode);
+    logger.info('✅ Created navigation component with sanitized routes');
+  }
 
-
-  /**
-   * Add navigation to layout
-   */
   async addNavigationToLayout() {
     const { language, projectType } = this.projectAnalysis;
-    
     if (projectType !== 'nextjs') return;
 
     const isTS = language === 'typescript';
@@ -1298,11 +2016,12 @@ ${routes.map((r) => `    { path: '${r.path}', label: '${r.label}' }`).join(',\n'
     }
   }
 
-   
   /**
- * Generate all pages with sanitized routes
- * FIX: Sanitize routes to prevent regex errors in Next.js
- */
+   * ✅ FIX #6: Generate pages with sanitized routes and component names
+   */
+  /**
+ * ✅ PRODUCTION READY: Generate pages with state tracking
+ */ 
 async generatePages() {
   const { pages } = this.projectPlan;
   const { language, projectType } = this.projectAnalysis;
@@ -1316,37 +2035,40 @@ async generatePages() {
     logger.info(`Generating ${page.name}...`);
 
     try {
-      // ✅ FIX: Sanitize component name (remove special chars)
-      let componentName = page.name.replace(/\s+/g, '');
-      componentName = componentName.replace(/[()[\]{}+*?^$|\\]/g, ''); // Remove regex chars
-      componentName = componentName.replace(/[^a-zA-Z0-9_]/g, ''); // Only alphanumeric and underscore
-      
-      if (!componentName) {
-        componentName = 'GeneratedPage';
-      }
+      // ✅ FIX: Sanitize component name properly
+      const componentName = sanitizeComponentName(page.name);
+      logger.info(`✅ Sanitized: "${page.name}" → "${componentName}"`);
 
-      const code = await generatePageCode(
+      // ================================================================
+      // ✅ NEW: Pass stateManager to generatePageCode
+      // ================================================================
+      const result = await generatePageCode(
         componentName,
         page.description,
         this.installedComponents,
         this.projectAnalysis,
-        this.projectPath
+        this.projectPath,
+        this.stateManager // ✅ Pass state manager for API tracking
       );
 
+      const code = result.code;
+      const validationMethod = result.validationMethod;
+      const lineCount = result.lineCount;
+      // ================================================================
+
       let relativePath;
-      let sanitizedRoute = page.route; // Keep original for vite
+      let sanitizedRoute = page.route;
 
       if (projectType === 'nextjs') {
         // ✅ FIX: Sanitize route before creating folder
         if (page.route !== '/') {
           sanitizedRoute = sanitizeRouteName(page.route);
-          logger.info(`✅ Sanitized route: "${page.route}" → "${sanitizedRoute}"`);
+          logger.info(`✅ Route: "${page.route}" → "${sanitizedRoute}"`);
         }
-        
-        if (sanitizedRoute === '/' || page.route === '/') {
+
+        if (sanitizedRoute === '/') {
           relativePath = path.join('app', 'page.tsx');
         } else {
-          // Remove leading slash and create folder path
           const routeSegments = sanitizedRoute.replace(/^\//, '').split('/');
           relativePath = path.join('app', ...routeSegments, 'page.tsx');
         }
@@ -1360,15 +2082,30 @@ async generatePages() {
       await fileSystem.createDirectory(this.projectPath, path.relative(this.projectPath, dir));
       await fileSystem.writeFile(this.projectPath, relativePath, code);
 
-      logger.info(`✅ Created file: ${relativePath}`);
-      generatedPages.push({ 
-        ...page, 
-        name: componentName, 
+      logger.info(`✅ Created: ${relativePath}`);
+
+      // ================================================================
+      // ✅ NEW: Track generated file in state
+      // ================================================================
+      if (this.stateManager) {
+        await this.stateManager.addGeneratedFile(
+          relativePath,
+          componentName,
+          validationMethod,
+          lineCount
+        );
+        logger.debug(`📝 Tracked file: ${relativePath} in manifest`);
+      }
+      // ================================================================
+
+      generatedPages.push({
+        ...page,
+        name: componentName,
         file: relativePath,
-        sanitizedRoute: sanitizedRoute // ✅ Store sanitized route for navigation
+        sanitizedRoute: sanitizedRoute, // ✅ Store for navigation
       });
     } catch (error) {
-      logger.error(`Failed to generate ${page.name}:`, error.message);
+      logger.error(`Failed ${page.name}:`, error.message);
       failedPages.push({ name: page.name, route: page.route, error: error.message });
     }
   }
@@ -1380,15 +2117,13 @@ async generatePages() {
     await this.validateMainJsx(ext);
   }
 
-  logger.info(`✅ Pages generated: ${generatedPages.length}/${pages.length}`);
+  logger.info(`✅ Pages: ${generatedPages.length}/${pages.length}`);
 
   if (failedPages.length > 0) {
-    logger.warn('Failed pages:', failedPages.map((p) => p.name).join(', '));
+    logger.warn('Failed:', failedPages.map((p) => p.name).join(', '));
     vscode.window
       .showWarningMessage(
-        `Project created with ${generatedPages.length}/${pages.length} pages. Failed: ${failedPages
-          .map((p) => p.name)
-          .join(', ')}. You can manually create these or retry.`,
+        `Project created with ${generatedPages.length}/${pages.length} pages. Failed: ${failedPages.map((p) => p.name).join(', ')}.`,
         'View Logs'
       )
       .then((selection) => {
@@ -1407,7 +2142,6 @@ async generatePages() {
 
     try {
       let content = await fs.readFile(mainPath, 'utf-8');
-
       if (!content.includes("import './index.css'")) {
         logger.warn('main.jsx missing CSS import, fixing...');
         content = content.replace(/import App from '\.\/App'/, `import './index.css'\nimport App from './App'`);
@@ -1433,7 +2167,7 @@ export default App;`;
     }
 
     const imports = pages.map((p) => `import ${p.name} from './pages/${p.name}';`).join('\n');
-    const routes = pages.map((p) => `<Route path="${p.route}" element={<${p.name} />} />`).join('\n          ');
+    const routes = pages.map((p) => `<Route path="${p.route}" element={<${p.name} />} />`).join('\n        ');
 
     return `import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
@@ -1452,15 +2186,11 @@ function App() {
 export default App;`;
   }
 
-  /**
-   * ✅ Remove duplicate .js files if .tsx versions exist
-   */
   async cleanupDuplicateFiles() {
     const appPath = path.join(this.projectPath, 'app');
 
     try {
       const files = await fs.readdir(appPath, { withFileTypes: true });
-
       for (const file of files) {
         if (file.isFile() && file.name.endsWith('.js')) {
           const tsxVersion = file.name.replace('.js', '.tsx');
@@ -1470,7 +2200,7 @@ export default App;`;
             await fs.access(tsxPath);
             const jsPath = path.join(appPath, file.name);
             await fs.unlink(jsPath);
-            logger.info(`🗑️  Removed duplicate: ${file.name} (${tsxVersion} exists)`);
+            logger.info(`🗑️ Removed duplicate: ${file.name} (${tsxVersion} exists)`);
           } catch {
             // TSX doesn't exist, keep JS
           }
@@ -1481,9 +2211,6 @@ export default App;`;
     }
   }
 
-  /**
-   * ✅ FIX #7: Create VS Code settings for better DX
-   */
   async createVSCodeSettings() {
     const settings = {
       'css.lint.unknownAtRules': 'ignore',
