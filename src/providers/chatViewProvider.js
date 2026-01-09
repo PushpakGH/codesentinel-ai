@@ -5,9 +5,12 @@
  */
 
 const vscode = require('vscode');
+const path = require('path');
 const { logger } = require('../utils/logger');
 const aiClient = require('../services/aiClient');
 const configManager = require('../services/configManager');
+const StateManager = require('../services/stateManager');
+
 
 class ChatViewProvider {
   constructor(context) {
@@ -15,6 +18,15 @@ class ChatViewProvider {
     this.context = context;
     this.chatHistory = [];
     this.isProcessing = false;
+    
+    // Initialize StateManager for the current workspace
+    // If multiple workspaces, this needs to be robust, but for now take the first root.
+    if (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0) {
+        this.projectPath = vscode.workspace.workspaceFolders[0].uri.fsPath;
+        this.stateManager = new StateManager(this.projectPath); 
+        // We will initialize it when the view resolves or immediately
+        this.stateManager.initialize().catch(err => logger.error('Failed to init state in chat', err));
+    }
   }
 
   
@@ -32,24 +44,16 @@ resolveWebviewView(webviewView) {
 
   webviewView.webview.html = this._getHtmlForWebview();
 
-  // ✅ PROPERLY AWAIT THE TEST (with error handling)
-  this._testMCPServer()
-    .then(() => {
-      logger.info('✅ MCP test completed successfully');
-    })
-    .catch((error) => {
-      logger.error('❌ MCP test failed with error:', error);
-      logger.error('Error details:', {
-        message: error.message,
-        stack: error.stack,
-        name: error.name
-      });
-    });
+  // Test MCP
+  this._testMCPServer().catch(() => {});
 
   // Handle messages from webview
   webviewView.webview.onDidReceiveMessage(
     async (message) => {
       switch (message.command) {
+        case 'webviewLoaded': // NEW: Hydration trigger
+           await this._restoreSession();
+           break;
         case 'sendMessage':
           await this._handleUserMessage(message.text);
           break;
@@ -69,6 +73,80 @@ resolveWebviewView(webviewView) {
 
   logger.info('✅ Chat side panel initialized');
 }
+
+  /**
+   * Restore previous chat session
+   */
+  async _restoreSession() {
+      if (!this.stateManager) return;
+      
+      try {
+          const history = this.stateManager.getChatHistory();
+          if (history && history.length > 0) {
+              this.chatHistory = history;
+              logger.info(`🔄 Restoring ${history.length} chat messages...`);
+              
+              await this._view.webview.postMessage({
+                  command: 'restoreHistory',
+                  messages: history
+              });
+          }
+      } catch (error) {
+          logger.error('Failed to restore session:', error);
+      }
+  }
+
+  // ... (Test methods omitted for brevity, keeping existing) ...
+
+  /**
+   * Handle user message (reuses logic from ChatPanelManager)
+   */
+  async _handleUserMessage(userMessage) {
+    if (this.isProcessing) {
+      this._sendMessage('assistant', '⏳ Please wait for the current response to complete...');
+      return;
+    }
+
+    logger.info('Side panel message:', { message: userMessage });
+
+    // Add user message to UI
+    this._sendMessage('user', userMessage);
+    this.chatHistory.push({ role: 'user', content: userMessage });
+    
+    // NEW: Persist to state
+    if (this.stateManager) await this.stateManager.saveChatHistory(this.chatHistory);
+
+    // Show typing indicator
+    this._view.webview.postMessage({ command: 'showTyping' });
+    this.isProcessing = true;
+
+    try {
+      const response = await this._processCommand(userMessage);
+      this._sendMessage('assistant', response);
+      this.chatHistory.push({ role: 'assistant', content: response });
+      
+      // NEW: Persist response
+      if (this.stateManager) await this.stateManager.saveChatHistory(this.chatHistory);
+
+    } catch (error) {
+      logger.error('Side panel error:', error);
+      this._sendMessage('assistant', `❌ Error: ${error.message}`);
+    } finally {
+      this._view.webview.postMessage({ command: 'hideTyping' });
+      this.isProcessing = false;
+    }
+  }
+  
+  /**
+   * Clear chat history
+   */
+  async _clearChat() {
+    this.chatHistory = [];
+    if (this.stateManager) await this.stateManager.saveChatHistory([]); // Clear in persistence
+    
+    this._view.webview.postMessage({ command: 'chatCleared' });
+    logger.info('Side panel chat cleared');
+  }
 
  
 /**
@@ -644,8 +722,32 @@ async _handleGeneralQuestion(question) {
                 case 'chatCleared':
                     messages.innerHTML = '<div class="empty"><div class="empty-icon">🤖</div><p><strong>Chat cleared</strong></p></div><div class="typing" id="typing"><span></span><span></span><span></span></div>';
                     break;
+                case 'restoreHistory': // NEW: Handle hydration
+                    if (msg.messages && msg.messages.length > 0) {
+                        const empty = document.querySelector('.empty');
+                        if (empty) empty.remove();
+                        
+                        // Clear existing (except typing)
+                        // Actually, simplified: just rebuild
+                        const typingDiv = document.getElementById('typing');
+                        messages.innerHTML = ''; 
+                        
+                        msg.messages.forEach(m => {
+                           const div = document.createElement('div');
+                           div.className = \`message \${m.role}\`;
+                           div.textContent = m.content;
+                           messages.appendChild(div);
+                        });
+                        
+                        messages.appendChild(typingDiv); 
+                        scrollToBottom();
+                    }
+                    break;
             }
         });
+
+        // NEW: Signal ready for hydration
+        vscode.postMessage({ command: 'webviewLoaded' });
 
         function addMessage(message) {
             const empty = document.querySelector('.empty');

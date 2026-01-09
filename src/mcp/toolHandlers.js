@@ -30,6 +30,9 @@ async function handleToolCall(toolName, params, mcpServer) {
       
     case 'generate_tests':
       return await handleGenerateTests(params, mcpServer);
+
+    case 'search_components':
+      return await handleSearchComponents(params, mcpServer);
       
     default:
       throw new Error(`Unknown tool: ${toolName}`);
@@ -367,6 +370,53 @@ async function handleGenerateTests(params, mcpServer) {
   }
 }
 
+/**
+ * Tool: search_components
+ * Semantic search for components driven by UniversalRegistry
+ */
+async function handleSearchComponents(params, mcpServer) {
+  const { query, style_preference = 'neutral' } = params;
+
+  if (!query) {
+    throw new Error('Missing required parameter: query');
+  }
+
+  logger.info(`Searching components: "${query}" (style: ${style_preference})`);
+
+  try {
+    const { UniversalRegistry } = require('../registry/registryIndex');
+    
+    // UniversalRegistry is now the singleton instance
+    const results = UniversalRegistry.findBestMatch(query, style_preference);
+    
+    // Limit results to top 10 to keep context manageable
+    const topResults = results.slice(0, 10).map(r => ({
+      name: r.name,
+      registry: r.registry,
+      score: r.score.toFixed(2),
+      description: r.description,
+      tags: r.tags,
+      useCase: r.useCase,
+      installCommand: r.registry === 'daisyui' ? 'npm install daisyui' : 
+                      r.registry === 'motion-primitives' ? 'npm install motion' :
+                      `npx shadcn@latest add ${r.registry === 'shadcn' ? '' : '@' + r.registry + '/'}${r.name}`
+    }));
+
+    return {
+      success: true,
+      query,
+      style_preference,
+      total_found: results.length,
+      top_matches: topResults,
+      message: `Found ${results.length} components matching "${query}"`
+    };
+
+  } catch (error) {
+    logger.error('search_components failed:', error);
+    throw new Error(`Component search failed: ${error.message}`);
+  }
+}
+
 module.exports = {
   handleToolCall,
   handleGenerateProject,
@@ -374,5 +424,6 @@ module.exports = {
   handleDiscoverComponents,
   handleReviewCode,
   handleFixCode,
-  handleGenerateTests
+  handleGenerateTests,
+  handleSearchComponents
 };

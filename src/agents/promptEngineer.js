@@ -10,64 +10,77 @@ class PromptEngineerAgent {
   /**
    * Improve and expand user prompt
    * @param {string} userPrompt - Raw user input
-   * @returns {Object} { improvedPrompt, requirements, suggestedComponents }
+   * @returns {Object} { improvedPrompt, requirements, suggestedComponents, designSystem }
    */
   async improvePrompt(userPrompt) {
-    logger.info('🎨 Prompt Engineer: Analyzing user intent...');
+    logger.info('🎨 Prompt Engineer: Analyzing user intent & designing visual system...');
 
-    const systemPrompt = `You are a Senior Software Architect and Requirements Engineer.
+    const systemPrompt = `You are a Senior Software Architect and Design System Expert.
 
-Your task: Transform vague user requests into professional, detailed project specifications.
+Your task: Transform vague user requests into professional project specifications with a COMPLETE VISUAL IDENTITY.
 
 Guidelines:
-1. Extract ALL implicit requirements from vague descriptions
-2. Suggest modern best practices (responsive, accessible, performant)
-3. Recommend appropriate tech stack based on project type
-4. Identify specific component needs from available registries
-5. Consider edge cases and error handling
-6. Think about user experience and polish
+1. Extract ALL implicit requirements
+2. Suggest modern best practices (Next.js 15, Tailwind v4)
+3. DESIGN A VISUAL IDENTITY:
+   - Define a color palette (Primary, Secondary, Accent, Background) using specific HSL values
+   - Choose a Typography strategy (e.g., Inter, Geist Sans)
+   - Define a Radius strategy (0.5rem, 1rem, etc.)
+4. Identify specific component needs from shadcn/magicui/aceternity
+5. Think about user experience and interaction design
 
 Available Component Registries:
-- shadcn: Forms, navigation, data display (48 components)
-- magicui: Animations, effects, backgrounds (30 components)
-- aceternity: Hero sections, interactive effects (42 components)
-- motion-primitives: Scroll animations, gestures (10 components)
-- daisyui: Utility-first components (55 components)
+- shadcn: Core UI primitives (Forms, Data Display, Feedback) - 48 components
+- magicui: High-impact animations (Shimmer Button, Animated Beam) - 30 components
+- aceternity: Hero sections & Effects (Hero Parallax, Tracing Beam) - 42 components
+- motion-primitives: Gestures & transitions - 10 components
+- daisyui: Utility-first components - 55 components
 
 Return ONLY valid JSON:
 {
-  "originalIntent": "Brief summary of user's request",
-  "improvedPrompt": "Professional, detailed specification",
-  "projectType": "vite-react" | "nextjs",
-  "reasoning": "Why this tech stack",
+  "originalIntent": "Brief summary",
+  "improvedPrompt": "Detailed technical spec",
+  "projectType": "nextjs",
+  "reasoning": "Tech stack justification",
+  "designSystem": {
+    "style": "minimal" | "cyberpunk" | "corporate" | "playful",
+    "colors": {
+       "primary": "222.2 47.4% 11.2%",
+       "secondary": "210 40% 96.1%",
+       "accent": "210 40% 96.1%",
+       "background": "0 0% 100%",
+       "foreground": "222.2 84% 4.9%"
+    },
+    "radius": "0.5rem",
+    "typography": "Inter",
+    "layoutStrategy": "dashboard" | "landing" | "fullscreen"
+  },
   "keyFeatures": ["feature1", "feature2"],
   "componentNeeds": {
     "forms": ["input", "button"],
     "navigation": ["navbar", "sidebar"],
-    "animations": ["shimmer-button", "animated-beam"]
+    "animations": ["shimmer-button", "animated-beam"],
+    "layout": ["resizable-panel", "card"]
   },
-  "designGuidelines": ["guideline1", "guideline2"],
-  "estimatedComplexity": "simple" | "moderate" | "complex"
+  "impliedLibraries": ["lucide-react", "clsx", "tailwind-merge"],
+  "estimatedComplexity": "moderate"
 }`;
 
     const prompt = `User Request: "${userPrompt}"
 
-Analyze this request and create a professional project specification.
+Analyze this request and create a professional project specification + Design System.
 
 Important:
-- If the request is vague (e.g., "build a website"), infer reasonable defaults
-- Suggest modern, production-ready approaches
-- Consider mobile responsiveness, accessibility, and performance
-- Recommend specific components from available registries
-- Think like a senior developer planning a real project
-
-Return detailed JSON specification now:`;
+- If "visual enhanced" or "animated" is requested, choose 'magicui' and 'aceternity' components.
+- Define a color palette that matches the mood (e.g., Cyberpunk = Neon HSL values).
+- For Layouts: Suggest 'resizable-panel' for IDEs, 'sidebar' for dashboards.
+- Return detailed JSON specification now:`;
 
     try {
       const response = await aiClient.generate(prompt, {
         systemPrompt,
-        maxTokens: 4000,
-        temperature: 0.4  // Balanced: creative but focused
+        maxTokens: 5000,
+        temperature: 0.5 
       });
 
       // Parse JSON response
@@ -81,7 +94,7 @@ Return detailed JSON specification now:`;
 
       logger.info('✅ Prompt Engineering Complete');
       logger.debug('Improved Prompt:', spec.improvedPrompt);
-      logger.debug('Component Needs:', spec.componentNeeds);
+      logger.debug('Design System:', spec.designSystem);
 
       return {
         success: true,
@@ -103,21 +116,26 @@ Return detailed JSON specification now:`;
       success: false,
       original: userPrompt,
       originalIntent: 'Simple web application',
-      improvedPrompt: `Create a modern, responsive web application: ${userPrompt}. 
-Include professional UI components, smooth animations, and best practices for accessibility and performance.`,
-      projectType: 'vite-react',
-      reasoning: 'Default to Vite + React for fast development',
-      keyFeatures: ['Responsive design', 'Modern UI', 'Fast performance'],
+      improvedPrompt: `Create a modern, responsive web application: ${userPrompt}. Include professional UI components.`,
+      projectType: 'nextjs',
+      reasoning: 'Default to Next.js for robustness',
+      designSystem: {
+        style: "minimal",
+        colors: {
+           "primary": "222.2 47.4% 11.2%",
+           "secondary": "210 40% 96.1%",
+           "accent": "210 40% 96.1%",
+           "background": "0 0% 100%",
+           "foreground": "222.2 84% 4.9%"
+        },
+        radius: "0.5rem"
+      },
+      keyFeatures: ['Responsive design', 'Modern UI'],
       componentNeeds: {
         forms: ['button', 'input', 'card'],
         navigation: ['navigation-menu'],
         dataDisplay: ['card', 'badge']
       },
-      designGuidelines: [
-        'Mobile-first responsive design',
-        'Clean, modern aesthetics',
-        'Smooth transitions and animations'
-      ],
       estimatedComplexity: 'simple'
     };
   }
@@ -126,13 +144,7 @@ Include professional UI components, smooth animations, and best practices for ac
    * Validate improved prompt makes sense
    */
   async validateSpecification(spec) {
-    // Check if all required fields present
-    const required = [
-      'improvedPrompt',
-      'projectType',
-      'keyFeatures',
-      'componentNeeds'
-    ];
+    const required = ['improvedPrompt', 'projectType', 'keyFeatures', 'componentNeeds', 'designSystem'];
 
     for (const field of required) {
       if (!spec[field]) {
@@ -140,23 +152,6 @@ Include professional UI components, smooth animations, and best practices for ac
         return false;
       }
     }
-
-    // Check if componentNeeds is reasonable
-    const totalComponents = Object.values(spec.componentNeeds)
-      .reduce((sum, arr) => sum + (Array.isArray(arr) ? arr.length : 0), 0);
-
-    if (totalComponents === 0) {
-      logger.warn('No components specified, adding defaults');
-      spec.componentNeeds = {
-        forms: ['button', 'input'],
-        dataDisplay: ['card']
-      };
-    }
-
-    if (totalComponents > 30) {
-      logger.warn('Too many components requested, may need simplification');
-    }
-
     return true;
   }
 }

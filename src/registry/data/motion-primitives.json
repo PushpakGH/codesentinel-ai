@@ -19,16 +19,20 @@
     "effects"
   ],
   "licensing": {
-  "model": "freemium",
-  "notes": "Core primitives are free under MIT; some advanced components and templates require Motion Primitives Pro."
-},
+    "model": "freemium",
+    "notes": "Core primitives are free under MIT; some advanced components and templates require Motion Primitives Pro."
+  },
   "components": [
     {
       "name": "motion-box",
       "category": "layout",
       "description": "Convenience wrapper around motion.div with sensible defaults that works with any Tailwind layout.",
-      "dependencies": ["framer-motion"],
-      "files": ["components/motion/motion-box.tsx"],
+      "dependencies": [
+        "framer-motion"
+      ],
+      "files": [
+        "components/motion/motion-box.tsx"
+      ],
       "props": {
         "as": {
           "type": "string | React.ComponentType",
@@ -62,18 +66,33 @@
           "title": "Fade In",
           "code": "<MotionBox\n  initial={{ opacity: 0 }}\n  animate={{ opacity: 1 }}\n  transition={{ duration: 0.4 }}\n  className=\"rounded-xl bg-card p-6 shadow\"\n>\n  Content\n</MotionBox>"
         }
-      ]
+      ],
+      "tags": [
+        "animation",
+        "container",
+        "div",
+        "primitive"
+      ],
+      "useCase": "Generic animated container."
     },
     {
       "name": "draggable",
       "category": "gestures",
       "description": "Makes any child draggable with optional axis and constraints, using Framer Motion drag.",
-      "dependencies": ["framer-motion"],
-      "files": ["components/motion/draggable.tsx"],
+      "dependencies": [
+        "framer-motion"
+      ],
+      "files": [
+        "components/motion/draggable.tsx"
+      ],
       "props": {
         "axis": {
           "type": "string",
-          "values": ["x", "y", "both"],
+          "values": [
+            "x",
+            "y",
+            "both"
+          ],
           "default": "both",
           "description": "Limits drag to the x-axis, y-axis, or both."
         },
@@ -92,14 +111,25 @@
           "title": "Draggable Card",
           "code": "<Draggable axis=\"x\" constraints={{ left: -100, right: 100 }}>\n  <div className=\"rounded-xl border bg-card p-4\">Drag me horizontally</div>\n</Draggable>"
         }
-      ]
+      ],
+      "tags": [
+        "gesture",
+        "drag",
+        "interaction",
+        "move"
+      ],
+      "useCase": "Making an element draggable."
     },
     {
       "name": "hover-lift",
       "category": "effects",
       "description": "Adds a subtle scale, translate and shadow on hover using whileHover under the hood.",
-      "dependencies": ["framer-motion"],
-      "files": ["components/motion/hover-lift.tsx"],
+      "dependencies": [
+        "framer-motion"
+      ],
+      "files": [
+        "components/motion/hover-lift.tsx"
+      ],
       "props": {
         "scale": {
           "type": "number",
@@ -122,14 +152,25 @@
           "title": "Hover Card",
           "code": "<HoverLift>\n  <div className=\"rounded-xl border bg-card p-4 shadow-sm\">\n    Hover me\n  </div>\n</HoverLift>"
         }
-      ]
+      ],
+      "tags": [
+        "hover",
+        "effect",
+        "card",
+        "scale"
+      ],
+      "useCase": "Subtle lift effect on hover."
     },
     {
       "name": "pressable",
       "category": "gestures",
       "description": "Adds press/tap feedback via scale animation using whileTap.",
-      "dependencies": ["framer-motion"],
-      "files": ["components/motion/pressable.tsx"],
+      "dependencies": [
+        "framer-motion"
+      ],
+      "files": [
+        "components/motion/pressable.tsx"
+      ],
       "props": {
         "scale": {
           "type": "number",
@@ -147,14 +188,25 @@
           "title": "Pressable Button",
           "code": "<Pressable>\n  <button className=\"rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground\">\n    Click me\n  </button>\n</Pressable>"
         }
-      ]
+      ],
+      "tags": [
+        "click",
+        "button",
+        "scale",
+        "tap"
+      ],
+      "useCase": "Scale down effect on click/tap."
     },
     {
       "name": "scroll-reveal",
       "category": "scroll",
       "description": "Reveals content when it scrolls into view using whileInView and viewport options.",
-      "dependencies": ["framer-motion"],
-      "files": ["components/motion/scroll-reveal.tsx"],
+      "dependencies": [
+        "framer-motion"
+      ],
+      "files": [
+        "components/motion/scroll-reveal.tsx"
+      ],
       "props": {
         "offset": {
           "type": "number",
@@ -183,14 +235,25 @@
           "title": "Section Reveal",
           "code": "<ScrollReveal>\n  <section className=\"space-y-4 py-16\">\n    <h2 className=\"text-2xl font-semibold\">Scroll into view</h2>\n    <p className=\"text-muted-foreground\">This section animates as it appears.</p>\n  </section>\n</ScrollReveal>"
         }
-      ]
+      ],
+      "tags": [
+        "scroll",
+        "fade",
+        "enter",
+        "view"
+      ],
+      "useCase": "Revealing element when scrolled into view."
     },
     {
       "name": "parallax-layer",
       "category": "scroll",
       "description": "Parallax layer that moves at a different speed than scroll, ideal for hero backgrounds.",
-      "dependencies": ["framer-motion"],
-      "files": ["components/motion/parallax-layer.tsx"],
+      "dependencies": [
+        "framer-motion"
+      ],
+      "files": [
+        "components/motion/parallax-layer.tsx"
+      ],
       "props": {
         "speed": {
           "type": "number",
@@ -208,14 +271,25 @@
           "title": "Parallax Background",
           "code": "<div className=\"relative h-[400px] overflow-hidden\">\n  <ParallaxLayer speed={-0.2}>\n    <div className=\"h-full w-full bg-gradient-to-br from-purple-500 to-indigo-500\" />\n  </ParallaxLayer>\n  <div className=\"relative z-10 flex h-full items-center justify-center\">\n    <h1 className=\"text-3xl font-bold text-white\">Parallax Hero</h1>\n  </div>\n</div>"
         }
-      ]
+      ],
+      "tags": [
+        "scroll",
+        "background",
+        "move",
+        "depth"
+      ],
+      "useCase": "Layer moving at different speed for parallax."
     },
     {
       "name": "stagger-container",
       "category": "transitions",
       "description": "Parent container that staggers children animations using Framer Motion variants.",
-      "dependencies": ["framer-motion"],
-      "files": ["components/motion/stagger-container.tsx"],
+      "dependencies": [
+        "framer-motion"
+      ],
+      "files": [
+        "components/motion/stagger-container.tsx"
+      ],
       "props": {
         "delay": {
           "type": "number",
@@ -239,18 +313,33 @@
           "title": "Staggered Items",
           "code": "<StaggerContainer>\n  {features.map((f) => (\n    <MotionBox\n      key={f.title}\n      initial={{ opacity: 0, y: 8 }}\n      animate={{ opacity: 1, y: 0 }}\n      className=\"rounded-md bg-card p-3\"\n    >\n      <h3 className=\"text-sm font-semibold\">{f.title}</h3>\n    </MotionBox>\n  ))}\n</StaggerContainer>"
         }
-      ]
+      ],
+      "tags": [
+        "list",
+        "sequence",
+        "children",
+        "animate"
+      ],
+      "useCase": "Staggering animations of child elements."
     },
     {
       "name": "presence",
       "category": "transitions",
       "description": "Thin wrapper around AnimatePresence for handling exit animations of conditional content.",
-      "dependencies": ["framer-motion"],
-      "files": ["components/motion/presence.tsx"],
+      "dependencies": [
+        "framer-motion"
+      ],
+      "files": [
+        "components/motion/presence.tsx"
+      ],
       "props": {
         "mode": {
           "type": "string",
-          "values": ["sync", "wait", "popLayout"],
+          "values": [
+            "sync",
+            "wait",
+            "popLayout"
+          ],
           "default": "sync",
           "description": "AnimatePresence mode controlling how exiting/entering elements are coordinated."
         }
@@ -261,14 +350,25 @@
           "title": "Conditional Modal",
           "code": "<Presence>\n  {open && (\n    <MotionBox\n      initial={{ opacity: 0, scale: 0.95 }}\n      animate={{ opacity: 1, scale: 1 }}\n      exit={{ opacity: 0, scale: 0.95 }}\n      className=\"fixed inset-0 grid place-items-center bg-black/40\"\n    >\n      <div className=\"rounded-xl bg-card p-6\">Modal content</div>\n    </MotionBox>\n  )}\n</Presence>"
         }
-      ]
+      ],
+      "tags": [
+        "exit",
+        "enter",
+        "conditional",
+        "mount"
+      ],
+      "useCase": "Handling exit animations for unmounting components."
     },
     {
       "name": "cursor-follow",
       "category": "effects",
       "description": "Element that smoothly follows the cursor with spring physics for custom cursors or highlights.",
-      "dependencies": ["framer-motion"],
-      "files": ["components/motion/cursor-follow.tsx"],
+      "dependencies": [
+        "framer-motion"
+      ],
+      "files": [
+        "components/motion/cursor-follow.tsx"
+      ],
       "props": {
         "className": {
           "type": "string",
@@ -291,14 +391,25 @@
           "title": "Custom Cursor",
           "code": "<CursorFollow className=\"pointer-events-none h-6 w-6 rounded-full bg-primary/60 mix-blend-screen\" />"
         }
-      ]
+      ],
+      "tags": [
+        "mouse",
+        "pointer",
+        "track",
+        "effect"
+      ],
+      "useCase": "Element tracking mouse position."
     },
     {
       "name": "motion-stack",
       "category": "layout",
       "description": "Stacked list with enter/exit animations built on AnimatePresence; ideal for toasts or notifications.",
-      "dependencies": ["framer-motion"],
-      "files": ["components/motion/motion-stack.tsx"],
+      "dependencies": [
+        "framer-motion"
+      ],
+      "files": [
+        "components/motion/motion-stack.tsx"
+      ],
       "props": {
         "items": {
           "type": "any[]",
@@ -317,7 +428,14 @@
           "title": "Animated Notifications",
           "code": "<MotionStack\n  items={notifications}\n  renderItem={(n) => (\n    <MotionBox\n      key={n.id}\n      initial={{ opacity: 0, y: 8 }}\n      animate={{ opacity: 1, y: 0 }}\n      exit={{ opacity: 0, y: 8 }}\n      className=\"rounded-md bg-card p-3 text-sm shadow\"\n    >\n      {n.message}\n    </MotionBox>\n  )}\n/>"
         }
-      ]
+      ],
+      "tags": [
+        "list",
+        "stack",
+        "toast",
+        "vertical"
+      ],
+      "useCase": "Stack of items with entrance/exit animations."
     }
   ]
 }

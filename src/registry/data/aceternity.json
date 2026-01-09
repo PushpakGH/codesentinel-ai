@@ -26,7 +26,9 @@
       "name": "3d-card",
       "category": "interactive",
       "description": "Card with 3D tilt and parallax effect on mouse hover.",
-      "dependencies": ["framer-motion"],
+      "dependencies": [
+        "framer-motion"
+      ],
       "props": {
         "className": {
           "type": "string",
@@ -43,13 +45,24 @@
           "title": "3D Product Card",
           "code": "<CardContainer className=\"w-full max-w-sm\">\n  <CardBody className=\"rounded-2xl border bg-card p-6 shadow-lg\">\n    <h3 className=\"text-lg font-semibold\">Pro Plan</h3>\n    <p className=\"mt-2 text-sm text-muted-foreground\">Perfect for growing teams.</p>\n  </CardBody>\n</CardContainer>"
         }
-      ]
+      ],
+      "tags": [
+        "3d",
+        "card",
+        "tilt",
+        "product",
+        "hover",
+        "interactive"
+      ],
+      "useCase": "Displaying products or features with a high-end 3D tilt effect on hover."
     },
     {
       "name": "3d-pin",
       "category": "interactive",
       "description": "3D animated gradient pin used to highlight links or cards.",
-      "dependencies": ["framer-motion"],
+      "dependencies": [
+        "framer-motion"
+      ],
       "props": {
         "href": {
           "type": "string",
@@ -66,13 +79,24 @@
           "title": "Pinned Product Link",
           "code": "<PinContainer href=\"/product\" title=\"View product\">\n  <img src=\"/images/product.png\" alt=\"Product\" className=\"h-32 w-32 rounded-xl object-cover\" />\n</PinContainer>"
         }
-      ]
+      ],
+      "tags": [
+        "map",
+        "pin",
+        "location",
+        "3d",
+        "marker",
+        "link"
+      ],
+      "useCase": "Highlighting locations on a map or features on a diagram with an animated 3D pin."
     },
     {
       "name": "animated-modal",
       "category": "overlay",
       "description": "Accessible modal dialog with Framer Motion entrance and exit animations.",
-      "dependencies": ["framer-motion"],
+      "dependencies": [
+        "framer-motion"
+      ],
       "props": {
         "open": {
           "type": "boolean",
@@ -113,13 +137,23 @@
           "title": "Controlled Animated Modal",
           "code": "const [open, setOpen] = useState(false);\n\n<>\n  <button\n    onClick={() => setOpen(true)}\n    className=\"rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground\"\n  >\n    Open modal\n  </button>\n\n  <AnimatedModal\n    open={open}\n    onOpenChange={setOpen}\n    className=\"w-full max-w-md rounded-2xl bg-background p-6 shadow-xl\"\n  >\n    <h2 className=\"text-lg font-semibold\">Aceternity Modal</h2>\n    <p className=\"mt-2 text-sm text-muted-foreground\">\n      Smooth entrance and exit animations using Framer Motion.\n    </p>\n  </AnimatedModal>\n</>"
         }
-      ]
+      ],
+      "tags": [
+        "modal",
+        "dialog",
+        "overlay",
+        "popup",
+        "animation"
+      ],
+      "useCase": "Presenting critical information or forms in a focused modal with smooth entrance animations."
     },
     {
       "name": "animated-tabs",
       "category": "navigation",
       "description": "Tabs with animated underline and smooth content transitions.",
-      "dependencies": ["framer-motion"],
+      "dependencies": [
+        "framer-motion"
+      ],
       "props": {
         "tabs": {
           "type": "Array<{ title:string; value?:string; content:ReactNode }>",
@@ -137,13 +171,23 @@
           "title": "Basic Animated Tabs",
           "code": "<AnimatedTabs\n  tabs={[\n    { title: \"Overview\", value: \"overview\", content: <div>Overview content</div> },\n    { title: \"Details\", value: \"details\", content: <div>Details content</div> }\n  ]}\n/>"
         }
-      ]
+      ],
+      "tags": [
+        "tabs",
+        "navigation",
+        "menu",
+        "switch",
+        "slide"
+      ],
+      "useCase": "Switching between different content views with a smooth sliding animation."
     },
     {
       "name": "animated-tooltip",
       "category": "overlay",
       "description": "Tooltip with entrance animation that follows the mouse pointer.",
-      "dependencies": ["framer-motion"],
+      "dependencies": [
+        "framer-motion"
+      ],
       "props": {
         "content": {
           "type": "string | ReactNode",
@@ -156,7 +200,15 @@
           "title": "Button Tooltip",
           "code": "<AnimatedTooltip content=\"Tooltip text\">\n  <button className=\"rounded-md border px-3 py-1 text-sm\">Hover</button>\n</AnimatedTooltip>"
         }
-      ]
+      ],
+      "tags": [
+        "tooltip",
+        "hover",
+        "info",
+        "helper",
+        "overlay"
+      ],
+      "useCase": "Providing contextual help or details when hovering over elements."
     },
     {
       "name": "aurora-background",
@@ -175,7 +227,15 @@
           "title": "Hero With Aurora",
           "code": "<section className=\"relative overflow-hidden rounded-3xl border\">\n  <AuroraBackground className=\"absolute inset-0\" />\n  <div className=\"relative z-10 px-8 py-16\">\n    <h1 className=\"text-4xl font-bold\">Ship animated UIs.</h1>\n  </div>\n</section>"
         }
-      ]
+      ],
+      "tags": [
+        "background",
+        "aurora",
+        "gradient",
+        "hero",
+        "atmospheric"
+      ],
+      "useCase": "Creating a stunning, colorful backdrop for hero sections or landing pages."
     },
     {
       "name": "background-beams",
@@ -193,13 +253,23 @@
           "title": "Beams Behind Hero",
           "code": "<div className=\"relative overflow-hidden rounded-3xl border\">\n  <BackgroundBeams className=\"absolute inset-0\" />\n  <div className=\"relative z-10 p-10\">\n    <h2 className=\"text-3xl font-bold\">Background Beams</h2>\n  </div>\n</div>"
         }
-      ]
+      ],
+      "tags": [
+        "background",
+        "beams",
+        "light",
+        "ray",
+        "hero"
+      ],
+      "useCase": "Adding a subtle, high-tech lighting effect to the background of a section."
     },
     {
       "name": "background-boxes",
       "category": "backgrounds",
       "description": "Animated grid of boxes background.",
-      "dependencies": ["framer-motion"],
+      "dependencies": [
+        "framer-motion"
+      ],
       "props": {},
       "usage": "import { BackgroundBoxes } from \"@/components/aceternity/background-boxes\"",
       "examples": [
@@ -207,7 +277,15 @@
           "title": "Boxes Background",
           "code": "<BackgroundBoxes />"
         }
-      ]
+      ],
+      "tags": [
+        "background",
+        "grid",
+        "boxes",
+        "interactive",
+        "pattern"
+      ],
+      "useCase": "A tech-themed background with interactive boxes that highlight on hover."
     },
     {
       "name": "background-gradient",
@@ -221,7 +299,15 @@
           "title": "Gradient Card",
           "code": "<BackgroundGradient>\n  <div className=\"rounded-2xl bg-background p-6\">\n    <h3 className=\"text-lg font-semibold\">Gradient Card</h3>\n  </div>\n</BackgroundGradient>"
         }
-      ]
+      ],
+      "tags": [
+        "background",
+        "gradient",
+        "card",
+        "container",
+        "glow"
+      ],
+      "useCase": "Wrapping content in a container with a subtle, shifting gradient glow."
     },
     {
       "name": "bento-grid",
@@ -235,13 +321,23 @@
           "title": "Feature Bento Grid",
           "code": "<BentoGrid>\n  <BentoGridItem title=\"Fast\" description=\"Optimized for performance\" />\n  <BentoGridItem title=\"Beautiful\" description=\"Thoughtful motion design\" />\n</BentoGrid>"
         }
-      ]
+      ],
+      "tags": [
+        "grid",
+        "layout",
+        "masonry",
+        "dashboard",
+        "gallery"
+      ],
+      "useCase": "Organizing multiple features, images, or data points in a modern Bento-style grid."
     },
     {
       "name": "card-hover-effect",
       "category": "interactive",
       "description": "Card with parallax hover effect for lists of links or features.",
-      "dependencies": ["framer-motion"],
+      "dependencies": [
+        "framer-motion"
+      ],
       "props": {
         "items": {
           "type": "Array<{ title:string; description:string }>",
@@ -254,13 +350,23 @@
           "title": "Hover Effect Grid",
           "code": "<HoverEffect\n  items={[\n    { title: \"Card\", description: \"Text\" },\n    { title: \"Another\", description: \"More text\" }\n  ]}\n/>"
         }
-      ]
+      ],
+      "tags": [
+        "card",
+        "grid",
+        "hover",
+        "list",
+        "links"
+      ],
+      "useCase": "Displaying a grid of links or features with a shared hover spotlight effect."
     },
     {
       "name": "card-stack",
       "category": "interactive",
       "description": "Stack of cards that auto-rotate, good for testimonials or reviews.",
-      "dependencies": ["framer-motion"],
+      "dependencies": [
+        "framer-motion"
+      ],
       "props": {
         "items": {
           "type": "Array<{ id:string | number; content:ReactNode }>",
@@ -273,7 +379,15 @@
           "title": "Testimonial Stack",
           "code": "<CardStack\n  items={[\n    { id: 1, content: <div>Card 1</div> },\n    { id: 2, content: <div>Card 2</div> }\n  ]}\n/>"
         }
-      ]
+      ],
+      "tags": [
+        "stack",
+        "cards",
+        "testimonials",
+        "rotate",
+        "list"
+      ],
+      "useCase": "Showcasing testimonials or reviews in a compact, auto-rotating stack."
     },
     {
       "name": "compare",
@@ -296,13 +410,23 @@
           "title": "Image Comparison",
           "code": "<Compare before=\"/images/before.jpg\" after=\"/images/after.jpg\" />"
         }
-      ]
+      ],
+      "tags": [
+        "comparison",
+        "slider",
+        "image",
+        "diff",
+        "before-after"
+      ],
+      "useCase": "Comparing two images (before/after) with a draggable slider."
     },
     {
       "name": "cover-image",
       "category": "effects",
       "description": "Image with animated cover/reveal effect.",
-      "dependencies": ["framer-motion"],
+      "dependencies": [
+        "framer-motion"
+      ],
       "props": {
         "src": {
           "type": "string",
@@ -318,13 +442,23 @@
           "title": "Reveal Image",
           "code": "<CoverImage src=\"/images/hero.jpg\" alt=\"Hero\" />"
         }
-      ]
+      ],
+      "tags": [
+        "image",
+        "reveal",
+        "cover",
+        "animation",
+        "hero"
+      ],
+      "useCase": "Revealing a hero image or section header with a smooth, curtain-like animation."
     },
     {
       "name": "direction-aware-hover",
       "category": "interactive",
       "description": "Hover effect aware of mouse enter direction.",
-      "dependencies": ["framer-motion"],
+      "dependencies": [
+        "framer-motion"
+      ],
       "props": {},
       "usage": "import { DirectionAwareHover } from \"@/components/aceternity/direction-aware-hover\"",
       "examples": [
@@ -332,7 +466,15 @@
           "title": "Direction Hover Card",
           "code": "<DirectionAwareHover>\n  <div className=\"rounded-xl border bg-card p-6\">Content</div>\n</DirectionAwareHover>"
         }
-      ]
+      ],
+      "tags": [
+        "hover",
+        "card",
+        "image",
+        "direction",
+        "overlay"
+      ],
+      "useCase": "Image galleries where the hover overlay enters from the direction of the mouse."
     },
     {
       "name": "evervault-card",
@@ -351,13 +493,23 @@
           "title": "Encrypted Card",
           "code": "<EvervaultCard text=\"Hover to reveal\" />"
         }
-      ]
+      ],
+      "tags": [
+        "card",
+        "security",
+        "encryption",
+        "text",
+        "hover"
+      ],
+      "useCase": "A decorative card with a 'hacker' style text decryption effect on hover."
     },
     {
       "name": "floating-dock",
       "category": "navigation",
       "description": "macOS-style floating dock used as a navigation bar.",
-      "dependencies": ["framer-motion"],
+      "dependencies": [
+        "framer-motion"
+      ],
       "props": {
         "items": {
           "type": "Array<{ icon:ReactNode; title:string; href?:string }>",
@@ -370,13 +522,23 @@
           "title": "Bottom Nav Dock",
           "code": "<FloatingDock\n  items={[\n    { icon: HomeIcon, title: \"Home\" },\n    { icon: StarIcon, title: \"Features\" }\n  ]}\n/>"
         }
-      ]
+      ],
+      "tags": [
+        "dock",
+        "navigation",
+        "menu",
+        "macos",
+        "bottom-bar"
+      ],
+      "useCase": "A floating bottom navigation bar similar to macOS Dock, ideal for apps."
     },
     {
       "name": "focus-cards",
       "category": "interactive",
       "description": "Card gallery where hovered card is focused and others blur.",
-      "dependencies": ["framer-motion"],
+      "dependencies": [
+        "framer-motion"
+      ],
       "props": {
         "cards": {
           "type": "Array<{ title:string; src:string }>",
@@ -389,7 +551,15 @@
           "title": "Gallery Focus Cards",
           "code": "<FocusCards\n  cards={[\n    { title: \"Card 1\", src: \"/images/1.jpg\" },\n    { title: \"Card 2\", src: \"/images/2.jpg\" }\n  ]}\n/>"
         }
-      ]
+      ],
+      "tags": [
+        "gallery",
+        "cards",
+        "focus",
+        "blur",
+        "image"
+      ],
+      "useCase": "An image gallery where hovering one item blurs the others to focus attention."
     },
     {
       "name": "following-pointer",
@@ -403,7 +573,15 @@
           "title": "Pointer Highlight",
           "code": "<FollowingPointer />"
         }
-      ]
+      ],
+      "tags": [
+        "cursor",
+        "pointer",
+        "card",
+        "profile",
+        "highlight"
+      ],
+      "useCase": "A custom cursor or element that follows the mouse, useful for collaborative UI demos."
     },
     {
       "name": "glare-card",
@@ -417,13 +595,24 @@
           "title": "Glare Card",
           "code": "<GlareCard>\n  <div>Content</div>\n</GlareCard>"
         }
-      ]
+      ],
+      "tags": [
+        "card",
+        "glare",
+        "reflection",
+        "shine",
+        "3d"
+      ],
+      "useCase": "A realistic card with a light glare effect that responds to mouse movement."
     },
     {
       "name": "globe",
       "category": "interactive",
       "description": "Interactive 3D globe with markers.",
-      "dependencies": ["three", "@react-three/fiber"],
+      "dependencies": [
+        "three",
+        "@react-three/fiber"
+      ],
       "props": {
         "markers": {
           "type": "Array<{ lat:number; lng:number; label?:string }>"
@@ -435,13 +624,23 @@
           "title": "Marker Globe",
           "code": "<Globe markers={[{ lat: 40, lng: -74, label: \"NYC\" }]} />"
         }
-      ]
+      ],
+      "tags": [
+        "globe",
+        "map",
+        "3d",
+        "earth",
+        "visualization"
+      ],
+      "useCase": "Visualizing global data or points of interest on an interactive 3D globe."
     },
     {
       "name": "google-gemini-effect",
       "category": "effects",
       "description": "Gemini-style animated text effect.",
-      "dependencies": ["framer-motion"],
+      "dependencies": [
+        "framer-motion"
+      ],
       "props": {
         "text": {
           "type": "string",
@@ -454,13 +653,23 @@
           "title": "Gemini Text",
           "code": "<GeminiEffect text=\"Animated text\" />"
         }
-      ]
+      ],
+      "tags": [
+        "scroll",
+        "animation",
+        "path",
+        "line",
+        "hero"
+      ],
+      "useCase": "A complex scroll-triggered path animation style like the Gemini landing page."
     },
     {
       "name": "hero-highlight",
       "category": "hero",
       "description": "Hero section with animated background and text highlight component.",
-      "dependencies": ["framer-motion"],
+      "dependencies": [
+        "framer-motion"
+      ],
       "props": {},
       "usage": "import { HeroHighlight, Highlight } from \"@/components/aceternity/hero-highlight\"",
       "examples": [
@@ -468,13 +677,23 @@
           "title": "Highlighted Hero",
           "code": "<HeroHighlight>\n  Your <Highlight>highlighted</Highlight> text\n</HeroHighlight>"
         }
-      ]
+      ],
+      "tags": [
+        "hero",
+        "text",
+        "highlight",
+        "marker",
+        "background"
+      ],
+      "useCase": "Highlighting key text in a hero section with a dynamic background animation."
     },
     {
       "name": "hero-parallax",
       "category": "hero",
       "description": "Parallax hero section with scroll-based rotation and translation animations.",
-      "dependencies": ["framer-motion"],
+      "dependencies": [
+        "framer-motion"
+      ],
       "props": {
         "products": {
           "type": "Array<{ title:string; link:string; thumbnail:string }>",
@@ -488,13 +707,23 @@
           "title": "Product Gallery Hero",
           "code": "<HeroParallax\n  products={[\n    { title: \"Dashboard\", link: \"/dashboard\", thumbnail: \"/images/dashboard.png\" },\n    { title: \"Analytics\", link: \"/analytics\", thumbnail: \"/images/analytics.png\" }\n  ]}\n/>"
         }
-      ]
+      ],
+      "tags": [
+        "hero",
+        "parallax",
+        "scroll",
+        "gallery",
+        "products"
+      ],
+      "useCase": "A grand hero section that displays a gallery of products moving in parallax on scroll."
     },
     {
       "name": "images-slider",
       "category": "interactive",
       "description": "Fullscreen image slider with overlay content.",
-      "dependencies": ["framer-motion"],
+      "dependencies": [
+        "framer-motion"
+      ],
       "props": {
         "images": {
           "type": "string[]",
@@ -507,13 +736,23 @@
           "title": "Hero Image Slider",
           "code": "<ImagesSlider images={[\"/images/hero-1.jpg\", \"/images/hero-2.jpg\"]} />"
         }
-      ]
+      ],
+      "tags": [
+        "slider",
+        "carousel",
+        "images",
+        "background",
+        "hero"
+      ],
+      "useCase": "A fullscreen background image slider with smooth transitions."
     },
     {
       "name": "infinite-moving-cards",
       "category": "animations",
       "description": "Horizontal, infinitely scrolling card strip for testimonials or quotes.",
-      "dependencies": ["framer-motion"],
+      "dependencies": [
+        "framer-motion"
+      ],
       "props": {
         "items": {
           "type": "Array<{ quote:string; name:string }>",
@@ -526,13 +765,23 @@
           "title": "Testimonial Strip",
           "code": "<InfiniteMovingCards\n  items={[\n    { quote: \"Text\", name: \"Author\" },\n    { quote: \"More text\", name: \"Another\" }\n  ]}\n/>"
         }
-      ]
+      ],
+      "tags": [
+        "marquee",
+        "scroll",
+        "testimonials",
+        "loop",
+        "cards"
+      ],
+      "useCase": "An auto-scrolling horizontal strip of cards, perfect for client logos or testimonials."
     },
     {
       "name": "lamp",
       "category": "effects",
       "description": "Lamp/spotlight effect that highlights centered content.",
-      "dependencies": ["framer-motion"],
+      "dependencies": [
+        "framer-motion"
+      ],
       "props": {},
       "usage": "import { LampContainer } from \"@/components/aceternity/lamp\"",
       "examples": [
@@ -540,7 +789,15 @@
           "title": "Lamp Hero",
           "code": "<LampContainer>\n  <h1 className=\"text-4xl font-bold\">Let your product shine.</h1>\n</LampContainer>"
         }
-      ]
+      ],
+      "tags": [
+        "light",
+        "spotlight",
+        "hero",
+        "header",
+        "glow"
+      ],
+      "useCase": "A dramatic spotlight effect for section headers or hero titles."
     },
     {
       "name": "lens",
@@ -554,13 +811,23 @@
           "title": "Zoom Image",
           "code": "<Lens>\n  <img src=\"/images/zoom.jpg\" alt=\"Zoom\" />\n</Lens>"
         }
-      ]
+      ],
+      "tags": [
+        "zoom",
+        "magnify",
+        "image",
+        "hover",
+        "detail"
+      ],
+      "useCase": "Magnifying part of an image on hover, useful for product details."
     },
     {
       "name": "moving-border",
       "category": "effects",
       "description": "Animated moving border effect around elements.",
-      "dependencies": ["framer-motion"],
+      "dependencies": [
+        "framer-motion"
+      ],
       "props": {},
       "usage": "import { MovingBorder } from \"@/components/aceternity/moving-border\"",
       "examples": [
@@ -568,13 +835,23 @@
           "title": "Animated Button Border",
           "code": "<MovingBorder>\n  <button className=\"rounded-md px-4 py-2\">Hover</button>\n</MovingBorder>"
         }
-      ]
+      ],
+      "tags": [
+        "border",
+        "glow",
+        "button",
+        "card",
+        "animation"
+      ],
+      "useCase": "Drawing attention to a button or card with a perpetually moving glowing border."
     },
     {
       "name": "parallax-scroll",
       "category": "effects",
       "description": "Parallax scrolling effect for image grids or galleries.",
-      "dependencies": ["framer-motion"],
+      "dependencies": [
+        "framer-motion"
+      ],
       "props": {
         "images": {
           "type": "string[]",
@@ -587,7 +864,15 @@
           "title": "Parallax Image Grid",
           "code": "<ParallaxScroll images={[\"/images/1.jpg\", \"/images/2.jpg\"]} />"
         }
-      ]
+      ],
+      "tags": [
+        "grid",
+        "gallery",
+        "scroll",
+        "parallax",
+        "images"
+      ],
+      "useCase": "A vertical image grid where columns scroll at different speeds."
     },
     {
       "name": "shooting-stars",
@@ -601,13 +886,23 @@
           "title": "Night Sky Background",
           "code": "<ShootingStars />"
         }
-      ]
+      ],
+      "tags": [
+        "background",
+        "stars",
+        "space",
+        "animation",
+        "night"
+      ],
+      "useCase": "A subtle animated background with shooting stars for a magical feel."
     },
     {
       "name": "sidebar",
       "category": "navigation",
       "description": "Animated sidebar navigation with icons.",
-      "dependencies": ["framer-motion"],
+      "dependencies": [
+        "framer-motion"
+      ],
       "props": {
         "links": {
           "type": "Array<{ label:string; icon:ReactNode; href:string }>",
@@ -620,7 +915,15 @@
           "title": "App Sidebar",
           "code": "<Sidebar\n  links={[\n    { label: \"Home\", icon: HomeIcon, href: \"/\" },\n    { label: \"Docs\", icon: BookIcon, href: \"/docs\" }\n  ]}\n/>"
         }
-      ]
+      ],
+      "tags": [
+        "navigation",
+        "menu",
+        "sidebar",
+        "layout",
+        "drawer"
+      ],
+      "useCase": "A collapsible sidebar navigation menu with smooth animations."
     },
     {
       "name": "sparkles",
@@ -634,7 +937,15 @@
           "title": "Sparkles Background",
           "code": "<SparklesCore />"
         }
-      ]
+      ],
+      "tags": [
+        "particles",
+        "sparkle",
+        "background",
+        "dust",
+        "effect"
+      ],
+      "useCase": "Adding floating sparkles or dust particles to a background or element."
     },
     {
       "name": "spotlight",
@@ -656,13 +967,23 @@
           "title": "Spotlight Hero",
           "code": "<Spotlight className=\"top-40 left-0\" fill=\"white\" />"
         }
-      ]
+      ],
+      "tags": [
+        "light",
+        "hover",
+        "reveal",
+        "gradient",
+        "hero"
+      ],
+      "useCase": "A spotlight effect that follows the mouse to reveal content or gradients."
     },
     {
       "name": "sticky-scroll-reveal",
       "category": "effects",
       "description": "Content reveals on scroll with sticky animation.",
-      "dependencies": ["framer-motion"],
+      "dependencies": [
+        "framer-motion"
+      ],
       "props": {
         "content": {
           "type": "Array<{ title:string; description:string }>",
@@ -675,13 +996,23 @@
           "title": "Story Scroll",
           "code": "<StickyScroll\n  content={[\n    { title: \"Title\", description: \"Text\" },\n    { title: \"More\", description: \"More text\" }\n  ]}\n/>"
         }
-      ]
+      ],
+      "tags": [
+        "scroll",
+        "sticky",
+        "presentation",
+        "story",
+        "layout"
+      ],
+      "useCase": "Explaining a process or story where text scrolls but illustrations stick."
     },
     {
       "name": "tabs",
       "category": "navigation",
       "description": "Animated tabs with smooth transitions.",
-      "dependencies": ["framer-motion"],
+      "dependencies": [
+        "framer-motion"
+      ],
       "props": {
         "tabs": {
           "type": "Array<{ title:string; value:string; content:ReactNode }>",
@@ -694,13 +1025,23 @@
           "title": "Tabs Example",
           "code": "<Tabs\n  tabs={[\n    { title: \"Tab 1\", value: \"tab1\", content: <div>Content</div> }\n  ]}\n/>"
         }
-      ]
+      ],
+      "tags": [
+        "tabs",
+        "navigation",
+        "switch",
+        "content",
+        "layout"
+      ],
+      "useCase": "A versatile tab component for switching between different views."
     },
     {
       "name": "text-generate-effect",
       "category": "text",
       "description": "Text that appears word by word with a type-like animation.",
-      "dependencies": ["framer-motion"],
+      "dependencies": [
+        "framer-motion"
+      ],
       "props": {
         "words": {
           "type": "string",
@@ -713,13 +1054,23 @@
           "title": "Generated Text",
           "code": "<TextGenerateEffect words=\"Generate this text\" />"
         }
-      ]
+      ],
+      "tags": [
+        "text",
+        "typing",
+        "reveal",
+        "animation",
+        "loading"
+      ],
+      "useCase": "Revealing text word-by-word, great for impactful statements or loading states."
     },
     {
       "name": "timeline",
       "category": "data-display",
       "description": "Animated timeline for events or steps.",
-      "dependencies": ["framer-motion"],
+      "dependencies": [
+        "framer-motion"
+      ],
       "props": {
         "data": {
           "type": "Array<{ title:string; content:ReactNode }>",
@@ -732,13 +1083,23 @@
           "title": "Project Timeline",
           "code": "<Timeline\n  data={[\n    { title: \"Event\", content: <div>Details</div> }\n  ]}\n/>"
         }
-      ]
+      ],
+      "tags": [
+        "timeline",
+        "history",
+        "steps",
+        "process",
+        "scroll"
+      ],
+      "useCase": "Displaying a chronological list of events or steps in a project."
     },
     {
       "name": "tracing-beam",
       "category": "effects",
       "description": "Vertical tracing beam that follows the scroll and highlights content.",
-      "dependencies": ["framer-motion"],
+      "dependencies": [
+        "framer-motion"
+      ],
       "props": {},
       "usage": "import { TracingBeam } from \"@/components/aceternity/tracing-beam\"",
       "examples": [
@@ -746,7 +1107,15 @@
           "title": "Beam Layout",
           "code": "<TracingBeam>\n  <div>Content</div>\n</TracingBeam>"
         }
-      ]
+      ],
+      "tags": [
+        "scroll",
+        "progress",
+        "beam",
+        "line",
+        "indicator"
+      ],
+      "useCase": "Verically tracing the user's reading progress with a glowing beam."
     },
     {
       "name": "vortex",
@@ -760,7 +1129,15 @@
           "title": "Vortex Section",
           "code": "<Vortex>\n  <div>Content</div>\n</Vortex>"
         }
-      ]
+      ],
+      "tags": [
+        "background",
+        "particle",
+        "fluid",
+        "simulation",
+        "hero"
+      ],
+      "useCase": "A mesmerizing fluid particle simulation background."
     },
     {
       "name": "wavy-background",
@@ -774,7 +1151,15 @@
           "title": "Wavy Hero",
           "code": "<WavyBackground>\n  <h1>Title</h1>\n</WavyBackground>"
         }
-      ]
+      ],
+      "tags": [
+        "background",
+        "waves",
+        "pattern",
+        "color",
+        "hero"
+      ],
+      "useCase": "A colorful, animated wave pattern background."
     },
     {
       "name": "world-map",
@@ -793,7 +1178,15 @@
           "title": "Connections Map",
           "code": "<WorldMap\n  dots={[\n    { start: { lat: 40, lng: -74 }, end: { lat: 51, lng: 0 } }\n  ]}\n/>"
         }
-      ]
+      ],
+      "tags": [
+        "map",
+        "dots",
+        "locations",
+        "connection",
+        "global"
+      ],
+      "useCase": "A flat map visualization showing connections between global coordinates."
     }
   ]
 }

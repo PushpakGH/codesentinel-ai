@@ -1,283 +1,81 @@
-/**
- * Configuration Manager - Production-Grade Version
- * Handles secure API key management with BYOK (Bring Your Own Key) fallback logic
- * Priority: User Key > System Key > Ollama Fallback
- * 
- * FIXES APPLIED:
- * - Defensive initialization checks on all methods
- * - Lazy configuration loading (no constructor side-effects)
- * - Separated migration from validation (explicit migration method)
- * - Clear error messages when not initialized
- */
-
 const vscode = require('vscode');
+const fs = require('fs').promises;
+const path = require('path');
+const { logger } = require('../utils/logger');
 
+const SECRET_KEY_API_TOKEN = 'codeSentinel.apiKey';
 
 class ConfigManager {
   constructor() {
-    this.secretStorage = null;
     this.context = null;
     this.initialized = false;
-    this.outputChannel = null;
   }
 
   /**
-   * Initialize with VS Code's SecretStorage for secure API key management
-   * MUST be called during extension activation before any other methods
+   * Initialize with extension context for SecretStorage access
    * @param {vscode.ExtensionContext} context 
    */
   async initialize(context) {
-    if (!context) {
-      throw new Error('ConfigManager.initialize() requires a valid ExtensionContext');
-    }
-
-    this.secretStorage = context.secrets;
     this.context = context;
     this.initialized = true;
-    
-    // Create dedicated output channel for logging
-    this.outputChannel = vscode.window.createOutputChannel('CodeSentinel AI');
-    
-    this.log('✅ ConfigManager initialized successfully', 'info');
+    logger.debug('ConfigManager initialized');
   }
 
   /**
-   * Verify initialization before operations requiring SecretStorage
-   * @private
-   */
-  _ensureInitialized() {
-    if (!this.initialized || !this.secretStorage) {
-      throw new Error('ConfigManager not initialized. Call initialize(context) during extension activation.');
-    }
-  }
-
-  /**
-   * Get workspace configuration (lazy loaded, no constructor dependencies)
-   * @returns {vscode.WorkspaceConfiguration}
-   * @private
-   */
-  _getConfig() {
-    return vscode.workspace.getConfiguration('codeSentinel');
-  }
-
-  /**
-   * Get API Key with BYOK fallback logic (READ-ONLY, no side effects)
-   * Priority: 1) User's saved key (SecretStorage) 2) System .env key
-   * NOTE: No longer migrates settings automatically - use migrateSettings() explicitly
-   * @returns {Promise<string|null>}
+   * Get secure API key
    */
   async getApiKey() {
-    this._ensureInitialized();
-    
-    try {
-      // Priority 1: Check VS Code Secret Storage (most secure)
-      const secretKey = await this.secretStorage.get('codeSentinel.apiKey');
-      if (secretKey && secretKey.trim()) {
-        this.log('Using API key from SecretStorage (User Key)', 'info');
-        return secretKey.trim();
-      }
-
-      // Priority 2: Check plain-text settings (legacy, will prompt migration)
-      const settingsKey = this._getConfig().get('apiKey', '');
-      if (settingsKey && settingsKey.trim()) {
-        this.log('⚠️ API key found in plain settings. Run "CodeSentinel: Migrate Settings" to secure it.', 'warn');
-        return settingsKey.trim();
-      }
-
-      // Priority 3: System fallback key from .env
-      const systemKey = process.env.SYSTEM_GEMINI_API_KEY;
-      if (systemKey && systemKey.trim()) {
-        this.log('Using System API Key (Fallback from .env)', 'info');
-        return systemKey.trim();
-      }
-
-      this.log('No API key found. Will attempt Ollama fallback.', 'warn');
-      return null;
-    } catch (error) {
-      this.log(`Error retrieving API key: ${error.message}`, 'error');
-      return null;
-    }
+    if (!this.initialized) throw new Error('ConfigManager not initialized');
+    return await this.context.secrets.get(SECRET_KEY_API_TOKEN);
   }
 
   /**
-   * Migrate API key from settings to SecretStorage (explicit, not automatic)
-   * Call this via a dedicated command or during first-run setup
-   * @returns {Promise<boolean>} True if migration happened, false if nothing to migrate
+   * Save API key securely
    */
-  async migrateSettingsToSecretStorage() {
-    this._ensureInitialized();
-
-    const settingsKey = this._getConfig().get('apiKey', '');
-    if (!settingsKey || !settingsKey.trim()) {
-      this.log('No settings key to migrate', 'info');
-      return false;
-    }
-
-    try {
-      // Save to SecretStorage
-      await this.secretStorage.store('codeSentinel.apiKey', settingsKey.trim());
-      
-      // Clear from settings
-      await this._getConfig().update('apiKey', '', vscode.ConfigurationTarget.Global);
-      
-      this.log('✅ Successfully migrated API key from settings to SecretStorage', 'info');
-      vscode.window.showInformationMessage('🔒 API Key migrated to secure storage');
-      return true;
-    } catch (error) {
-      this.log(`Migration failed: ${error.message}`, 'error');
-      throw error;
-    }
-  }
-
-  /**
-   * Save user's API key securely to SecretStorage
-   * @param {string} apiKey 
-   */
-  async saveApiKey(apiKey) {
-    this._ensureInitialized();
-
-    if (!apiKey || !apiKey.trim()) {
-      throw new Error('API key cannot be empty');
-    }
-
-    // Basic validation for Gemini API key format
-    if (!apiKey.startsWith('AIza') && !apiKey.startsWith('sk-')) {
-      const proceed = await vscode.window.showWarningMessage(
-        '⚠️ API key format looks unusual. Continue anyway?',
-        'Yes', 'Cancel'
-      );
-      if (proceed !== 'Yes') {
-        throw new Error('API key save cancelled by user');
-      }
-    }
-
-    await this.secretStorage.store('codeSentinel.apiKey', apiKey.trim());
-    this.log('✅ API key saved successfully to SecretStorage', 'info');
-    vscode.window.showInformationMessage('✅ API Key saved securely');
+  async saveApiKey(key) {
+    if (!this.initialized) throw new Error('ConfigManager not initialized');
+    await this.context.secrets.store(SECRET_KEY_API_TOKEN, key);
   }
 
   /**
    * Delete stored API key
    */
-  async clearApiKey() {
-    this._ensureInitialized();
-    await this.secretStorage.delete('codeSentinel.apiKey');
-    this.log('🗑️ API key cleared from SecretStorage', 'info');
-    vscode.window.showInformationMessage('🗑️ API Key removed');
-  }
-
-  /**
-   * Delete stored API key (alias for clearApiKey for consistency)
-   */
   async deleteApiKey() {
-    return this.clearApiKey();
+    if (!this.initialized) throw new Error('ConfigManager not initialized');
+    await this.context.secrets.delete(SECRET_KEY_API_TOKEN);
   }
 
   /**
-   * Get current model provider (gemini/ollama)
-   * @returns {string}
+   * Migrate legacy settings key to SecretStorage
    */
-  getModelProvider() {
-    return this._getConfig().get('modelProvider', 'gemini');
+  async migrateSettingsToSecretStorage() {
+    const config = vscode.workspace.getConfiguration('codeSentinel');
+    const legacyKey = config.get('apiKey');
+
+    if (legacyKey && legacyKey.trim()) {
+      await this.saveApiKey(legacyKey);
+      await config.update('apiKey', undefined, vscode.ConfigurationTarget.Global);
+      return true;
+    }
+    return false;
   }
 
   /**
-   * Get Gemini model name
-   * @returns {string}
-   */
-  getGeminiModel() {
-    return this._getConfig().get('geminiModel', 'gemini-2.0-flash-exp');
-  }
-
-  /**
-   * Get Ollama configuration (updated with user's available models)
-   * @returns {{model: string, endpoint: string}}
-   */
-  getOllamaConfig() {
-    return {
-      model: this._getConfig().get('ollamaModel', 'deepseek-r1:7b'),
-      endpoint: this._getConfig().get('ollamaEndpoint', 'http://localhost:11434')
-    };
-  }
-
-  /**
-   * Check if security agent is enabled
-   * @returns {boolean}
-   */
-  isSecurityAgentEnabled() {
-    return this._getConfig().get('enableSecurityAgent', true);
-  }
-
-  /**
-   * Check if validator agent is enabled
-   * @returns {boolean}
-   */
-  isValidatorAgentEnabled() {
-    return this._getConfig().get('enableValidatorAgent', true);
-  }
-
-  /**
-   * Get confidence threshold for self-correction loops
-   * @returns {number}
-   */
-  getConfidenceThreshold() {
-    return this._getConfig().get('confidenceThreshold', 85);
-  }
-
-  /**
-   * Check if streaming is enabled
-   * @returns {boolean}
-   */
-  isStreamingEnabled() {
-    return this._getConfig().get('streamingEnabled', true);
-  }
-
-  /**
-   * Check if debug mode is active
-   * @returns {boolean}
+   * Check if running in debug/demo mode
    */
   isDebugMode() {
-    return this._getConfig().get('debugMode', false);
+    return vscode.workspace.getConfiguration('codeSentinel').get('debugMode', false);
   }
 
   /**
-   * Get maximum tokens for generation
-   * @returns {number}
+   * Get selected model provider (gemini, ollama, etc)
    */
-  getMaxTokens() {
-    return this._getConfig().get('maxTokens', 10000);
-  }
-/**
- * Get chat history limit (number of messages to remember)
- * @returns {number}
- */
-getChatHistoryLimit() {
-  return this._getConfig().get('chatHistoryLimit', 50);
-}
-// =========================================
-
-  /**
-   * Logging utility with output channel support
-   * @param {string} message 
-   * @param {string} level - 'info' | 'warn' | 'error'
-   */
-  log(message, level = 'info') {
-    const timestamp = new Date().toISOString();
-    const logMessage = `[ConfigManager ${level.toUpperCase()}] ${timestamp}: ${message}`;
-    
-    if (this.isDebugMode() && this.outputChannel) {
-      this.outputChannel.appendLine(logMessage);
-    }
-    
-    // Always log errors to console
-    if (level === 'error') {
-      console.error(logMessage);
-    }
+  getModelProvider() {
+    return vscode.workspace.getConfiguration('codeSentinel').get('modelProvider', 'gemini');
   }
 
   /**
-   * Validate configuration completeness (READ-ONLY, no side effects)
-   * @returns {{valid: boolean, errors: string[], warnings: string[]}}
+   * Validate current configuration
    */
   async validateConfig() {
     const errors = [];
@@ -285,26 +83,13 @@ getChatHistoryLimit() {
     const provider = this.getModelProvider();
 
     if (provider === 'gemini') {
-      const apiKey = await this.getApiKey();
-      if (!apiKey) {
-        errors.push('Gemini API key not configured. Please add your API key in settings or switch to Ollama.');
+      const key = await this.getApiKey();
+      if (!key) {
+        errors.push('Gemini API Key is missing');
       }
-
-      // Check for legacy plain-text key
-      const settingsKey = this._getConfig().get('apiKey', '');
-      if (settingsKey) {
-        warnings.push('API key stored in plain settings. Consider running migration for better security.');
-      }
-    }
-
-    if (provider === 'ollama') {
-      const { endpoint, model } = this.getOllamaConfig();
-      if (!endpoint) {
-        errors.push('Ollama endpoint not configured.');
-      }
-      if (!model) {
-        warnings.push('Ollama model not specified. Will use default: deepseek-r1:7b');
-      }
+    } else if (provider === 'ollama') {
+      // Check if Ollama ID/URL is set?
+      // For now assume default
     }
 
     return {
@@ -313,33 +98,83 @@ getChatHistoryLimit() {
       warnings
     };
   }
+
   /**
- * Get custom system prompt (if user provided one)
- * @returns {string}
- */
-getCustomSystemPrompt() {
-  return this._getConfig().get('customSystemPrompt', '');
+   * Add image domains to next.config.ts/mjs/js
+   * (NEW FEATURE)
+   */
+  async addImageDomains(projectPath, domains = ['images.unsplash.com', 'assets.aceternity.com', 'aceternity.com', 'pbs.twimg.com', 'media.licdn.com']) {
+    logger.info('🔧 ConfigManager: Updating image domains...');
+    
+    // 1. Detect Config File
+    const configFiles = ['next.config.ts', 'next.config.mjs', 'next.config.js'];
+    let configFile = null;
+    
+    for (const f of configFiles) {
+        try {
+            await fs.access(path.join(projectPath, f));
+            configFile = f;
+            break;
+        } catch {}
+    }
+    
+    if (!configFile) {
+        logger.warn('ConfigManager: No next.config file found.');
+        return;
+    }
+    
+    const configPath = path.join(projectPath, configFile);
+    let content = await fs.readFile(configPath, 'utf-8');
+    
+    // 2. Prepare Remote Patterns
+    const patterns = domains.map(d => `      { protocol: 'https', hostname: '${d}' }`).join(',\n');
+    
+    // 3. Inject into Config
+    // Regex matches: const nextConfig = { ... } or const nextConfig: NextConfig = { ... }
+    const configRegex = /(const nextConfig.*=.*{)/s;
+    
+    if (content.includes('remotePatterns')) {
+        logger.info('ConfigManager: remotePatterns already exists, skipping auto-injection.');
+        return;
+    }
+    
+    if (content.match(configRegex)) {
+        const insertion = `
+  images: {
+    remotePatterns: [
+${patterns}
+    ],
+  },`;
+        content = content.replace(configRegex, `$1${insertion}`);
+        await fs.writeFile(configPath, content);
+        logger.info(`✅ Updated ${configFile} with image domains.`);
+    } else {
+        logger.warn(`ConfigManager: Could not parse ${configFile} structure.`);
+    }
+  }
+
+  // --- AI Configuration Methods (Restored) ---
+
+  getGeminiModel() {
+    return vscode.workspace.getConfiguration('codeSentinel').get('geminiModel', 'gemini-pro');
+  }
+
+  isStreamingEnabled() {
+    return vscode.workspace.getConfiguration('codeSentinel').get('enableStreaming', true);
+  }
+
+  getMaxTokens() {
+    return vscode.workspace.getConfiguration('codeSentinel').get('maxTokens', 8192);
+  }
+
+  getOllamaConfig() {
+     const config = vscode.workspace.getConfiguration('codeSentinel');
+     return {
+        endpoint: config.get('ollamaEndpoint', 'http://127.0.0.1:11434'),
+        model: config.get('ollamaModel', 'llama3')
+     };
+  }
 }
 
-/**
- * Get file exclusion patterns
- * @returns {string[]}
- */
-getExcludePatterns() {
-  return this._getConfig().get('excludePatterns', ['**/node_modules/**', '**/dist/**', '**/.git/**']);
-}
-
-/**
- * Check if auto-review on save is enabled
- * @returns {boolean}
- */
-isAutoReviewEnabled() {
-  return this._getConfig().get('autoReviewOnSave', false);
-}
-  
-}
-
-
-
-// Export singleton instance
+// Export Singleton Instance
 module.exports = new ConfigManager();

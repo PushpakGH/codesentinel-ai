@@ -66,7 +66,14 @@
           "title": "Multiple Items Open",
           "code": "<Accordion type='multiple'>\n  <AccordionItem value='item-1'>\n    <AccordionTrigger>Section 1</AccordionTrigger>\n    <AccordionContent>Content 1</AccordionContent>\n  </AccordionItem>\n  <AccordionItem value='item-2'>\n    <AccordionTrigger>Section 2</AccordionTrigger>\n    <AccordionContent>Content 2</AccordionContent>\n  </AccordionItem>\n</Accordion>"
         }
-      ]
+      ],
+      "tags": [
+        "collapse",
+        "expand",
+        "faq",
+        "list"
+      ],
+      "useCase": "Organizing extensive content into collapsible sections (FAQs)."
     },
     {
       "name": "alert",
@@ -101,7 +108,14 @@
           "title": "Destructive Alert",
           "code": "<Alert variant='destructive'>\n  <AlertTitle>Error</AlertTitle>\n  <AlertDescription>Your session has expired.</AlertDescription>\n</Alert>"
         }
-      ]
+      ],
+      "tags": [
+        "notification",
+        "warning",
+        "error",
+        "info"
+      ],
+      "useCase": "Displaying important status messages to the user."
     },
     {
       "name": "alert-dialog",
@@ -139,7 +153,14 @@
           "title": "Confirmation Dialog",
           "code": "<AlertDialog>\n  <AlertDialogTrigger asChild>\n    <Button variant='outline'>Delete Account</Button>\n  </AlertDialogTrigger>\n  <AlertDialogContent>\n    <AlertDialogHeader>\n      <AlertDialogTitle>Are you sure?</AlertDialogTitle>\n      <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>\n    </AlertDialogHeader>\n    <AlertDialogFooter>\n      <AlertDialogCancel>Cancel</AlertDialogCancel>\n      <AlertDialogAction>Continue</AlertDialogAction>\n    </AlertDialogFooter>\n  </AlertDialogContent>\n</AlertDialog>"
         }
-      ]
+      ],
+      "tags": [
+        "modal",
+        "confirm",
+        "warning",
+        "overlay"
+      ],
+      "useCase": "Interrupting user to confirm a dangerous action."
     },
     {
       "name": "aspect-ratio",
@@ -164,7 +185,14 @@
           "title": "16:9 Image",
           "code": "<AspectRatio ratio={16 / 9}>\n  <img src='photo.jpg' alt='Photo' className='object-cover' />\n</AspectRatio>"
         }
-      ]
+      ],
+      "tags": [
+        "layout",
+        "image",
+        "video",
+        "container"
+      ],
+      "useCase": "Maintaining a consistent width-to-height ratio for media."
     },
     {
       "name": "avatar",
@@ -195,7 +223,14 @@
           "title": "With Image",
           "code": "<Avatar>\n  <AvatarImage src='avatar.jpg' alt='@username' />\n  <AvatarFallback>CN</AvatarFallback>\n</Avatar>"
         }
-      ]
+      ],
+      "tags": [
+        "image",
+        "user",
+        "profile",
+        "picture"
+      ],
+      "useCase": "Displaying user profile pictures or initials."
     },
     {
       "name": "badge",
@@ -232,7 +267,14 @@
           "title": "Outline Badge",
           "code": "<Badge variant='outline'>Draft</Badge>"
         }
-      ]
+      ],
+      "tags": [
+        "label",
+        "tag",
+        "status",
+        "indicator"
+      ],
+      "useCase": "Labeling items with status or category."
     },
     {
       "name": "breadcrumb",
@@ -257,7 +299,14 @@
           "title": "Simple Breadcrumb",
           "code": "<Breadcrumb>\n  <BreadcrumbList>\n    <BreadcrumbItem>\n      <BreadcrumbLink href='/'>Home</BreadcrumbLink>\n    </BreadcrumbItem>\n    <BreadcrumbSeparator />\n    <BreadcrumbItem>\n      <BreadcrumbLink href='/docs'>Docs</BreadcrumbLink>\n    </BreadcrumbItem>\n    <BreadcrumbSeparator />\n    <BreadcrumbItem>\n      <BreadcrumbPage>Breadcrumb</BreadcrumbPage>\n    </BreadcrumbItem>\n  </BreadcrumbList>\n</Breadcrumb>"
         }
-      ]
+      ],
+      "tags": [
+        "navigation",
+        "path",
+        "history",
+        "links"
+      ],
+      "useCase": "Showing current page location in hierarchy."
     },
     {
       "name": "button",
@@ -326,7 +375,14 @@
           "title": "As Link",
           "code": "<Button asChild>\n  <Link href='/login'>Login</Link>\n</Button>"
         }
-      ]
+      ],
+      "tags": [
+        "action",
+        "input",
+        "click",
+        "submit"
+      ],
+      "useCase": "Triggering actions or submitting forms."
     },
     {
       "name": "calendar",
@@ -372,7 +428,14 @@
           "title": "Date Range Picker",
           "code": "const [dateRange, setDateRange] = React.useState<DateRange | undefined>()\n\n<Calendar\n  mode='range'\n  selected={dateRange}\n  onSelect={setDateRange}\n/>"
         }
-      ]
+      ],
+      "tags": [
+        "date",
+        "picker",
+        "time",
+        "input"
+      ],
+      "useCase": "Selecting dates from a monthly view."
     },
     {
       "name": "card",
@@ -396,7 +459,14 @@
           "title": "Basic Card",
           "code": "<Card>\n  <CardHeader>\n    <CardTitle>Card Title</CardTitle>\n    <CardDescription>Card Description</CardDescription>\n  </CardHeader>\n  <CardContent>\n    <p>Card Content</p>\n  </CardContent>\n  <CardFooter>\n    <Button>Action</Button>\n  </CardFooter>\n</Card>"
         }
-      ]
+      ],
+      "tags": [
+        "container",
+        "box",
+        "panel",
+        "layout"
+      ],
+      "useCase": "Grouping related content and actions in a container."
     },
     {
       "name": "carousel",
@@ -439,7 +509,14 @@
           "title": "Basic Carousel",
           "code": "<Carousel>\n  <CarouselContent>\n    <CarouselItem>Slide 1</CarouselItem>\n    <CarouselItem>Slide 2</CarouselItem>\n    <CarouselItem>Slide 3</CarouselItem>\n  </CarouselContent>\n  <CarouselPrevious />\n  <CarouselNext />\n</Carousel>"
         }
-      ]
+      ],
+      "tags": [
+        "slider",
+        "gallery",
+        "slides",
+        "swipe"
+      ],
+      "useCase": "Cycling through a set of content or images."
     },
     {
       "name": "chart",
@@ -464,7 +541,14 @@
           "title": "Bar Chart",
           "code": "<ChartContainer config={chartConfig}>\n  <BarChart data={data}>\n    <Bar dataKey='value' fill='var(--color-primary)' />\n    <ChartTooltip content={<ChartTooltipContent />} />\n  </BarChart>\n</ChartContainer>"
         }
-      ]
+      ],
+      "tags": [
+        "graph",
+        "data",
+        "visual",
+        "statistics"
+      ],
+      "useCase": "Visualizing data in bar, line, or pie charts."
     },
     {
       "name": "checkbox",
@@ -500,7 +584,14 @@
           "title": "Controlled Checkbox",
           "code": "const [checked, setChecked] = React.useState(false)\n\n<Checkbox\n  checked={checked}\n  onCheckedChange={setChecked}\n/>"
         }
-      ]
+      ],
+      "tags": [
+        "input",
+        "form",
+        "select",
+        "boolean"
+      ],
+      "useCase": "Selecting one or more options from a list."
     },
     {
       "name": "collapsible",
@@ -534,7 +625,14 @@
           "title": "Basic Collapsible",
           "code": "<Collapsible>\n  <CollapsibleTrigger>Can I use this in my project?</CollapsibleTrigger>\n  <CollapsibleContent>\n    Yes. Free to use for personal and commercial projects.\n  </CollapsibleContent>\n</Collapsible>"
         }
-      ]
+      ],
+      "tags": [
+        "expand",
+        "hide",
+        "section",
+        "disclosure"
+      ],
+      "useCase": "Showing or hiding a section of content."
     },
     {
       "name": "combobox",
@@ -552,7 +650,14 @@
           "title": "Framework Selector",
           "code": "<Popover open={open} onOpenChange={setOpen}>\n  <PopoverTrigger asChild>\n    <Button variant='outline' role='combobox'>\n      {value || 'Select framework...'}\n    </Button>\n  </PopoverTrigger>\n  <PopoverContent>\n    <Command>\n      <CommandInput placeholder='Search framework...' />\n      <CommandList>\n        <CommandItem onSelect={setValue}>Next.js</CommandItem>\n        <CommandItem onSelect={setValue}>React</CommandItem>\n      </CommandList>\n    </Command>\n  </PopoverContent>\n</Popover>"
         }
-      ]
+      ],
+      "tags": [
+        "input",
+        "select",
+        "search",
+        "autocomplete"
+      ],
+      "useCase": "Selecting an item from a large list with search."
     },
     {
       "name": "command",
@@ -580,7 +685,14 @@
           "title": "Command Menu",
           "code": "<Command>\n  <CommandInput placeholder='Type a command or search...' />\n  <CommandList>\n    <CommandEmpty>No results found.</CommandEmpty>\n    <CommandGroup heading='Suggestions'>\n      <CommandItem>Calendar</CommandItem>\n      <CommandItem>Search Emoji</CommandItem>\n    </CommandGroup>\n  </CommandList>\n</Command>"
         }
-      ]
+      ],
+      "tags": [
+        "search",
+        "menu",
+        "palette",
+        "dialog"
+      ],
+      "useCase": "Global command palette for navigation or actions."
     },
     {
       "name": "context-menu",
@@ -612,7 +724,14 @@
           "title": "Basic Context Menu",
           "code": "<ContextMenu>\n  <ContextMenuTrigger>Right click here</ContextMenuTrigger>\n  <ContextMenuContent>\n    <ContextMenuItem>Copy</ContextMenuItem>\n    <ContextMenuItem>Paste</ContextMenuItem>\n    <ContextMenuItem>Delete</ContextMenuItem>\n  </ContextMenuContent>\n</ContextMenu>"
         }
-      ]
+      ],
+      "tags": [
+        "menu",
+        "right-click",
+        "actions",
+        "overlay"
+      ],
+      "useCase": "Showing actions on right-click."
     },
     {
       "name": "dialog",
@@ -652,7 +771,14 @@
           "title": "Basic Dialog",
           "code": "<Dialog>\n  <DialogTrigger asChild>\n    <Button>Open Dialog</Button>\n  </DialogTrigger>\n  <DialogContent>\n    <DialogHeader>\n      <DialogTitle>Are you sure?</DialogTitle>\n      <DialogDescription>This action cannot be undone.</DialogDescription>\n    </DialogHeader>\n  </DialogContent>\n</Dialog>"
         }
-      ]
+      ],
+      "tags": [
+        "modal",
+        "popup",
+        "window",
+        "overlay"
+      ],
+      "useCase": "Focused task or content in a modal window."
     },
     {
       "name": "drawer",
@@ -698,7 +824,14 @@
           "title": "Bottom Drawer",
           "code": "<Drawer>\n  <DrawerTrigger asChild>\n    <Button>Open Drawer</Button>\n  </DrawerTrigger>\n  <DrawerContent>\n    <DrawerHeader>\n      <DrawerTitle>Drawer Title</DrawerTitle>\n      <DrawerDescription>Drawer description</DrawerDescription>\n    </DrawerHeader>\n    <DrawerFooter>\n      <Button>Submit</Button>\n      <DrawerClose asChild>\n        <Button variant='outline'>Cancel</Button>\n      </DrawerClose>\n    </DrawerFooter>\n  </DrawerContent>\n</Drawer>"
         }
-      ]
+      ],
+      "tags": [
+        "sheet",
+        "mobile",
+        "panel",
+        "overlay"
+      ],
+      "useCase": "Pull-up panel, common on mobile devices."
     },
     {
       "name": "dropdown-menu",
@@ -743,7 +876,14 @@
           "title": "Basic Dropdown",
           "code": "<DropdownMenu>\n  <DropdownMenuTrigger asChild>\n    <Button variant='outline'>Open Menu</Button>\n  </DropdownMenuTrigger>\n  <DropdownMenuContent>\n    <DropdownMenuLabel>My Account</DropdownMenuLabel>\n    <DropdownMenuSeparator />\n    <DropdownMenuItem>Profile</DropdownMenuItem>\n    <DropdownMenuItem>Settings</DropdownMenuItem>\n    <DropdownMenuItem>Logout</DropdownMenuItem>\n  </DropdownMenuContent>\n</DropdownMenu>"
         }
-      ]
+      ],
+      "tags": [
+        "menu",
+        "actions",
+        "list",
+        "select"
+      ],
+      "useCase": "Revealing a list of actions or links."
     },
     {
       "name": "form",
@@ -772,7 +912,14 @@
           "title": "Form with Validation",
           "code": "const form = useForm({\n  resolver: zodResolver(formSchema)\n})\n\n<Form {...form}>\n  <form onSubmit={form.handleSubmit(onSubmit)}>\n    <FormField\n      control={form.control}\n      name='username'\n      render={({ field }) => (\n        <FormItem>\n          <FormLabel>Username</FormLabel>\n          <FormControl>\n            <Input placeholder='shadcn' {...field} />\n          </FormControl>\n          <FormMessage />\n        </FormItem>\n      )}\n    />\n    <Button type='submit'>Submit</Button>\n  </form>\n</Form>"
         }
-      ]
+      ],
+      "tags": [
+        "input",
+        "validation",
+        "group",
+        "data"
+      ],
+      "useCase": "Building validated forms with multiple inputs."
     },
     {
       "name": "hover-card",
@@ -811,7 +958,14 @@
           "title": "Profile Hover Card",
           "code": "<HoverCard>\n  <HoverCardTrigger asChild>\n    <Button variant='link'>@nextjs</Button>\n  </HoverCardTrigger>\n  <HoverCardContent className='w-80'>\n    <div className='flex justify-between space-x-4'>\n      <Avatar>\n        <AvatarImage src='avatar.jpg' />\n        <AvatarFallback>VC</AvatarFallback>\n      </Avatar>\n      <div className='space-y-1'>\n        <h4 className='text-sm font-semibold'>@nextjs</h4>\n        <p className='text-sm'>The React Framework</p>\n      </div>\n    </div>\n  </HoverCardContent>\n</HoverCard>"
         }
-      ]
+      ],
+      "tags": [
+        "preview",
+        "tooltip",
+        "overlay",
+        "info"
+      ],
+      "useCase": "Previewing more content on hover."
     },
     {
       "name": "input",
@@ -852,7 +1006,14 @@
           "title": "With Label",
           "code": "<div>\n  <Label htmlFor='email'>Email</Label>\n  <Input type='email' id='email' placeholder='Email' />\n</div>"
         }
-      ]
+      ],
+      "tags": [
+        "field",
+        "text",
+        "form",
+        "entry"
+      ],
+      "useCase": "Basic text input field."
     },
     {
       "name": "input-otp",
@@ -885,7 +1046,14 @@
           "title": "6-Digit OTP",
           "code": "<InputOTP maxLength={6}>\n  <InputOTPGroup>\n    <InputOTPSlot index={0} />\n    <InputOTPSlot index={1} />\n    <InputOTPSlot index={2} />\n  </InputOTPGroup>\n  <InputOTPSeparator />\n  <InputOTPGroup>\n    <InputOTPSlot index={3} />\n    <InputOTPSlot index={4} />\n    <InputOTPSlot index={5} />\n  </InputOTPGroup>\n</InputOTP>"
         }
-      ]
+      ],
+      "tags": [
+        "code",
+        "auth",
+        "security",
+        "digit"
+      ],
+      "useCase": "Entering one-time passwords."
     },
     {
       "name": "label",
@@ -909,7 +1077,14 @@
           "title": "With Input",
           "code": "<div>\n  <Label htmlFor='email'>Email</Label>\n  <Input type='email' id='email' />\n</div>"
         }
-      ]
+      ],
+      "tags": [
+        "text",
+        "form",
+        "caption",
+        "name"
+      ],
+      "useCase": "Labeling form elements."
     },
     {
       "name": "menubar",
@@ -943,7 +1118,14 @@
           "title": "Application Menu",
           "code": "<Menubar>\n  <MenubarMenu>\n    <MenubarTrigger>File</MenubarTrigger>\n    <MenubarContent>\n      <MenubarItem>New Tab</MenubarItem>\n      <MenubarItem>New Window</MenubarItem>\n      <MenubarSeparator />\n      <MenubarItem>Save</MenubarItem>\n    </MenubarContent>\n  </MenubarMenu>\n  <MenubarMenu>\n    <MenubarTrigger>Edit</MenubarTrigger>\n    <MenubarContent>\n      <MenubarItem>Cut</MenubarItem>\n      <MenubarItem>Copy</MenubarItem>\n      <MenubarItem>Paste</MenubarItem>\n    </MenubarContent>\n  </MenubarMenu>\n</Menubar>"
         }
-      ]
+      ],
+      "tags": [
+        "navigation",
+        "dropdown",
+        "desktop",
+        "top"
+      ],
+      "useCase": "Desktop-style top menu bar."
     },
     {
       "name": "navigation-menu",
@@ -971,7 +1153,14 @@
           "title": "Header Navigation",
           "code": "<NavigationMenu>\n  <NavigationMenuList>\n    <NavigationMenuItem>\n      <NavigationMenuTrigger>Getting started</NavigationMenuTrigger>\n      <NavigationMenuContent>\n        <NavigationMenuLink>Introduction</NavigationMenuLink>\n        <NavigationMenuLink>Installation</NavigationMenuLink>\n      </NavigationMenuContent>\n    </NavigationMenuItem>\n    <NavigationMenuItem>\n      <NavigationMenuLink href='/docs'>Documentation</NavigationMenuLink>\n    </NavigationMenuItem>\n  </NavigationMenuList>\n</NavigationMenu>"
         }
-      ]
+      ],
+      "tags": [
+        "header",
+        "links",
+        "mega-menu",
+        "nav"
+      ],
+      "useCase": "Main site navigation with mega-menus."
     },
     {
       "name": "pagination",
@@ -996,7 +1185,14 @@
           "title": "Basic Pagination",
           "code": "<Pagination>\n  <PaginationContent>\n    <PaginationItem>\n      <PaginationPrevious href='#' />\n    </PaginationItem>\n    <PaginationItem>\n      <PaginationLink href='#'>1</PaginationLink>\n    </PaginationItem>\n    <PaginationItem>\n      <PaginationLink href='#' isActive>2</PaginationLink>\n    </PaginationItem>\n    <PaginationItem>\n      <PaginationLink href='#'>3</PaginationLink>\n    </PaginationItem>\n    <PaginationItem>\n      <PaginationEllipsis />\n    </PaginationItem>\n    <PaginationItem>\n      <PaginationNext href='#' />\n    </PaginationItem>\n  </PaginationContent>\n</Pagination>"
         }
-      ]
+      ],
+      "tags": [
+        "navigation",
+        "pages",
+        "list",
+        "next"
+      ],
+      "useCase": "Navigating between pages of data."
     },
     {
       "name": "popover",
@@ -1032,7 +1228,14 @@
           "title": "Basic Popover",
           "code": "<Popover>\n  <PopoverTrigger asChild>\n    <Button variant='outline'>Open popover</Button>\n  </PopoverTrigger>\n  <PopoverContent className='w-80'>\n    <div className='grid gap-4'>\n      <h4 className='font-medium'>Dimensions</h4>\n      <p className='text-sm text-muted-foreground'>Set dimensions</p>\n    </div>\n  </PopoverContent>\n</Popover>"
         }
-      ]
+      ],
+      "tags": [
+        "overlay",
+        "bubble",
+        "content",
+        "popup"
+      ],
+      "useCase": "Small overlay content triggered by click."
     },
     {
       "name": "progress",
@@ -1064,7 +1267,14 @@
           "title": "With Label",
           "code": "<div>\n  <div className='flex justify-between mb-2'>\n    <span className='text-sm'>Uploading...</span>\n    <span className='text-sm'>{progress}%</span>\n  </div>\n  <Progress value={progress} />\n</div>"
         }
-      ]
+      ],
+      "tags": [
+        "loading",
+        "bar",
+        "status",
+        "indicator"
+      ],
+      "useCase": "Showing completion percentage."
     },
     {
       "name": "radio-group",
@@ -1097,7 +1307,14 @@
           "title": "Basic Radio Group",
           "code": "<RadioGroup defaultValue='option-one'>\n  <div className='flex items-center space-x-2'>\n    <RadioGroupItem value='option-one' id='option-one' />\n    <Label htmlFor='option-one'>Option One</Label>\n  </div>\n  <div className='flex items-center space-x-2'>\n    <RadioGroupItem value='option-two' id='option-two' />\n    <Label htmlFor='option-two'>Option Two</Label>\n  </div>\n</RadioGroup>"
         }
-      ]
+      ],
+      "tags": [
+        "select",
+        "option",
+        "form",
+        "list"
+      ],
+      "useCase": "Selecting exactly one option from a list."
     },
     {
       "name": "resizable",
@@ -1136,7 +1353,14 @@
           "title": "Horizontal Panels",
           "code": "<ResizablePanelGroup direction='horizontal'>\n  <ResizablePanel defaultSize={50}>\n    <div>Panel 1</div>\n  </ResizablePanel>\n  <ResizableHandle />\n  <ResizablePanel defaultSize={50}>\n    <div>Panel 2</div>\n  </ResizablePanel>\n</ResizablePanelGroup>"
         }
-      ]
+      ],
+      "tags": [
+        "layout",
+        "split",
+        "drag",
+        "panels"
+      ],
+      "useCase": "Resizable panel layouts."
     },
     {
       "name": "scroll-area",
@@ -1170,7 +1394,14 @@
           "title": "Vertical Scroll",
           "code": "<ScrollArea className='h-72 w-48 rounded-md border'>\n  <div className='p-4'>\n    {Array.from({ length: 50 }).map((_, i) => (\n      <div key={i}>Item {i + 1}</div>\n    ))}\n  </div>\n</ScrollArea>"
         }
-      ]
+      ],
+      "tags": [
+        "container",
+        "overflow",
+        "view",
+        "list"
+      ],
+      "useCase": "Custom scrollable container."
     },
     {
       "name": "select",
@@ -1212,7 +1443,14 @@
           "title": "Basic Select",
           "code": "<Select>\n  <SelectTrigger className='w-[180px]'>\n    <SelectValue placeholder='Select a fruit' />\n  </SelectTrigger>\n  <SelectContent>\n    <SelectItem value='apple'>Apple</SelectItem>\n    <SelectItem value='banana'>Banana</SelectItem>\n    <SelectItem value='orange'>Orange</SelectItem>\n  </SelectContent>\n</Select>"
         }
-      ]
+      ],
+      "tags": [
+        "dropdown",
+        "input",
+        "form",
+        "option"
+      ],
+      "useCase": "Picking a value from a dropdown list."
     },
     {
       "name": "separator",
@@ -1248,7 +1486,14 @@
           "title": "Vertical Separator",
           "code": "<div className='flex h-5 items-center space-x-4'>\n  <div>Item 1</div>\n  <Separator orientation='vertical' />\n  <div>Item 2</div>\n</div>"
         }
-      ]
+      ],
+      "tags": [
+        "divider",
+        "line",
+        "rule",
+        "layout"
+      ],
+      "useCase": "Visually separating content."
     },
     {
       "name": "sheet",
@@ -1294,7 +1539,14 @@
           "title": "Right Side Sheet",
           "code": "<Sheet>\n  <SheetTrigger asChild>\n    <Button variant='outline'>Open</Button>\n  </SheetTrigger>\n  <SheetContent>\n    <SheetHeader>\n      <SheetTitle>Edit profile</SheetTitle>\n      <SheetDescription>Make changes to your profile</SheetDescription>\n    </SheetHeader>\n  </SheetContent>\n</Sheet>"
         }
-      ]
+      ],
+      "tags": [
+        "sidebar",
+        "drawer",
+        "overlay",
+        "panel"
+      ],
+      "useCase": "Side-panel for navigation or details."
     },
     {
       "name": "sidebar",
@@ -1335,7 +1587,12 @@
           "title": "Application Sidebar",
           "code": "<SidebarProvider>\n  <Sidebar>\n    <SidebarContent>\n      <SidebarGroup>\n        <SidebarGroupLabel>Application</SidebarGroupLabel>\n        <SidebarGroupContent>\n          <SidebarMenu>\n            <SidebarMenuItem>\n              <SidebarMenuButton asChild>\n                <a href='/'><Home />Home</a>\n              </SidebarMenuButton>\n            </SidebarMenuItem>\n          </SidebarMenu>\n        </SidebarGroupContent>\n      </SidebarGroup>\n    </SidebarContent>\n  </Sidebar>\n</SidebarProvider>"
         }
-      ]
+      ],
+      "tags": [
+        "shadcn",
+        "navigation"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "skeleton",
@@ -1351,7 +1608,14 @@
           "title": "Loading Card",
           "code": "<div className='flex flex-col space-y-3'>\n  <Skeleton className='h-[125px] w-[250px] rounded-xl' />\n  <div className='space-y-2'>\n    <Skeleton className='h-4 w-[250px]' />\n    <Skeleton className='h-4 w-[200px]' />\n  </div>\n</div>"
         }
-      ]
+      ],
+      "tags": [
+        "loading",
+        "placeholder",
+        "mockup",
+        "state"
+      ],
+      "useCase": "Placeholder state while data loads."
     },
     {
       "name": "slider",
@@ -1396,7 +1660,14 @@
           "title": "Range Slider",
           "code": "<Slider defaultValue={[25, 75]} max={100} step={1} />"
         }
-      ]
+      ],
+      "tags": [
+        "input",
+        "range",
+        "track",
+        "control"
+      ],
+      "useCase": "Selecting a value from a range."
     },
     {
       "name": "sonner",
@@ -1422,7 +1693,14 @@
           "title": "Error Toast",
           "code": "toast.error('Something went wrong')"
         }
-      ]
+      ],
+      "tags": [
+        "toast",
+        "notification",
+        "alert",
+        "message"
+      ],
+      "useCase": "Stackable toast notifications."
     },
     {
       "name": "switch",
@@ -1451,7 +1729,14 @@
           "title": "Basic Switch",
           "code": "<div className='flex items-center space-x-2'>\n  <Switch id='airplane-mode' />\n  <Label htmlFor='airplane-mode'>Airplane Mode</Label>\n</div>"
         }
-      ]
+      ],
+      "tags": [
+        "toggle",
+        "boolean",
+        "input",
+        "form"
+      ],
+      "useCase": "Toggling a setting on or off."
     },
     {
       "name": "table",
@@ -1477,7 +1762,14 @@
           "title": "Basic Table",
           "code": "<Table>\n  <TableCaption>A list of your recent invoices.</TableCaption>\n  <TableHeader>\n    <TableRow>\n      <TableHead>Invoice</TableHead>\n      <TableHead>Status</TableHead>\n      <TableHead>Amount</TableHead>\n    </TableRow>\n  </TableHeader>\n  <TableBody>\n    <TableRow>\n      <TableCell>INV001</TableCell>\n      <TableCell>Paid</TableCell>\n      <TableCell>$250.00</TableCell>\n    </TableRow>\n  </TableBody>\n</Table>"
         }
-      ]
+      ],
+      "tags": [
+        "data",
+        "grid",
+        "rows",
+        "list"
+      ],
+      "useCase": "Displaying tabular data."
     },
     {
       "name": "tabs",
@@ -1512,7 +1804,14 @@
           "title": "Basic Tabs",
           "code": "<Tabs defaultValue='account'>\n  <TabsList>\n    <TabsTrigger value='account'>Account</TabsTrigger>\n    <TabsTrigger value='password'>Password</TabsTrigger>\n  </TabsList>\n  <TabsContent value='account'>Account content</TabsContent>\n  <TabsContent value='password'>Password content</TabsContent>\n</Tabs>"
         }
-      ]
+      ],
+      "tags": [
+        "navigation",
+        "switch",
+        "panels",
+        "content"
+      ],
+      "useCase": "Switching between views in the same context."
     },
     {
       "name": "textarea",
@@ -1543,7 +1842,14 @@
           "title": "With Label",
           "code": "<div>\n  <Label htmlFor='message'>Your message</Label>\n  <Textarea id='message' placeholder='Type your message here.' />\n</div>"
         }
-      ]
+      ],
+      "tags": [
+        "input",
+        "text",
+        "multiline",
+        "form"
+      ],
+      "useCase": "Multi-line text input."
     },
     {
       "name": "toast",
@@ -1577,7 +1883,14 @@
           "title": "With Action",
           "code": "toast({\n  title: 'Uh oh! Something went wrong.',\n  description: 'There was a problem with your request.',\n  action: <ToastAction altText='Try again'>Try again</ToastAction>\n})"
         }
-      ]
+      ],
+      "tags": [
+        "notification",
+        "message",
+        "alert",
+        "popup"
+      ],
+      "useCase": "Brief status message."
     },
     {
       "name": "toggle",
@@ -1627,7 +1940,14 @@
           "title": "Outline Toggle",
           "code": "<Toggle variant='outline' aria-label='Toggle bold'>\n  <Bold className='h-4 w-4' />\n</Toggle>"
         }
-      ]
+      ],
+      "tags": [
+        "button",
+        "switch",
+        "state",
+        "icon"
+      ],
+      "useCase": "Two-state button."
     },
     {
       "name": "toggle-group",
@@ -1720,7 +2040,14 @@
           "title": "With Spacing and Custom Styles",
           "code": "import { BookmarkIcon, HeartIcon, StarIcon } from 'lucide-react'\n\n<ToggleGroup type='multiple' variant='outline' spacing={2} size='sm'>\n  <ToggleGroupItem\n    value='star'\n    aria-label='Toggle star'\n    className='data-[state=on]:bg-transparent data-[state=on]:*:[svg]:fill-yellow-500 data-[state=on]:*:[svg]:stroke-yellow-500'\n  >\n    <StarIcon />\n    Star\n  </ToggleGroupItem>\n  <ToggleGroupItem\n    value='heart'\n    aria-label='Toggle heart'\n    className='data-[state=on]:bg-transparent data-[state=on]:*:[svg]:fill-red-500 data-[state=on]:*:[svg]:stroke-red-500'\n  >\n    <HeartIcon />\n    Heart\n  </ToggleGroupItem>\n  <ToggleGroupItem\n    value='bookmark'\n    aria-label='Toggle bookmark'\n    className='data-[state=on]:bg-transparent data-[state=on]:*:[svg]:fill-blue-500 data-[state=on]:*:[svg]:stroke-blue-500'\n  >\n    <BookmarkIcon />\n    Bookmark\n  </ToggleGroupItem>\n</ToggleGroup>"
         }
-      ]
+      ],
+      "tags": [
+        "buttons",
+        "select",
+        "options",
+        "set"
+      ],
+      "useCase": "Set of toggle buttons."
     },
     {
       "name": "tooltip",
@@ -1756,7 +2083,14 @@
           "title": "Basic Tooltip",
           "code": "<TooltipProvider>\n  <Tooltip>\n    <TooltipTrigger asChild>\n      <Button variant='outline'>Hover</Button>\n    </TooltipTrigger>\n    <TooltipContent>\n      <p>Add to library</p>\n    </TooltipContent>\n  </Tooltip>\n</TooltipProvider>"
         }
-      ]
+      ],
+      "tags": [
+        "hint",
+        "hover",
+        "info",
+        "label"
+      ],
+      "useCase": "Small hint on hover."
     }
   ]
 }

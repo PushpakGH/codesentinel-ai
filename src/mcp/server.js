@@ -349,6 +349,26 @@ class MCPServer extends EventEmitter {
               },
               required: ['code', 'language'],
             },
+          },
+          {
+            name: 'search_components',
+            description: 'Semantically search for UI components across all registries (Shadcn, MagicUI, Aceternity, Motion Primitives). Uses intelligent ranking.',
+            inputSchema: {
+              type: 'object',
+              properties: {
+                query: {
+                  type: 'string',
+                  description: 'Search query (e.g. "animated hero section", "minimal button").',
+                },
+                style_preference: {
+                  type: 'string',
+                  enum: ['minimal', 'animated', 'creative', 'corporate', 'neutral'],
+                  description: 'Visual style preference to bias the results.',
+                  default: 'neutral'
+                }
+              },
+              required: ['query'],
+            },
           }
         ],
       };

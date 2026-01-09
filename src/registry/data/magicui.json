@@ -25,7 +25,9 @@
       "name": "animated-beam",
       "category": "animations",
       "description": "Animated connection lines between elements with smooth transitions.",
-      "dependencies": ["framer-motion"],
+      "dependencies": [
+        "framer-motion"
+      ],
       "props": {
         "from": {
           "type": "HTMLElement | null",
@@ -47,13 +49,22 @@
           "title": "Connect Two Cards",
           "code": "<AnimatedBeam from={cardRefA.current} to={cardRefB.current} />"
         }
-      ]
+      ],
+      "tags": [
+        "beam",
+        "connector",
+        "line",
+        "flow"
+      ],
+      "useCase": "Connecting two elements with a moving beam, good for explaining data flow."
     },
     {
       "name": "animated-list",
       "category": "animations",
       "description": "List with staggered entrance animations for each item.",
-      "dependencies": ["framer-motion"],
+      "dependencies": [
+        "framer-motion"
+      ],
       "props": {
         "as": {
           "type": "string",
@@ -72,13 +83,22 @@
           "title": "Feature List",
           "code": "<AnimatedList>\n  <AnimatedListItem>Type-safe components</AnimatedListItem>\n  <AnimatedListItem>Framer Motion animations</AnimatedListItem>\n  <AnimatedListItem>Perfect for landing pages</AnimatedListItem>\n</AnimatedList>"
         }
-      ]
+      ],
+      "tags": [
+        "list",
+        "notification",
+        "feed",
+        "stagger"
+      ],
+      "useCase": "A list where new items animate in, perfect for activity feeds."
     },
     {
       "name": "bento-grid",
       "category": "layout",
       "description": "Masonry-style bento grid layout with smooth hover effects.",
-      "dependencies": ["framer-motion"],
+      "dependencies": [
+        "framer-motion"
+      ],
       "props": {
         "cols": {
           "type": "number",
@@ -92,13 +112,22 @@
           "title": "Marketing Bento Grid",
           "code": "<BentoGrid cols={3}>\n  <BentoCard title=\"Fast\" description=\"Optimized animations.\" />\n  <BentoCard title=\"Beautiful\" description=\"Thoughtful motion design.\" />\n  <BentoCard title=\"Copy-paste\" description=\"Drop into any Next.js app.\" />\n</BentoGrid>"
         }
-      ]
+      ],
+      "tags": [
+        "grid",
+        "layout",
+        "masonry",
+        "cards"
+      ],
+      "useCase": "A bento-style grid for featuring multiple items of varying importance."
     },
     {
       "name": "blur-in",
       "category": "effects",
       "description": "Text that blurs in on mount or when scrolled into view.",
-      "dependencies": ["framer-motion"],
+      "dependencies": [
+        "framer-motion"
+      ],
       "props": {
         "delay": {
           "type": "number",
@@ -115,13 +144,22 @@
           "title": "Blurred Heading",
           "code": "<BlurIn>\n  <h2 className=\"text-3xl font-bold\">Blur into view</h2>\n</BlurIn>"
         }
-      ]
+      ],
+      "tags": [
+        "text",
+        "reveal",
+        "blur",
+        "animation"
+      ],
+      "useCase": "Text that reveals itself by unblurring."
     },
     {
       "name": "border-beam",
       "category": "effects",
       "description": "Animated border beam that moves around the edges of a container.",
-      "dependencies": ["framer-motion"],
+      "dependencies": [
+        "framer-motion"
+      ],
       "props": {
         "duration": {
           "type": "number",
@@ -134,17 +172,31 @@
           "title": "Highlighted Card",
           "code": "<BorderBeam>\n  <div className=\"rounded-xl border bg-card p-6\">\n    <h3 className=\"text-lg font-semibold\">Border Beam</h3>\n  </div>\n</BorderBeam>"
         }
-      ]
+      ],
+      "tags": [
+        "border",
+        "light",
+        "glow",
+        "card"
+      ],
+      "useCase": "A beam of light traveling around a container's border."
     },
     {
       "name": "box-reveal",
       "category": "animations",
       "description": "Content reveals from inside a box with a masking animation.",
-      "dependencies": ["framer-motion"],
+      "dependencies": [
+        "framer-motion"
+      ],
       "props": {
         "direction": {
           "type": "string",
-          "values": ["left", "right", "up", "down"],
+          "values": [
+            "left",
+            "right",
+            "up",
+            "down"
+          ],
           "default": "up"
         }
       },
@@ -154,13 +206,22 @@
           "title": "Reveal Text",
           "code": "<BoxReveal>\n  Hidden content\n</BoxReveal>"
         }
-      ]
+      ],
+      "tags": [
+        "reveal",
+        "mask",
+        "text",
+        "animation"
+      ],
+      "useCase": "Revealing content with a sliding box mask effect."
     },
     {
       "name": "confetti",
       "category": "effects",
       "description": "Celebratory confetti animation triggered by an event.",
-      "dependencies": ["canvas-confetti"],
+      "dependencies": [
+        "canvas-confetti"
+      ],
       "props": {
         "onComplete": {
           "type": "function",
@@ -173,13 +234,22 @@
           "title": "Trigger On Click",
           "code": "<Confetti trigger={onClick} />"
         }
-      ]
+      ],
+      "tags": [
+        "celebration",
+        "particles",
+        "success",
+        "effect"
+      ],
+      "useCase": "Firing confetti on success states or celebrations."
     },
     {
       "name": "dock",
       "category": "navigation",
       "description": "macOS-style dock navigation with hover magnification.",
-      "dependencies": ["framer-motion"],
+      "dependencies": [
+        "framer-motion"
+      ],
       "props": {
         "items": {
           "type": "Array<{icon:ReactNode; label:string; href?:string}>",
@@ -192,7 +262,14 @@
           "title": "Floating Dock",
           "code": "<Dock>\n  <DockIcon icon={<HomeIcon />} label=\"Home\" href=\"#home\" />\n  <DockIcon icon={<UserIcon />} label=\"Profile\" href=\"#profile\" />\n</Dock>"
         }
-      ]
+      ],
+      "tags": [
+        "navigation",
+        "menu",
+        "macos",
+        "icon"
+      ],
+      "useCase": "An icon dock that expands on hover, like macOS."
     },
     {
       "name": "dot-pattern",
@@ -210,13 +287,22 @@
           "title": "Subtle Card Background",
           "code": "<div className=\"relative overflow-hidden rounded-xl border bg-background\">\n  <DotPattern className=\"absolute inset-0 opacity-20\" />\n  <div className=\"relative p-6\">Content</div>\n</div>"
         }
-      ]
+      ],
+      "tags": [
+        "background",
+        "pattern",
+        "dots",
+        "svg"
+      ],
+      "useCase": "A subtle dot grid background pattern."
     },
     {
       "name": "fade-text",
       "category": "text",
       "description": "Text that fades in character by character.",
-      "dependencies": ["framer-motion"],
+      "dependencies": [
+        "framer-motion"
+      ],
       "props": {
         "children": {
           "type": "string | ReactNode",
@@ -233,13 +319,23 @@
           "title": "Animated Heading",
           "code": "<FadeText>Your text</FadeText>"
         }
-      ]
+      ],
+      "tags": [
+        "text",
+        "fade",
+        "reveal",
+        "animation"
+      ],
+      "useCase": "Simple fade-in animation for text."
     },
     {
       "name": "globe",
       "category": "interactive",
       "description": "Interactive 3D rotating globe with markers.",
-      "dependencies": ["three", "@react-three/fiber"],
+      "dependencies": [
+        "three",
+        "@react-three/fiber"
+      ],
       "props": {
         "markers": {
           "type": "Array<{lat:number; lng:number; label?:string}>"
@@ -251,7 +347,14 @@
           "title": "User Locations",
           "code": "<Globe markers={[{ lat: 40, lng: -74, label: \"NYC\" }]} />"
         }
-      ]
+      ],
+      "tags": [
+        "globe",
+        "3d",
+        "earth",
+        "interactive"
+      ],
+      "useCase": "Interactive 3D globe."
     },
     {
       "name": "grid-pattern",
@@ -269,7 +372,14 @@
           "title": "Section Background",
           "code": "<section className=\"relative overflow-hidden rounded-3xl border\">\n  <GridPattern className=\"absolute inset-0 opacity-10\" />\n  <div className=\"relative z-10 p-10\">Content</div>\n</section>"
         }
-      ]
+      ],
+      "tags": [
+        "background",
+        "grid",
+        "lines",
+        "pattern"
+      ],
+      "useCase": "A simple line grid background."
     },
     {
       "name": "hyper-text",
@@ -288,13 +398,22 @@
           "title": "Glitch Heading",
           "code": "<HyperText text=\"Scramble Me\" />"
         }
-      ]
+      ],
+      "tags": [
+        "text",
+        "glitch",
+        "random",
+        "scramble"
+      ],
+      "useCase": "Text that cycles through random characters before settling."
     },
     {
       "name": "icon-cloud",
       "category": "interactive",
       "description": "3D rotating cloud of icons.",
-      "dependencies": ["react-icon-cloud"],
+      "dependencies": [
+        "react-icon-cloud"
+      ],
       "props": {
         "iconSlugs": {
           "type": "string[]",
@@ -308,7 +427,14 @@
           "title": "Tech Stack Cloud",
           "code": "<IconCloud iconSlugs={[\"react\", \"typescript\", \"tailwindcss\", \"nextdotjs\"]} />"
         }
-      ]
+      ],
+      "tags": [
+        "cloud",
+        "sphere",
+        "icons",
+        "3d"
+      ],
+      "useCase": "A rotating cloud of tech stack icons."
     },
     {
       "name": "marquee",
@@ -323,7 +449,10 @@
         },
         "direction": {
           "type": "string",
-          "values": ["left", "right"],
+          "values": [
+            "left",
+            "right"
+          ],
           "default": "left"
         },
         "speed": {
@@ -349,7 +478,14 @@
           "title": "Logo Marquee",
           "code": "<Marquee direction=\"left\" speed={25} pauseOnHover>\n  <img src=\"/logos/nextjs.svg\" className=\"h-8\" />\n  <img src=\"/logos/vercel.svg\" className=\"h-8\" />\n  <img src=\"/logos/react.svg\" className=\"h-8\" />\n</Marquee>"
         }
-      ]
+      ],
+      "tags": [
+        "scroll",
+        "loop",
+        "infinite",
+        "brand"
+      ],
+      "useCase": "Infinite scrolling strip for logos or text."
     },
     {
       "name": "meteors",
@@ -368,13 +504,22 @@
           "title": "Meteors Background",
           "code": "<div className=\"relative overflow-hidden rounded-3xl\">\n  <Meteors number={20} />\n  <div className=\"relative z-10 p-8\">Content</div>\n</div>"
         }
-      ]
+      ],
+      "tags": [
+        "background",
+        "space",
+        "particles",
+        "star"
+      ],
+      "useCase": "Meteor shower animation for backgrounds."
     },
     {
       "name": "number-ticker",
       "category": "animations",
       "description": "Animated number counter.",
-      "dependencies": ["framer-motion"],
+      "dependencies": [
+        "framer-motion"
+      ],
       "props": {
         "value": {
           "type": "number",
@@ -391,7 +536,14 @@
           "title": "Metric Counter",
           "code": "<NumberTicker value={1000} />"
         }
-      ]
+      ],
+      "tags": [
+        "counter",
+        "numbers",
+        "stats",
+        "animate"
+      ],
+      "useCase": "Animate numbers counting up to a value."
     },
     {
       "name": "orbiting-circles",
@@ -405,13 +557,22 @@
           "title": "Orbit Icons",
           "code": "<OrbitingCircles>\n  <Icon />\n</OrbitingCircles>"
         }
-      ]
+      ],
+      "tags": [
+        "animation",
+        "circle",
+        "orbit",
+        "planet"
+      ],
+      "useCase": "Elements orbiting in circles around a center."
     },
     {
       "name": "particles",
       "category": "backgrounds",
       "description": "Animated particle background.",
-      "dependencies": ["tsparticles"],
+      "dependencies": [
+        "tsparticles"
+      ],
       "props": {
         "className": {
           "type": "string"
@@ -423,7 +584,14 @@
           "title": "Hero Background Particles",
           "code": "<div className=\"relative\">\n  <Particles className=\"absolute inset-0\" />\n  <div className=\"relative z-10 p-16\">Content</div>\n</div>"
         }
-      ]
+      ],
+      "tags": [
+        "background",
+        "dots",
+        "interactive",
+        "web"
+      ],
+      "useCase": "Interactive particles that respond to mouse movement."
     },
     {
       "name": "pulsating-button",
@@ -437,7 +605,14 @@
           "title": "CTA Button",
           "code": "<PulsatingButton>Click me</PulsatingButton>"
         }
-      ]
+      ],
+      "tags": [
+        "button",
+        "pulse",
+        "cta",
+        "glow"
+      ],
+      "useCase": "A primary call-to-action button that pulses to attract attention."
     },
     {
       "name": "retro-grid",
@@ -451,7 +626,14 @@
           "title": "Hero Retro Grid",
           "code": "<RetroGrid />"
         }
-      ]
+      ],
+      "tags": [
+        "background",
+        "retro",
+        "perspective",
+        "grid"
+      ],
+      "useCase": "A retro 80s style perspective grid background."
     },
     {
       "name": "ripple",
@@ -465,13 +647,22 @@
           "title": "Button Ripple",
           "code": "<Ripple>\n  <button>Click</button>\n</Ripple>"
         }
-      ]
+      ],
+      "tags": [
+        "effect",
+        "circle",
+        "click",
+        "wave"
+      ],
+      "useCase": "Expanding ripple circles, useful for emphasis."
     },
     {
       "name": "scroll-progress",
       "category": "feedback",
       "description": "Progress bar showing scroll position.",
-      "dependencies": ["framer-motion"],
+      "dependencies": [
+        "framer-motion"
+      ],
       "props": {},
       "usage": "import { ScrollProgress } from \"@/components/magicui/scroll-progress\"",
       "examples": [
@@ -479,7 +670,14 @@
           "title": "Top Scroll Bar",
           "code": "<ScrollProgress />"
         }
-      ]
+      ],
+      "tags": [
+        "progress",
+        "scroll",
+        "bar",
+        "indicator"
+      ],
+      "useCase": "Reading progress bar fixed to the top of the screen."
     },
     {
       "name": "shimmer-button",
@@ -493,7 +691,14 @@
           "title": "Shimmer CTA",
           "code": "<ShimmerButton>Hover me</ShimmerButton>"
         }
-      ]
+      ],
+      "tags": [
+        "button",
+        "shimmer",
+        "shine",
+        "premium"
+      ],
+      "useCase": "A shiny, premium-looking button."
     },
     {
       "name": "shine-border",
@@ -507,7 +712,14 @@
           "title": "Card Shine",
           "code": "<ShineBorder>\n  <div>Content</div>\n</ShineBorder>"
         }
-      ]
+      ],
+      "tags": [
+        "border",
+        "shine",
+        "glow",
+        "card"
+      ],
+      "useCase": "A border with a rotating shine effect."
     },
     {
       "name": "sparkles",
@@ -521,13 +733,21 @@
           "title": "Sparkling Heading",
           "code": "<Sparkles>\n  <h1>Title</h1>\n</Sparkles>"
         }
-      ]
+      ],
+      "tags": [
+        "text",
+        "sparkle",
+        "highlight"
+      ],
+      "useCase": "Text revealed or highlighted with sparkles."
     },
     {
       "name": "text-reveal",
       "category": "text",
       "description": "Text reveals on scroll with mask effect.",
-      "dependencies": ["framer-motion"],
+      "dependencies": [
+        "framer-motion"
+      ],
       "props": {
         "text": {
           "type": "string",
@@ -540,7 +760,14 @@
           "title": "Reveal Text",
           "code": "<TextReveal text=\"Reveal this\" />"
         }
-      ]
+      ],
+      "tags": [
+        "text",
+        "scroll",
+        "fade",
+        "read"
+      ],
+      "useCase": "Text that lights up as you scroll."
     },
     {
       "name": "typing-animation",
@@ -559,13 +786,21 @@
           "title": "Typewriter Hero",
           "code": "<TypingAnimation text=\"Type this out\" />"
         }
-      ]
+      ],
+      "tags": [
+        "text",
+        "typewriter",
+        "code"
+      ],
+      "useCase": "Text appearing as if being typed."
     },
     {
       "name": "word-pull-up",
       "category": "text",
       "description": "Words pull up into view animation.",
-      "dependencies": ["framer-motion"],
+      "dependencies": [
+        "framer-motion"
+      ],
       "props": {
         "words": {
           "type": "string",
@@ -578,13 +813,21 @@
           "title": "Animated Sentence",
           "code": "<WordPullUp words=\"Pull up animation\" />"
         }
-      ]
+      ],
+      "tags": [
+        "text",
+        "animation",
+        "entrance"
+      ],
+      "useCase": "Words sliding up into view."
     },
     {
       "name": "word-rotate",
       "category": "text",
       "description": "Rotating words animation.",
-      "dependencies": ["framer-motion"],
+      "dependencies": [
+        "framer-motion"
+      ],
       "props": {
         "words": {
           "type": "string[]",
@@ -597,7 +840,13 @@
           "title": "Rotating Keywords",
           "code": "<WordRotate words={[\"Fast\", \"Reliable\", \"Secure\"]} />"
         }
-      ]
+      ],
+      "tags": [
+        "text",
+        "cycle",
+        "substitution"
+      ],
+      "useCase": "Cycling through a list of words in a sentence."
     }
   ]
 }

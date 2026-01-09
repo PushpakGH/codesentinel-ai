@@ -43,6 +43,20 @@ async function activate(context) {
     // Still continue - some commands might have registered
   }
 
+  // REGISTER RESET COMMAND (Safety Valve)
+  context.subscriptions.push(vscode.commands.registerCommand('codesentinel.resetState', async () => {
+       const StateManager = require('./services/stateManager');
+       if (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0) {
+           const root = vscode.workspace.workspaceFolders[0].uri.fsPath;
+           const sm = new StateManager(root);
+           await sm.initialize();
+           await sm.clearState();
+           vscode.window.showInformationMessage('🗑️ Project state CLEARED. Please reload window.');
+       } else {
+           vscode.window.showErrorMessage('No workspace open to reset.');
+       }
+  }));
+
   try {
     logger.info('🚀 CodeSentinel AI Extension Activating...');
 
@@ -115,43 +129,43 @@ async function activate(context) {
     // =========================================
     // STEP 2: Initialize MCP Server (NEW!)
     // =========================================
+    // =========================================
+    // STEP 2: Initialize MCP Server (Async Background Start)
+    // =========================================
     try {
-      logger.info('🔧 Initializing MCP server...');
+      logger.info('🔧 Initializing MCP server (Background)...');
       const MCPServer = require('./mcp/server');
       const mcpServer = new MCPServer(context);
       
-      const mcpInitialized = await mcpServer.initialize();
+      // Don't await strict initialization to unblock extension activation
+      mcpServer.initialize().then(initialized => {
+          if (initialized) {
+            global.mcpServer = mcpServer;
+            logger.info('✅ MCP server initialized successfully (Background)');
+            
+             // Create chat provider late if needed or connect events here
+             const provider = global.chatViewProvider;
+             if (provider) {
+                 try {
+                     mcpServer.on('tool_call_start', d => logger.debug('MCP Start:', d));
+                     mcpServer.on('tool_call_complete', d => logger.debug('MCP Complete:', d));
+                     mcpServer.on('tool_call_error', d => logger.error('MCP Error:', d));
+                     logger.info('✅ MCP Connected to Chat');
+                 } catch(e) { logger.warn('MCP connection warning:', e); }
+             }
+             
+             if (configManager.isDebugMode()) {
+                 vscode.window.showInformationMessage('🔧 MCP Server Ready');
+             }
+          } else {
+             logger.warn('⚠️ MCP server failed to initialize');
+          }
+      }).catch(err => {
+          logger.error('MCP Background Init Failed:', err);
+      });
       
-      if (mcpInitialized) {
-        // Make MCP server globally available for chat panel
-        global.mcpServer = mcpServer;
-        logger.info('✅ MCP server initialized successfully');
-        
-        // Optional: Start external transport for Claude Desktop
-        // Uncomment the lines below if you want Claude Desktop to connect
-        // try {
-        //   await mcpServer.startExternalTransport();
-        //   logger.info('✅ MCP server listening for external clients (Claude Desktop)');
-        // } catch (transportError) {
-        //   logger.warn('Could not start external transport:', transportError);
-        // }
-        
-        // Show success notification in debug mode
-        if (configManager.isDebugMode()) {
-          vscode.window.showInformationMessage('🔧 MCP Server initialized', 'View Logs').then(action => {
-            if (action === 'View Logs') {
-              logger.show();
-            }
-          });
-        }
-      } else {
-        logger.warn('⚠️ MCP server initialization failed, continuing without MCP features');
-        global.mcpServer = null;
-      }
     } catch (error) {
-      logger.error('MCP server initialization error:', error);
-      global.mcpServer = null;
-      // Don't throw - extension can work without MCP
+      logger.error('MCP setup error:', error);
     }
 
     // =========================================
@@ -199,6 +213,67 @@ async function activate(context) {
       logger.info('✅ Tree data provider registered');
     } catch (error) {
       logger.error('Failed to register tree data provider:', error);
+    }
+
+    // =========================================
+    // STEP 5.5: Register Project History Provider (NEW!)
+    // =========================================
+    try {
+      const ProjectHistoryProvider = require('./views/ProjectHistoryProvider');
+      const projectHistoryProvider = new ProjectHistoryProvider(context);
+      
+      // Register the tree view
+      const treeView = vscode.window.createTreeView('codesentinel.projectHistory', {
+        treeDataProvider: projectHistoryProvider,
+        showCollapseAll: true
+      });
+      context.subscriptions.push(treeView);
+      
+      // Make globally available for updates
+      global.projectHistoryProvider = projectHistoryProvider;
+      
+      // Register project history commands
+      context.subscriptions.push(
+        vscode.commands.registerCommand('codeSentinel.refreshProjectHistory', () => {
+          projectHistoryProvider.refresh();
+        }),
+        
+        vscode.commands.registerCommand('codeSentinel.clearProjectHistory', async () => {
+          const confirm = await vscode.window.showWarningMessage(
+            'Clear all project history?',
+            { modal: true },
+            'Yes, Clear'
+          );
+          if (confirm === 'Yes, Clear') {
+            await projectHistoryProvider.clearHistory();
+            vscode.window.showInformationMessage('Project history cleared');
+          }
+        }),
+        
+        vscode.commands.registerCommand('codeSentinel.resumeProject', async (project) => {
+          if (!project || !project.path) {
+            vscode.window.showErrorMessage('No project selected');
+            return;
+          }
+          
+          // Open the project folder
+          const uri = vscode.Uri.file(project.path);
+          await vscode.commands.executeCommand('vscode.openFolder', uri);
+          
+          vscode.window.showInformationMessage(`Opened project: ${project.name}. Run "Build Project" to resume.`);
+        }),
+        
+        vscode.commands.registerCommand('codeSentinel.openProjectFolder', async (item) => {
+          if (item && item.project && item.project.path) {
+            const uri = vscode.Uri.file(item.project.path);
+            await vscode.commands.executeCommand('revealFileInOS', uri);
+          }
+        })
+      );
+      
+      logger.info('✅ Project History Provider registered');
+    } catch (error) {
+      logger.error('Failed to register Project History Provider:', error);
     }
 
     // =========================================
@@ -548,9 +623,10 @@ function registerCommands(context) {
           logger.debug(`Executing command: ${cmd.name}`);
           await cmd.callback(...args);
         } catch (error) {
-          logger.error(`Command ${cmd.name} failed:`, error);
+          const errorMsg = error.stack || error.message || String(error);
+          logger.error(`Command ${cmd.name} failed:`, errorMsg);
           vscode.window.showErrorMessage(
-            `Command failed: ${error.message}`,
+            `Command failed: ${error.message || String(error)}`,
             'View Logs'
           ).then(action => {
             if (action === 'View Logs') {

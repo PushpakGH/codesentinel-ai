@@ -47,7 +47,7 @@ async function listComponents(registryId, category = null) {
 
   try {
     // Prefer embedded rich data; allow fetch fallback if you later wire it
-    const registryData = getRegistryData(registryId);
+    const registryData = await getRegistryData(registryId);
     const componentsSource =
       registryData && Array.isArray(registryData.components)
         ? registryData.components
@@ -88,7 +88,7 @@ async function getComponentDetails(registryId, componentNames) {
 
     for (const name of componentNames) {
       // Try from embedded rich data first
-      let component = getRegistryComponentMeta(registryId, name);
+      let component = await getRegistryComponentMeta(registryId, name);
 
       // Optional: fallback to fetched data (if you later normalize it)
       if (!component) {

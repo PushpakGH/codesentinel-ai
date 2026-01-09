@@ -55,7 +55,14 @@
           "title": "Button Sizes",
           "code": "<button className='btn btn-xs'>Tiny</button>\n<button className='btn btn-sm'>Small</button>\n<button className='btn btn-md'>Normal</button>\n<button className='btn btn-lg'>Large</button>"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "actions",
+        "button",
+        "action"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "dropdown",
@@ -78,7 +85,12 @@
           "title": "Basic Dropdown",
           "code": "<div className='dropdown'>\n  <label tabIndex={0} className='btn'>Click</label>\n  <ul tabIndex={0} className='dropdown-content menu'>\n    <li><a>Item 1</a></li>\n    <li><a>Item 2</a></li>\n  </ul>\n</div>"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "actions"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "modal",
@@ -101,7 +113,12 @@
           "title": "Basic Modal",
           "code": "<input type='checkbox' id='my-modal' className='modal-toggle' />\n<div className='modal'>\n  <div className='modal-box'>\n    <h3>Modal Title</h3>\n    <p>Modal content</p>\n    <div className='modal-action'>\n      <label htmlFor='my-modal' className='btn'>Close</label>\n    </div>\n  </div>\n</div>"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "actions"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "swap",
@@ -121,7 +138,12 @@
           "title": "Icon Swap",
           "code": "<label className='swap'>\n  <input type='checkbox' />\n  <div className='swap-on'>ON</div>\n  <div className='swap-off'>OFF</div>\n</label>"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "actions"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "theme-controller",
@@ -136,7 +158,12 @@
           "title": "Theme Toggle",
           "code": "<input type='checkbox' className='theme-controller' />"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "actions"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "accordion",
@@ -157,7 +184,12 @@
           "title": "Basic Accordion",
           "code": "<div className='collapse collapse-arrow'>\n  <input type='checkbox' />\n  <div className='collapse-title'>Click me</div>\n  <div className='collapse-content'>\n    <p>Content</p>\n  </div>\n</div>"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "data-display"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "avatar",
@@ -183,7 +215,12 @@
           "title": "Avatar Group",
           "code": "<div className='avatar-group -space-x-6'>\n  <div className='avatar'><div className='w-12'><img src='avatar1.jpg' /></div></div>\n  <div className='avatar'><div className='w-12'><img src='avatar2.jpg' /></div></div>\n</div>"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "data-display"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "badge",
@@ -211,7 +248,12 @@
           "title": "Status Badge",
           "code": "<span className='badge badge-primary'>New</span>"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "data-display"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "card",
@@ -234,7 +276,14 @@
           "title": "Basic Card",
           "code": "<div className='card bg-base-100 shadow-xl'>\n  <div className='card-body'>\n    <h2 className='card-title'>Card Title</h2>\n    <p>Card content</p>\n    <div className='card-actions'>\n      <button className='btn btn-primary'>Action</button>\n    </div>\n  </div>\n</div>"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "data-display",
+        "card",
+        "container"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "carousel",
@@ -253,7 +302,12 @@
           "title": "Image Carousel",
           "code": "<div className='carousel'>\n  <div className='carousel-item'><img src='img1.jpg' /></div>\n  <div className='carousel-item'><img src='img2.jpg' /></div>\n</div>"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "data-display"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "chat",
@@ -276,7 +330,12 @@
           "title": "Chat Message",
           "code": "<div className='chat chat-start'>\n  <div className='chat-bubble'>Hello!</div>\n</div>"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "data-display"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "collapse",
@@ -296,7 +355,12 @@
           "title": "Collapsible Section",
           "code": "<div className='collapse'>\n  <input type='checkbox' />\n  <div className='collapse-title'>Title</div>\n  <div className='collapse-content'><p>Content</p></div>\n</div>"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "data-display"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "countdown",
@@ -311,7 +375,12 @@
           "title": "Timer Countdown",
           "code": "<span className='countdown'>\n  <span style={{'--value': 15}}></span>\n</span>"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "data-display"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "diff",
@@ -329,7 +398,12 @@
           "title": "Image Comparison",
           "code": "<div className='diff'>\n  <div className='diff-item-1'><img src='before.jpg' /></div>\n  <div className='diff-item-2'><img src='after.jpg' /></div>\n  <div className='diff-resizer'></div>\n</div>"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "data-display"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "kbd",
@@ -348,7 +422,12 @@
           "title": "Keyboard Shortcut",
           "code": "<kbd className='kbd'>ctrl</kbd> + <kbd className='kbd'>c</kbd>"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "data-display"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "stat",
@@ -371,7 +450,12 @@
           "title": "Statistics Card",
           "code": "<div className='stats shadow'>\n  <div className='stat'>\n    <div className='stat-title'>Total Views</div>\n    <div className='stat-value'>89,400</div>\n    <div className='stat-desc'>21% more than last month</div>\n  </div>\n</div>"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "data-display"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "table",
@@ -393,7 +477,12 @@
           "title": "Data Table",
           "code": "<table className='table'>\n  <thead><tr><th>Name</th><th>Job</th></tr></thead>\n  <tbody>\n    <tr><td>Cy</td><td>Developer</td></tr>\n    <tr><td>Hart</td><td>Designer</td></tr>\n  </tbody>\n</table>"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "data-display"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "timeline",
@@ -416,7 +505,12 @@
           "title": "Event Timeline",
           "code": "<ul className='timeline'>\n  <li>\n    <div className='timeline-start'>1984</div>\n    <div className='timeline-middle'><svg className='w-5 h-5' /></div>\n    <div className='timeline-end timeline-box'>First Event</div>\n  </li>\n</ul>"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "data-display"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "checkbox",
@@ -438,7 +532,12 @@
           "title": "Basic Checkbox",
           "code": "<input type='checkbox' className='checkbox' />"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "data-input"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "file-input",
@@ -460,7 +559,14 @@
           "title": "File Upload",
           "code": "<input type='file' className='file-input file-input-bordered' />"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "data-input",
+        "form",
+        "input"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "input",
@@ -488,7 +594,14 @@
           "title": "Text Input",
           "code": "<input type='text' placeholder='Type here' className='input input-bordered' />"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "data-input",
+        "form",
+        "input"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "radio",
@@ -510,7 +623,12 @@
           "title": "Radio Group",
           "code": "<input type='radio' name='radio' className='radio' />\n<input type='radio' name='radio' className='radio' checked />"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "data-input"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "range",
@@ -532,7 +650,12 @@
           "title": "Slider",
           "code": "<input type='range' min='0' max='100' className='range' />"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "data-input"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "rating",
@@ -553,7 +676,12 @@
           "title": "Star Rating",
           "code": "<div className='rating'>\n  <input type='radio' name='rating' className='mask mask-star' />\n  <input type='radio' name='rating' className='mask mask-star' checked />\n</div>"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "data-input"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "select",
@@ -575,7 +703,12 @@
           "title": "Dropdown Select",
           "code": "<select className='select select-bordered'>\n  <option>Option 1</option>\n  <option>Option 2</option>\n</select>"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "data-input"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "textarea",
@@ -597,7 +730,14 @@
           "title": "Text Area",
           "code": "<textarea className='textarea textarea-bordered' placeholder='Bio'></textarea>"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "data-input",
+        "text",
+        "typography"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "toggle",
@@ -619,7 +759,12 @@
           "title": "Toggle Switch",
           "code": "<input type='checkbox' className='toggle' checked />"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "data-input"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "artboard",
@@ -641,7 +786,12 @@
           "title": "Phone Mockup",
           "code": "<div className='artboard phone-1'>320×568</div>"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "layout"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "divider",
@@ -661,7 +811,12 @@
           "title": "Section Divider",
           "code": "<div className='divider'>OR</div>"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "layout"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "drawer",
@@ -682,7 +837,12 @@
           "title": "Sidebar Drawer",
           "code": "<div className='drawer'>\n  <input id='my-drawer' type='checkbox' className='drawer-toggle' />\n  <div className='drawer-content'>\n    <label htmlFor='my-drawer' className='btn'>Open</label>\n  </div>\n  <div className='drawer-side'>\n    <label htmlFor='my-drawer' className='drawer-overlay'></label>\n    <ul className='menu p-4 w-80 bg-base-200'>Sidebar</ul>\n  </div>\n</div>"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "layout"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "footer",
@@ -699,7 +859,12 @@
           "title": "Page Footer",
           "code": "<footer className='footer p-10 bg-base-200'>\n  <div>\n    <span className='footer-title'>Services</span>\n    <a className='link link-hover'>Branding</a>\n  </div>\n</footer>"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "layout"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "hero",
@@ -716,7 +881,12 @@
           "title": "Landing Hero",
           "code": "<div className='hero min-h-screen'>\n  <div className='hero-content text-center'>\n    <h1 className='text-5xl font-bold'>Hello there</h1>\n  </div>\n</div>"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "layout"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "indicator",
@@ -738,7 +908,12 @@
           "title": "Badge Indicator",
           "code": "<div className='indicator'>\n  <span className='indicator-item badge badge-secondary'>new</span>\n  <button className='btn'>Inbox</button>\n</div>"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "layout"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "join",
@@ -756,7 +931,12 @@
           "title": "Button Group",
           "code": "<div className='join'>\n  <button className='btn join-item'>Button</button>\n  <button className='btn join-item'>Button</button>\n</div>"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "layout"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "mask",
@@ -787,7 +967,12 @@
           "title": "Masked Image",
           "code": "<img src='photo.jpg' className='mask mask-hexagon' />"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "layout"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "stack",
@@ -802,7 +987,12 @@
           "title": "Stacked Cards",
           "code": "<div className='stack'>\n  <div className='card shadow-md bg-primary'>1</div>\n  <div className='card shadow bg-primary'>2</div>\n</div>"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "layout"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "breadcrumbs",
@@ -817,7 +1007,12 @@
           "title": "Page Breadcrumbs",
           "code": "<div className='breadcrumbs'>\n  <ul>\n    <li><a>Home</a></li>\n    <li><a>Documents</a></li>\n    <li>Add Document</li>\n  </ul>\n</div>"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "navigation"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "bottom-navigation",
@@ -837,7 +1032,12 @@
           "title": "Mobile Nav",
           "code": "<div className='btm-nav'>\n  <button className='active'><svg /><span>Home</span></button>\n  <button><svg /><span>Search</span></button>\n</div>"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "navigation"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "link",
@@ -857,7 +1057,12 @@
           "title": "Styled Link",
           "code": "<a className='link link-primary'>I'm a link</a>"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "navigation"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "menu",
@@ -881,7 +1086,12 @@
           "title": "Navigation Menu",
           "code": "<ul className='menu bg-base-200'>\n  <li><a>Item 1</a></li>\n  <li><a>Item 2</a></li>\n</ul>"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "navigation"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "navbar",
@@ -899,7 +1109,12 @@
           "title": "Header Navbar",
           "code": "<div className='navbar bg-base-100'>\n  <div className='navbar-start'>\n    <a className='btn btn-ghost text-xl'>daisyUI</a>\n  </div>\n  <div className='navbar-end'>\n    <button className='btn'>Button</button>\n  </div>\n</div>"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "navigation"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "pagination",
@@ -916,7 +1131,12 @@
           "title": "Page Numbers",
           "code": "<div className='join'>\n  <button className='join-item btn'>1</button>\n  <button className='join-item btn btn-active'>2</button>\n  <button className='join-item btn'>3</button>\n</div>"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "navigation"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "steps",
@@ -939,7 +1159,12 @@
           "title": "Progress Steps",
           "code": "<ul className='steps'>\n  <li className='step step-primary'>Register</li>\n  <li className='step step-primary'>Choose plan</li>\n  <li className='step'>Purchase</li>\n</ul>"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "navigation"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "tab",
@@ -964,7 +1189,12 @@
           "title": "Content Tabs",
           "code": "<div className='tabs'>\n  <a className='tab'>Tab 1</a>\n  <a className='tab tab-active'>Tab 2</a>\n  <a className='tab'>Tab 3</a>\n</div>"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "navigation"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "alert",
@@ -983,7 +1213,12 @@
           "title": "Info Alert",
           "code": "<div className='alert alert-info'>\n  <svg />\n  <span>Info message</span>\n</div>"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "feedback"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "loading",
@@ -1008,7 +1243,12 @@
           "title": "Spinner",
           "code": "<span className='loading loading-spinner loading-lg'></span>"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "feedback"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "progress",
@@ -1030,7 +1270,12 @@
           "title": "Progress Bar",
           "code": "<progress className='progress progress-primary' value='70' max='100'></progress>"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "feedback"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "radial-progress",
@@ -1045,7 +1290,12 @@
           "title": "Circular Progress",
           "code": "<div className='radial-progress' style={{'--value': 70}}>70%</div>"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "feedback"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "skeleton",
@@ -1060,7 +1310,12 @@
           "title": "Loading Skeleton",
           "code": "<div className='skeleton h-32 w-full'></div>"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "feedback"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "toast",
@@ -1081,7 +1336,12 @@
           "title": "Notification Toast",
           "code": "<div className='toast'>\n  <div className='alert alert-info'>\n    <span>New message arrived.</span>\n  </div>\n</div>"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "feedback"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "tooltip",
@@ -1104,7 +1364,12 @@
           "title": "Hover Tooltip",
           "code": "<div className='tooltip' data-tip='hello'>\n  <button className='btn'>Hover me</button>\n</div>"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "feedback"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "mockup-browser",
@@ -1120,7 +1385,12 @@
           "title": "Browser Window",
           "code": "<div className='mockup-browser border border-base-300'>\n  <div className='mockup-browser-toolbar'>\n    <div className='input'>https://daisyui.com</div>\n  </div>\n  <div className='px-4 py-16'>Content</div>\n</div>"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "mockup"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "mockup-code",
@@ -1135,7 +1405,12 @@
           "title": "Code Block",
           "code": "<div className='mockup-code'>\n  <pre data-prefix='$'><code>npm install daisyui</code></pre>\n</div>"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "mockup"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "mockup-phone",
@@ -1150,7 +1425,12 @@
           "title": "Mobile Preview",
           "code": "<div className='mockup-phone'>\n  <div className='camera'></div>\n  <div className='display'>\n    <div className='artboard'>Content</div>\n  </div>\n</div>"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "mockup"
+      ],
+      "useCase": "General purpose UI component."
     },
     {
       "name": "mockup-window",
@@ -1166,7 +1446,12 @@
           "title": "Desktop Window",
           "code": "<div className='mockup-window border border-base-300'>\n  <div className='px-4 py-16'>Content</div>\n</div>"
         }
-      ]
+      ],
+      "tags": [
+        "daisyui",
+        "mockup"
+      ],
+      "useCase": "General purpose UI component."
     }
   ]
 }

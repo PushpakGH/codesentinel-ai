@@ -31,10 +31,49 @@
   ],
   "activationEvents": [
     "onStartupFinished",
-    "onView:codesentinel.reviewPanel"
+    "onView:codesentinel.reviewPanel",
+    "onView:codesentinel.projectHistory"
   ],
   "main": "./src/extension.js",
   "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "codesentinel",
+          "title": "CodeSentinel AI",
+          "icon": "media/icon2.svg"
+        },
+        {
+          "id": "codesentinel-projects",
+          "title": "CodeSentinel Projects",
+          "icon": "$(folder-library)"
+        }
+      ]
+    },
+    "views": {
+      "codesentinel": [
+        {
+          "icon": "media/icon2.svg",
+          "id": "codesentinel.chatView",
+          "name": "AI Chat",
+          "type": "webview",
+          "contextualTitle": "CodeSentinel AI Chat"
+        },
+        {
+          "id": "codesentinel.reviewPanel",
+          "name": "Review Results",
+          "icon": "media/icon.svg"
+        }
+      ],
+      "codesentinel-projects": [
+        {
+          "id": "codesentinel.projectHistory",
+          "name": "Project History",
+          "icon": "$(history)",
+          "contextualTitle": "CodeSentinel Projects"
+        }
+      ]
+    },
     "commands": [
       {
         "command": "codeSentinel.reviewCode",
@@ -152,6 +191,30 @@
         "title": "CodeSentinel: Delete API Key",
         "category": "CodeSentinel",
         "icon": "$(trash)"
+      },
+      {
+        "command": "codeSentinel.resumeProject",
+        "title": "CodeSentinel: Resume Project",
+        "category": "CodeSentinel",
+        "icon": "$(play)"
+      },
+      {
+        "command": "codeSentinel.refreshProjectHistory",
+        "title": "CodeSentinel: Refresh Project History",
+        "category": "CodeSentinel",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "codeSentinel.clearProjectHistory",
+        "title": "CodeSentinel: Clear Project History",
+        "category": "CodeSentinel",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "codeSentinel.openProjectFolder",
+        "title": "CodeSentinel: Open Project Folder",
+        "category": "CodeSentinel",
+        "icon": "$(folder-opened)"
       }
     ],
     "menus": {
@@ -223,6 +286,23 @@
           "when": "view == codesentinel.reviewPanel",
           "command": "codeSentinel.openChat",
           "group": "navigation"
+        },
+        {
+          "when": "view == codesentinel.projectHistory",
+          "command": "codeSentinel.refreshProjectHistory",
+          "group": "navigation@1"
+        },
+        {
+          "when": "view == codesentinel.projectHistory",
+          "command": "codeSentinel.clearProjectHistory",
+          "group": "navigation@2"
+        }
+      ],
+      "view/item/context": [
+        {
+          "when": "view == codesentinel.projectHistory && viewItem == project",
+          "command": "codeSentinel.openProjectFolder",
+          "group": "inline"
         }
       ],
       "commandPalette": [
@@ -369,31 +449,6 @@
           "order": 13
         }
       }
-    },
-    "viewsContainers": {
-      "activitybar": [
-        {
-          "id": "codesentinel",
-          "title": "CodeSentinel AI",
-          "icon": "media/icon2.svg"
-        }
-      ]
-    },
-    "views": {
-      "codesentinel": [
-        {
-          "icon": "media/icon2.svg",
-          "id": "codesentinel.chatView",
-          "name": "AI Chat",
-          "type": "webview",
-          "contextualTitle": "CodeSentinel AI Chat"
-        },
-        {
-          "id": "codesentinel.reviewPanel",
-          "name": "Review Results",
-          "icon": "media/icon.svg"
-        }
-      ]
     }
   },
   "scripts": {
@@ -420,6 +475,7 @@
     "@modelcontextprotocol/sdk": "^1.25.1",
     "axios": "^1.13.2",
     "marked": "^12.0.2",
+    "minisearch": "^7.2.0",
     "ollama": "^0.5.9",
     "typescript": "^5.9.3"
   },
