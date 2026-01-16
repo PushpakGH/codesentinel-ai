@@ -3,7 +3,12 @@
  * Handles git diff parsing and SCM integration
  */
 
-const vscode = require('vscode');
+let vscode;
+try {
+  vscode = require('vscode');
+} catch (e) {
+  vscode = null;
+}
 const { exec } = require('child_process');
 const { promisify } = require('util');
 const { logger } = require('../utils/logger');

@@ -33,7 +33,42 @@ function sanitizeComponentName(name) {
 
 function validateJSXCode(code) {
   let fixed = code;
-  fixed = fixed.replace(/(<\w+[^>]*?);(\s*\w+=)/g, '$1$2'); // Fix semicolons in props
+  
+  // ✅ NEW: Detect truncated responses (common patterns)
+  const truncationIndicators = [
+    /import\s+{\s*[^}]*$/m,          // Incomplete import block
+    /from\s*['"][^'"]*$/m,            // Incomplete from statement
+    /<\w+[^>]*$/m,                    // Unclosed JSX tag at end
+    /className="[^"]*$/m,             // Incomplete className string
+    /{\s*[^}]*$/m,                    // Unclosed curly brace
+    /\([^)]*$/m,                      // Unclosed parenthesis at end
+  ];
+  
+  for (const pattern of truncationIndicators) {
+    if (pattern.test(fixed.slice(-200))) { // Check last 200 chars
+      logger.warn('⚠️ Detected potentially truncated response - attempting repair');
+      
+      // Try to close any unclosed structures
+      const openBraces = (fixed.match(/{/g) || []).length;
+      const closeBraces = (fixed.match(/}/g) || []).length;
+      const openParens = (fixed.match(/\(/g) || []).length;
+      const closeParens = (fixed.match(/\)/g) || []).length;
+      
+      // Add missing closing braces/parens
+      fixed += '\n// Auto-repaired truncated code\n';
+      fixed += ')'.repeat(Math.max(0, openParens - closeParens));
+      fixed += '}'.repeat(Math.max(0, openBraces - closeBraces));
+      
+      // Ensure proper export if missing
+      if (!fixed.includes('export default')) {
+        fixed += '\n\nexport default function GeneratedPage() { return <div>Page could not be fully generated</div>; }';
+      }
+      
+      break;
+    }
+  }
+  
+  fixed = fixed.replace(/(\<\w+[^\>]*?);(\s*\w+=)/g, '$1$2'); // Fix semicolons in props
   return fixed;
 }
 
@@ -131,7 +166,7 @@ REQUIREMENTS:
         1. Fix syntax/validation errors ONLY
         2. NO placeholder code
         3. Return complete, working code`,
-               maxTokens: 16000 
+               maxTokens: 24000
           });
 
           if (!fixed || fixed.length < 100) {
@@ -174,8 +209,9 @@ class GeneratorService {
    * @param {Object} designSystem - Design system configuration
    * @param {Array} pageFeatures - Features this page should implement
    * @param {string} projectType - Type of project (IDE, dashboard, landing, etc.)
+   * @param {Object} projectContext - Full project context including sitemap (optional)
    */
-  async generatePageCode(pageName, pageDesc, installedComponents, projectAnalysis, projectPath, componentCatalog = {}, designSystem = null, pageFeatures = [], projectType = 'web-app') {
+  async generatePageCode(pageName, pageDesc, installedComponents, projectAnalysis, projectPath, componentCatalog = {}, designSystem = null, pageFeatures = [], projectType = 'web-app', projectContext = null) {
     // 1. Check State
     if (this.stateManager && this.stateManager.isPageGenerated(pageName)) {
       logger.info(`Page ${pageName} already generated, skipping...`);
@@ -235,8 +271,49 @@ class GeneratorService {
     });
     
     // Add specific page request
+    const installedList = installedComponents ? Array.from(installedComponents).join(', ') : '';
+    
+    // Construct Sitemap Context
+    let sitemapContext = '';
+    if (projectContext && projectContext.sitemap) {
+        sitemapContext = `
+PROJECT STRUCTURE (SITEMAP):
+Use these routes for internal linking. DO NOT hallucinate routes.
+${projectContext.sitemap.map(p => `- ${p.name}: "${p.route}" (${p.description})`).join('\n')}
+`;
+    }
+
+    // NEW: Inject Project Identity to prevent Branding Hallucinations
+    let identityContext = '';
+    if (projectContext && projectContext.projectName) {
+      identityContext = `
+PROJECT IDENTITY (CRITICAL - DO NOT INVENT):
+- Project Name: "${projectContext.projectName}"
+- Description: "${projectContext.projectDescription}"
+- ❌ DO NOT use generic names like "Acme Corp", "AetherFlow", "SaaS Starter"
+- ✅ Use the actual Project Name in text, headings, and metadata
+`;
+    }
+
     const fullPrompt = `
 ${prompt}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CONTEXT: AVAILABLE TOOLS & LIBRARIES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+The following components are ALREADY INSTALLED in @/components/ui/ :
+[ ${installedList} ]
+
+User also has access to:
+- "lucide-react" (Import specific icons!)
+- "recharts" (For charts)
+- "framer-motion" (For animations)
+- "react-resizable-panels" (Use @/components/ui/resizable wrapper)
+
+${sitemapContext}
+
+${identityContext}
+
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 PAGE GENERATION REQUEST
@@ -282,7 +359,7 @@ Return ONLY the TypeScript code - no explanations or markdown.
 - Production-ready quality
 - "use client" if needed`,
             temperature: usedTemperature,
-            maxTokens: 8000
+            maxTokens: 24000
           });
           break; // Success
         } catch (error) {
@@ -343,6 +420,114 @@ export default function ${componentName}() {
     </div>
   );
 }`;
+    }
+  }
+
+  /**
+   * Generate Next.js Layout Component
+   * @param {Object} context - { path, description, type, designSystem }
+   */
+  async generateLayoutCode(context, projectPath) {
+     const { path: layoutPath, description, type, designSystem } = context;
+     const isRoot = type === 'root';
+     const componentName = isRoot ? 'RootLayout' : 'DashboardLayout'; // Simplified naming strategy
+
+     logger.info(`🏗️ Generating Layout: ${layoutPath} (${type})`);
+
+     const prompt = `
+Act as an expert Next.js Developer.
+Generate a "${type}" layout component for: ${layoutPath}
+Description: ${description}
+
+${context.projectName ? `PROJECT IDENTITY:
+- Name: "${context.projectName}"
+- Description: "${context.projectDescription}"
+- ✅ Use this exact name in <title> or metadata.title
+` : ''}
+
+
+CONTEXT:
+${designSystem ? `Design System: ${JSON.stringify(designSystem)}` : ''}
+
+CRITICAL IMPORT PATHS (DO NOT DEVIATE):
+- Navbar: import { Navbar } from "@/components/navbar"
+- Footer: import { Footer } from "@/components/footer"  
+- ThemeProvider: import { ThemeProvider } from "@/components/providers/theme-provider"
+- Global CSS: import "./globals.css" (relative, NOT @/styles/globals.css)
+- ❌ NEVER use @/components/layout/* subdirectory (doesn't exist)
+- ❌ NEVER use @/app/providers (use @/components/providers/theme-provider)
+- ❌ NEVER use @/styles/* directory (doesn't exist in App Router)
+
+REQUIREMENTS:
+1. **Next.js App Router**: Use \`export default function Layout({ children }: { children: React.ReactNode })\`
+2. ${isRoot ? '**Root Layout**: Must include `<html>` and `<body>` tags. Import Inter font from next/font/google.' : '**Nested Layout**: Do NOT use html/body tags. Do NOT export metadata. Wrap children in semantic containers.'}
+3. **Styling**: Use Tailwind CSS. ${isRoot ? 'Apply `antialiased` to body.' : ''}
+4. **Components**:
+   - ${isRoot ? 'MUST include ThemeProvider wrap with attribute="class" defaultTheme="dark"' : 'Do NOT include ThemeProvider (already in root)'}
+   - ${isRoot ? 'MUST include <Navbar /> inside ThemeProvider' : 'Only include Sidebar if description mentions it'}
+5. ${isRoot ? '**Metadata**: Export `metadata` constant with title and description.' : '**NO Metadata**: Nested layouts cannot export metadata.'}
+
+🚫 FORBIDDEN:
+- Do NOT use comments like "// Placeholder for..." or "TODO:"
+- Do NOT return "Coming soon" divs
+- Do NOT invent import paths not listed above
+- ${!isRoot ? 'Do NOT use "use client" with metadata export' : ''}
+
+RETURN ONLY CODE. NO MARKDOWN.
+`;
+
+
+    try {
+        let code = await aiClient.generate(prompt, {
+            systemPrompt: 'You are a senior Next.js architect. Output production-ready Typescript code only.',
+            maxTokens: 8000,
+            temperature: 0.3
+        });
+
+        // Basic Cleanup
+        code = code.replace(/```[a-z]*\n?/g, '').replace(/```/g, '');
+        
+        // Write File
+        const fullPath = path.join(projectPath, layoutPath);
+        await fileSystem.createDirectory(path.dirname(fullPath), '');
+        await fileSystem.writeFile(path.dirname(fullPath), path.basename(fullPath), code);
+        
+        logger.info(`✅ Generated Layout: ${layoutPath}`);
+        return true;
+    } catch (e) {
+        logger.error(`Failed to generate layout ${layoutPath}`, e);
+        // Fallback for Root Layout to prevent broken app
+        if (isRoot) {
+            const fallback = `
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import "./globals.css";
+
+const inter = Inter({ subsets: ["latin"] });
+
+export const metadata: Metadata = {
+  title: "Generated App",
+  description: "Created by Code Sentinel AI",
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="en">
+      <body className={inter.className}>{children}</body>
+    </html>
+  );
+}
+`;
+            const fullPath = path.join(projectPath, layoutPath);
+            await fileSystem.createDirectory(path.dirname(fullPath), '');
+            await fileSystem.writeFile(path.dirname(fullPath), path.basename(fullPath), fallback);
+            return true;
+        }
+        return false;
     }
   }
   

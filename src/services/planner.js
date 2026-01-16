@@ -3,7 +3,16 @@
  * Handles Project Specification, Prompt Engineering, and Planning.
  */
 
-const vscode = require('vscode');
+let vscode;
+try {
+  vscode = require('vscode');
+} catch (e) {
+  // Standalone mode - mock or ignore
+  vscode = {
+     window: { showInformationMessage: () => {}, withProgress: async (opts, task) => await task({ report: () => {} }) },
+     workspace: { openTextDocument: async () => {}, getConfiguration: () => ({}) }
+  };
+}
 const path = require('path');
 const { logger } = require('../utils/logger');
 const aiClient = require('./aiClient');
@@ -60,39 +69,56 @@ User Request: "${userPrompt}"
 
 RULES:
 1. **Dynamic Structure**: 
-   - If user asks for "Landing Page", create ONE page (HomePage) with multiple sections.
-   - If user asks for "Portfolio" or "Web App", create at least 3 pages (e.g. HomePage, AboutPage, ProjectsPage).
-   - "Project Details" or "Dashboard" pages are highly recommended for fullness.
-   - MIN 3 pages, MAX 6 pages for this MVP.
+   - **Root Layout**: ALWAYS 'app/layout.tsx' (Global).
+   - **Nested Layouts**: Use for Dashboards ('app/dashboard/layout.tsx') or Auth ('app/auth/layout.tsx') if needed.
+   - **Pages**: explicit 'page.tsx' for every route.
+   - **Layout Mapping**: Every page MUST specify which layout it uses.
 
 2. **Naming Conventions** (Strict):
    - Page Names must be PascalCase and end with 'Page' (e.g. 'HomePage', 'DashboardPage').
    - Page Names must be SHORT (< 15 chars).
-   - Routes must be lowercase, single-segment, and descriptive (e.g. '/about', '/projects').
+   - Routes must be lowercase, single-segment preferred (e.g. '/about', '/projects').
 
 3. **Component Needs**:
    - Infer heavily from description.
-   - If "Contact Form" -> needs 'forms' (input, textarea, button).
-   - If "Charts" -> needs 'dataDisplay' (chart).
-   - If "Hero" -> needs 'hero' components.
+   - If "Contact Form" -> needs 'forms'.
+   - If "Charts" -> needs 'dataDisplay'.
 
 4. **Library Preference**:
-   - If user mentions "flashy", "aceternity", "modern" -> set "preferredLibraries": ["aceternity", "magicui"]
-   - If user mentions "minimal", "clean", "shadcn" -> set "preferredLibraries": ["shadcn"]
-   - If user mentions "animation" -> set "preferredLibraries": ["motion-primitives", "magicui"]
+   - "modern/flashy" -> ["aceternity", "magicui"]
+   - "minimal/clean" -> ["shadcn", "daisyui"]
 
 RETURN JSON ONLY:
 {
   "projectName": "PascalCaseName",
   "description": "Professional technical summary",
-  "styleIntent": "creative", // or 'minimal', 'animated', 'corporate'
-  "preferredLibraries": ["aceternity"], // or ['shadcn'], ['magicui']
+  "styleIntent": "creative", 
+  "preferredLibraries": ["aceternity", "magicui"], 
+  "layouts": [
+    {
+      "path": "app/layout.tsx",
+      "description": "Root layout with Navbar, Footer, and ThemeProvider",
+      "type": "root"
+    },
+    {
+      "path": "app/dashboard/layout.tsx",
+      "description": "Dashboard layout with Sidebar and Header",
+      "type": "nested"
+    }
+  ],
   "pages": [
     { 
       "name": "HomePage", 
       "route": "/", 
-      "description": "Primary landing page with hero and features", 
-      "features": ["Hero Section", "Feature Grid", "Call to Action"] 
+      "description": "Primary landing page", 
+      "layout": "app/layout.tsx",
+      "features": ["Hero Section", "Feature Grid"] 
+    },
+    {
+       "name": "DashboardPage",
+       "route": "/dashboard",
+       "layout": "app/dashboard/layout.tsx",
+       "features": ["Analytics Chart", "User Table"]
     }
   ],
   "componentNeeds": {
@@ -116,7 +142,10 @@ RETURN JSON ONLY:
 
       // Defaults
       if (!plan.pages || !Array.isArray(plan.pages) || plan.pages.length === 0) {
-        plan.pages = [{ name: 'HomePage', route: '/', description: 'Main page', features: ['Content display'] }];
+        plan.pages = [{ name: 'HomePage', route: '/', description: 'Main page', features: ['Content display'], layout: 'app/layout.tsx' }];
+      }
+      if (!plan.layouts || !Array.isArray(plan.layouts)) {
+          plan.layouts = [{ path: 'app/layout.tsx', description: 'Root layout', type: 'root' }];
       }
       if (!plan.componentNeeds || typeof plan.componentNeeds !== 'object') {
         plan.componentNeeds = { forms: ['input', 'button'], dataDisplay: ['card'] };
@@ -143,6 +172,10 @@ RETURN JSON ONLY:
              p.route = '/page-' + Math.floor(Math.random() * 1000);
           }
         }
+        
+        // Fix Layout (Default to root if missing)
+        if (!p.layout) p.layout = 'app/layout.tsx';
+        
         return p;
       });
 
@@ -152,7 +185,9 @@ RETURN JSON ONLY:
       return {
         projectName: 'MyApp',
         description: 'Generated application',
-        pages: [{ name: 'HomePage', route: '/', description: 'Main page', features: ['Content'] }],
+        preferredLibraries: ['shadcn'],
+        layouts: [{ path: 'app/layout.tsx', description: 'Root layout', type: 'root' }],
+        pages: [{ name: 'HomePage', route: '/', description: 'Main page', features: ['Content'], layout: 'app/layout.tsx' }],
         componentNeeds: { forms: ['input', 'button'], dataDisplay: ['card'] },
       };
     }
@@ -189,8 +224,13 @@ ${JSON.stringify(engineeredSpec.componentNeeds, null, 2)}
     await fileSystem.createDirectory(projectPath, '');
     await fileSystem.writeFile(projectPath, 'project-spec.md', specContent);
     
-    const doc = await vscode.workspace.openTextDocument(specFile);
-    await vscode.window.showTextDocument(doc);
+    // Safe VSCode Interaction
+    try {
+        const doc = await vscode.workspace.openTextDocument(specFile);
+        await vscode.window.showTextDocument(doc);
+    } catch (e) {
+        logger.warn('Could not open spec file in editor:', e);
+    }
     
     return engineeredSpec;
   }

@@ -139,6 +139,7 @@ class ASTValidator {
   static addMissingImports(ast) {
     const usedComponents = new Set();
     const importedComponents = new Set();
+    const locallyDefinedComponents = new Set(); // NEW: Track local definitions
     const fixes = [];
 
     // Step 1: Collect all imported components
@@ -149,6 +150,25 @@ class ASTValidator {
             importedComponents.add(spec.local.name);
           }
         });
+      }
+    });
+
+    // Step 1.5: Collect locally defined components (const/let/function/class)
+    traverse(ast, {
+      VariableDeclarator: (path) => {
+        if (t.isIdentifier(path.node.id) && /^[A-Z]/.test(path.node.id.name)) {
+          locallyDefinedComponents.add(path.node.id.name);
+        }
+      },
+      FunctionDeclaration: (path) => {
+        if (path.node.id && /^[A-Z]/.test(path.node.id.name)) {
+          locallyDefinedComponents.add(path.node.id.name);
+        }
+      },
+      ClassDeclaration: (path) => {
+        if (path.node.id && /^[A-Z]/.test(path.node.id.name)) {
+          locallyDefinedComponents.add(path.node.id.name);
+        }
       }
     });
 
@@ -165,9 +185,9 @@ class ASTValidator {
       }
     });
 
-    // Step 3: Find missing imports
+    // Step 3: Find missing imports (exclude locally defined!)
     const missingComponents = [...usedComponents].filter(
-      comp => !importedComponents.has(comp)
+      comp => !importedComponents.has(comp) && !locallyDefinedComponents.has(comp)
     );
 
     // Step 4: Add missing imports (use @/components/ui as default)
@@ -281,6 +301,41 @@ class ASTValidator {
     }
 
     return needsClient;
+  }
+
+  /**
+   * Detect "use client" + metadata export conflict (Phase 12)
+   * Client Components cannot export metadata - this breaks Next.js builds.
+   */
+  static detectClientMetadataConflict(code, ast) {
+    const hasUseClient = code.includes("'use client'") || code.includes('"use client"');
+    let hasMetadataExport = false;
+    
+    // Check for "export const metadata" or "export const generateMetadata"
+    if (ast && ast.program && ast.program.body) {
+      for (const node of ast.program.body) {
+        if (node.type === 'ExportNamedDeclaration' && node.declaration) {
+          const decl = node.declaration;
+          if (decl.type === 'VariableDeclaration' && decl.declarations) {
+            for (const d of decl.declarations) {
+              if (d.id && d.id.name && (d.id.name === 'metadata' || d.id.name === 'generateMetadata')) {
+                hasMetadataExport = true;
+                break;
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    if (hasUseClient && hasMetadataExport) {
+      return {
+        hasConflict: true,
+        message: 'Cannot export "metadata" from a Client Component. Remove "use client" or move metadata to a Server Component (layout.tsx).'
+      };
+    }
+    
+    return { hasConflict: false };
   }
 
   /**
@@ -508,6 +563,18 @@ class ASTValidator {
           }
       } catch (e) {
           logger.warn('Step 5 (Client Directive) failed:', e.message);
+      }
+      
+      // Step 5.5: Detect Client/Metadata Conflict (Phase 12)
+      try {
+          const conflictCheck = this.detectClientMetadataConflict(code, ast);
+          if (conflictCheck.hasConflict) {
+            logger.warn(`⚠️ ${conflictCheck.message}`);
+            // Add to fixes so it's reported back
+            allFixes.push({ type: 'CLIENT_METADATA_CONFLICT', message: conflictCheck.message });
+          }
+      } catch (e) {
+          logger.warn('Step 5.5 (Client/Metadata Conflict) failed:', e.message);
       }
       
       // Step 6: Fix Metadata Quotes

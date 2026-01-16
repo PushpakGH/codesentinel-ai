@@ -4,7 +4,16 @@
  * MCP-style function calling interface
  */
 
-const vscode = require('vscode');
+let vscode;
+try {
+  vscode = require('vscode');
+} catch (e) {
+  // Standalone mode - mock
+  vscode = {
+     window: { showInformationMessage: () => {}, showErrorMessage: console.error },
+     workspace: { rootPath: process.cwd() }
+  };
+}
 const { exec } = require('child_process');
 const { promisify } = require('util');
 const { logger } = require('../utils/logger');
@@ -365,6 +374,31 @@ async function initializeShadcn(projectPath) {
     );
 
     vscode.window.showInformationMessage('✅ shadcn/ui initialized');
+
+    // NEW: Install commonly needed packages that AI often uses
+    try {
+      logger.info('📦 Installing common dependencies...');
+      await execAsync('npm install recharts next-themes @radix-ui/react-icons class-variance-authority clsx tailwind-merge tailwindcss-animate react-resizable-panels framer-motion date-fns @nivo/calendar @nivo/core @tailwindcss/typography canvas-confetti @types/canvas-confetti', {
+        cwd: projectPath,
+        timeout: 90000
+      });
+      logger.info('✅ Installed common dependencies');
+    } catch (depsError) {
+      logger.warn('Could not install common deps:', depsError.message);
+    }
+
+    // Install core Shadcn components that AI frequently uses
+    // These ensure consistent API regardless of what vector search returns
+    try {
+      logger.info('📦 Installing core Shadcn components...');
+      await execAsync('npx shadcn@latest add tabs card tooltip select dialog dropdown-menu avatar skeleton --yes', {
+        cwd: projectPath,
+        timeout: 120000
+      });
+      logger.info('✅ Installed core Shadcn components (tabs, card, tooltip, select, dialog, dropdown-menu, avatar, skeleton)');
+    } catch (coreError) {
+      logger.warn('Could not install core Shadcn components:', coreError.message);
+    }
 
     return {
       success: true,

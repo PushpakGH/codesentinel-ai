@@ -8,7 +8,15 @@
  * - Better testability (no hardcoded UI in core logic)
  */
 
-const vscode = require('vscode');
+let vscode;
+try {
+  vscode = require('vscode');
+} catch (e) {
+  vscode = {
+     window: { showErrorMessage: console.error, showWarningMessage: console.warn, showInformationMessage: console.log },
+     env: { clipboard: { writeText: () => {} } }
+  };
+}
 
 class ErrorHandler {
   /**

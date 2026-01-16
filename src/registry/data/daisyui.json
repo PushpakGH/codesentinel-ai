@@ -62,7 +62,8 @@
         "button",
         "action"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Buttons allow the user to take actions Also known as: clickable, action button, cta, call-to-action, submit, interactive. Related concepts: daisyui, actions, button, action. Primary use case: General purpose UI component."
     },
     {
       "name": "dropdown",
@@ -90,7 +91,8 @@
         "daisyui",
         "actions"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Dropdown can open a menu or any other element Related concepts: daisyui, actions. Primary use case: General purpose UI component."
     },
     {
       "name": "modal",
@@ -118,7 +120,8 @@
         "daisyui",
         "actions"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Modal shows content on top of everything Related concepts: daisyui, actions. Primary use case: General purpose UI component."
     },
     {
       "name": "swap",
@@ -143,7 +146,8 @@
         "daisyui",
         "actions"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Swap allows you to toggle the visibility of two elements Related concepts: daisyui, actions. Primary use case: General purpose UI component."
     },
     {
       "name": "theme-controller",
@@ -163,7 +167,8 @@
         "daisyui",
         "actions"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Toggle between themes Related concepts: daisyui, actions. Primary use case: General purpose UI component."
     },
     {
       "name": "accordion",
@@ -189,7 +194,8 @@
         "daisyui",
         "data-display"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Accordion with collapse Also known as: collapsible, expandable, faq, disclosure, toggle panel. Related concepts: daisyui, data-display. Primary use case: General purpose UI component."
     },
     {
       "name": "avatar",
@@ -220,7 +226,8 @@
         "daisyui",
         "data-display"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Avatar shows a thumbnail of user Also known as: profile picture, user avatar, profile image, user icon. Related concepts: daisyui, data-display. Primary use case: General purpose UI component."
     },
     {
       "name": "badge",
@@ -253,7 +260,8 @@
         "daisyui",
         "data-display"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Badge shows a small badge for status Also known as: label, tag, chip, status indicator, pill, counter badge. Related concepts: daisyui, data-display. Primary use case: General purpose UI component."
     },
     {
       "name": "card",
@@ -283,7 +291,8 @@
         "card",
         "container"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Card is a container for content Also known as: container, panel, box, wrapper, section, grouping, tile. Related concepts: daisyui, data-display, card, container. Primary use case: General purpose UI component."
     },
     {
       "name": "carousel",
@@ -307,7 +316,8 @@
         "daisyui",
         "data-display"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Carousel shows items in a scrollable container Also known as: slider, image carousel, content slider, slideshow, image gallery. Related concepts: daisyui, data-display. Primary use case: General purpose UI component."
     },
     {
       "name": "chat",
@@ -335,7 +345,8 @@
         "daisyui",
         "data-display"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Chat bubble for messaging Related concepts: daisyui, data-display. Primary use case: General purpose UI component."
     },
     {
       "name": "collapse",
@@ -360,7 +371,8 @@
         "daisyui",
         "data-display"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Collapse shows and hides content Related concepts: daisyui, data-display. Primary use case: General purpose UI component."
     },
     {
       "name": "countdown",
@@ -380,7 +392,8 @@
         "daisyui",
         "data-display"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Countdown shows remaining time Related concepts: daisyui, data-display. Primary use case: General purpose UI component."
     },
     {
       "name": "diff",
@@ -403,7 +416,8 @@
         "daisyui",
         "data-display"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Diff shows comparison between two items Related concepts: daisyui, data-display. Primary use case: General purpose UI component."
     },
     {
       "name": "kbd",
@@ -427,7 +441,8 @@
         "daisyui",
         "data-display"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Kbd shows keyboard key Related concepts: daisyui, data-display. Primary use case: General purpose UI component."
     },
     {
       "name": "stat",
@@ -455,7 +470,8 @@
         "daisyui",
         "data-display"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Stat shows statistics Related concepts: daisyui, data-display. Primary use case: General purpose UI component."
     },
     {
       "name": "table",
@@ -482,7 +498,8 @@
         "daisyui",
         "data-display"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Table shows data in rows and columns Also known as: data table, grid, spreadsheet, tabular data. Related concepts: daisyui, data-display. Primary use case: General purpose UI component."
     },
     {
       "name": "timeline",
@@ -510,7 +527,8 @@
         "daisyui",
         "data-display"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Timeline shows list of events in chronological order Related concepts: daisyui, data-display. Primary use case: General purpose UI component."
     },
     {
       "name": "checkbox",
@@ -537,7 +555,8 @@
         "daisyui",
         "data-input"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Checkbox allows selection Also known as: check box, tick box, boolean input, multi-select option. Related concepts: daisyui, data-input. Primary use case: General purpose UI component."
     },
     {
       "name": "file-input",
@@ -566,7 +585,8 @@
         "form",
         "input"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "File input for uploading files Related concepts: daisyui, data-input, form, input. Primary use case: General purpose UI component."
     },
     {
       "name": "input",
@@ -601,7 +621,8 @@
         "form",
         "input"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Input field for text Also known as: text field, text input, form field, input box, text box. Related concepts: daisyui, data-input, form, input. Primary use case: General purpose UI component."
     },
     {
       "name": "radio",
@@ -628,7 +649,8 @@
         "daisyui",
         "data-input"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Radio button for single selection Related concepts: daisyui, data-input. Primary use case: General purpose UI component."
     },
     {
       "name": "range",
@@ -655,7 +677,8 @@
         "daisyui",
         "data-input"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Range slider for selecting value Related concepts: daisyui, data-input. Primary use case: General purpose UI component."
     },
     {
       "name": "rating",
@@ -681,7 +704,8 @@
         "daisyui",
         "data-input"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Rating shows user rating Related concepts: daisyui, data-input. Primary use case: General purpose UI component."
     },
     {
       "name": "select",
@@ -708,7 +732,8 @@
         "daisyui",
         "data-input"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Select dropdown for choosing option Also known as: dropdown select, picker, choice list, option selector. Related concepts: daisyui, data-input. Primary use case: General purpose UI component."
     },
     {
       "name": "textarea",
@@ -737,7 +762,8 @@
         "text",
         "typography"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Textarea for multiline text Also known as: multiline input, text area, large text input, comment box. Related concepts: daisyui, data-input, text, typography. Primary use case: General purpose UI component."
     },
     {
       "name": "toggle",
@@ -764,7 +790,8 @@
         "daisyui",
         "data-input"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Toggle switch for on/off Also known as: toggle button, pressed button, stateful button. Related concepts: daisyui, data-input. Primary use case: General purpose UI component."
     },
     {
       "name": "artboard",
@@ -791,7 +818,8 @@
         "daisyui",
         "layout"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Artboard provides width container Related concepts: daisyui, layout. Primary use case: General purpose UI component."
     },
     {
       "name": "divider",
@@ -816,7 +844,8 @@
         "daisyui",
         "layout"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Divider separates content Related concepts: daisyui, layout. Primary use case: General purpose UI component."
     },
     {
       "name": "drawer",
@@ -842,7 +871,8 @@
         "daisyui",
         "layout"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Drawer can be used for sidebar Also known as: sidebar overlay, slide-in panel, mobile menu, off-canvas. Related concepts: daisyui, layout. Primary use case: General purpose UI component."
     },
     {
       "name": "footer",
@@ -864,7 +894,8 @@
         "daisyui",
         "layout"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Footer shows at bottom Related concepts: daisyui, layout. Primary use case: General purpose UI component."
     },
     {
       "name": "hero",
@@ -886,7 +917,8 @@
         "daisyui",
         "layout"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Hero section for landing page Related concepts: daisyui, layout. Primary use case: General purpose UI component."
     },
     {
       "name": "indicator",
@@ -913,7 +945,8 @@
         "daisyui",
         "layout"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Indicator shows notification badge Related concepts: daisyui, layout. Primary use case: General purpose UI component."
     },
     {
       "name": "join",
@@ -936,7 +969,8 @@
         "daisyui",
         "layout"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Join groups elements together Related concepts: daisyui, layout. Primary use case: General purpose UI component."
     },
     {
       "name": "mask",
@@ -972,7 +1006,8 @@
         "daisyui",
         "layout"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Mask crops content to shape Related concepts: daisyui, layout. Primary use case: General purpose UI component."
     },
     {
       "name": "stack",
@@ -992,7 +1027,8 @@
         "daisyui",
         "layout"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Stack shows elements on top of each other Related concepts: daisyui, layout. Primary use case: General purpose UI component."
     },
     {
       "name": "breadcrumbs",
@@ -1012,7 +1048,8 @@
         "daisyui",
         "navigation"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Breadcrumbs helps users navigate Related concepts: daisyui, navigation. Primary use case: General purpose UI component."
     },
     {
       "name": "bottom-navigation",
@@ -1037,7 +1074,8 @@
         "daisyui",
         "navigation"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Bottom navigation bar for mobile Related concepts: daisyui, navigation. Primary use case: General purpose UI component."
     },
     {
       "name": "link",
@@ -1062,7 +1100,8 @@
         "daisyui",
         "navigation"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Link styled text Related concepts: daisyui, navigation. Primary use case: General purpose UI component."
     },
     {
       "name": "menu",
@@ -1091,7 +1130,8 @@
         "daisyui",
         "navigation"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Menu is used for navigation Related concepts: daisyui, navigation. Primary use case: General purpose UI component."
     },
     {
       "name": "navbar",
@@ -1114,7 +1154,8 @@
         "daisyui",
         "navigation"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Navbar is used for navigation bar Related concepts: daisyui, navigation. Primary use case: General purpose UI component."
     },
     {
       "name": "pagination",
@@ -1136,7 +1177,8 @@
         "daisyui",
         "navigation"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Pagination shows page numbers Also known as: page navigation, page selector, pager, page controls. Related concepts: daisyui, navigation. Primary use case: General purpose UI component."
     },
     {
       "name": "steps",
@@ -1164,7 +1206,8 @@
         "daisyui",
         "navigation"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Steps shows progression Related concepts: daisyui, navigation. Primary use case: General purpose UI component."
     },
     {
       "name": "tab",
@@ -1194,7 +1237,8 @@
         "daisyui",
         "navigation"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Tabs show different content Related concepts: daisyui, navigation. Primary use case: General purpose UI component."
     },
     {
       "name": "alert",
@@ -1218,7 +1262,8 @@
         "daisyui",
         "feedback"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Alert shows important message Also known as: notification banner, message box, info callout, status message. Related concepts: daisyui, feedback. Primary use case: General purpose UI component."
     },
     {
       "name": "loading",
@@ -1248,7 +1293,8 @@
         "daisyui",
         "feedback"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Loading shows loading state Related concepts: daisyui, feedback. Primary use case: General purpose UI component."
     },
     {
       "name": "progress",
@@ -1275,7 +1321,8 @@
         "daisyui",
         "feedback"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Progress shows completion Also known as: progress bar, loading indicator, completion status, loading bar. Related concepts: daisyui, feedback. Primary use case: General purpose UI component."
     },
     {
       "name": "radial-progress",
@@ -1295,7 +1342,8 @@
         "daisyui",
         "feedback"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Radial progress circular indicator Related concepts: daisyui, feedback. Primary use case: General purpose UI component."
     },
     {
       "name": "skeleton",
@@ -1315,7 +1363,8 @@
         "daisyui",
         "feedback"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Skeleton shows loading placeholder Also known as: loading placeholder, content skeleton, shimmer effect, loading state. Related concepts: daisyui, feedback. Primary use case: General purpose UI component."
     },
     {
       "name": "toast",
@@ -1341,7 +1390,8 @@
         "daisyui",
         "feedback"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Toast shows temporary message Also known as: snackbar, notification toast, popup message, brief notification, status toast. Related concepts: daisyui, feedback. Primary use case: General purpose UI component."
     },
     {
       "name": "tooltip",
@@ -1369,7 +1419,8 @@
         "daisyui",
         "feedback"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Tooltip shows on hover Also known as: hint, hover tip, info tooltip, title attribute, helper text. Related concepts: daisyui, feedback. Primary use case: General purpose UI component."
     },
     {
       "name": "mockup-browser",
@@ -1390,7 +1441,8 @@
         "daisyui",
         "mockup"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Browser mockup window Related concepts: daisyui, mockup. Primary use case: General purpose UI component."
     },
     {
       "name": "mockup-code",
@@ -1410,7 +1462,8 @@
         "daisyui",
         "mockup"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Code editor mockup Related concepts: daisyui, mockup. Primary use case: General purpose UI component."
     },
     {
       "name": "mockup-phone",
@@ -1430,7 +1483,8 @@
         "daisyui",
         "mockup"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Phone device mockup Related concepts: daisyui, mockup. Primary use case: General purpose UI component."
     },
     {
       "name": "mockup-window",
@@ -1451,7 +1505,8 @@
         "daisyui",
         "mockup"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Window mockup Related concepts: daisyui, mockup. Primary use case: General purpose UI component."
     }
   ]
 }

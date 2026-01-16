@@ -30,9 +30,7 @@
     "chat assistant"
   ],
   "activationEvents": [
-    "onStartupFinished",
-    "onView:codesentinel.reviewPanel",
-    "onView:codesentinel.projectHistory"
+    "onStartupFinished"
   ],
   "main": "./src/extension.js",
   "contributes": {

@@ -18,7 +18,7 @@
     {
       "name": "accordion",
       "category": "data-display",
-      "description": "Vertically stacked set of interactive headings that each reveal content",
+      "description": "Vertically stacked collapsible sections with interactive headers. Supports single or multiple open items. Built on Radix primitives for accessibility.",
       "dependencies": [
         "@radix-ui/react-accordion"
       ],
@@ -71,9 +71,42 @@
         "collapse",
         "expand",
         "faq",
-        "list"
+        "list",
+        "disclosure",
+        "toggle",
+        "sections",
+        "collapsible"
       ],
-      "useCase": "Organizing extensive content into collapsible sections (FAQs)."
+      "useCase": "Organizing extensive content into collapsible sections (FAQs).",
+      "embeddingContext": "An accordion organizes content into collapsible sections with expandable headers. Also known as: collapsible, expandable, faq, disclosure, toggle panel. Supports single mode (only one open at a time) or multiple mode (many can be open). Features smooth animations, keyboard navigation, and ARIA attributes. Parts include AccordionItem (section), AccordionTrigger (clickable header), and AccordionContent (collapsible body).",
+      "implementation": {
+        "importSpecifier": "import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'",
+        "dependencies": [
+          "@radix-ui/react-accordion"
+        ],
+        "keyProps": [
+          {
+            "name": "type",
+            "type": "'single' | 'multiple'",
+            "description": "Allow one or multiple items open"
+          },
+          {
+            "name": "collapsible",
+            "type": "boolean",
+            "description": "Allow closing the open item (single mode)"
+          },
+          {
+            "name": "value",
+            "type": "string | string[]",
+            "description": "Controlled open item(s)"
+          },
+          {
+            "name": "onValueChange",
+            "type": "function",
+            "description": "Callback when open items change"
+          }
+        ]
+      }
     },
     {
       "name": "alert",
@@ -115,7 +148,8 @@
         "error",
         "info"
       ],
-      "useCase": "Displaying important status messages to the user."
+      "useCase": "Displaying important status messages to the user.",
+      "embeddingContext": "Displays a callout for user attention Also known as: notification banner, message box, info callout, status message. Related concepts: notification, warning, error, info. Primary use case: Displaying important status messages to the user. Composed of parts: AlertTitle, AlertDescription."
     },
     {
       "name": "alert-dialog",
@@ -160,7 +194,8 @@
         "warning",
         "overlay"
       ],
-      "useCase": "Interrupting user to confirm a dangerous action."
+      "useCase": "Interrupting user to confirm a dangerous action.",
+      "embeddingContext": "Modal dialog that interrupts the user with important content Also known as: confirmation dialog, warning modal, confirm popup, interrupt dialog. Related concepts: modal, confirm, warning, overlay. Primary use case: Interrupting user to confirm a dangerous action. Composed of parts: AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription, AlertDialogAction, AlertDialogCancel."
     },
     {
       "name": "aspect-ratio",
@@ -192,7 +227,8 @@
         "video",
         "container"
       ],
-      "useCase": "Maintaining a consistent width-to-height ratio for media."
+      "useCase": "Maintaining a consistent width-to-height ratio for media.",
+      "embeddingContext": "Displays content within a desired aspect ratio Also known as: responsive container, media wrapper, ratio box. Related concepts: layout, image, video, container. Primary use case: Maintaining a consistent width-to-height ratio for media."
     },
     {
       "name": "avatar",
@@ -230,7 +266,8 @@
         "profile",
         "picture"
       ],
-      "useCase": "Displaying user profile pictures or initials."
+      "useCase": "Displaying user profile pictures or initials.",
+      "embeddingContext": "Image element with fallback for representing user Also known as: profile picture, user avatar, profile image, user icon. Related concepts: image, user, profile, picture. Primary use case: Displaying user profile pictures or initials. Composed of parts: Avatar, AvatarImage, AvatarFallback."
     },
     {
       "name": "badge",
@@ -274,7 +311,8 @@
         "status",
         "indicator"
       ],
-      "useCase": "Labeling items with status or category."
+      "useCase": "Labeling items with status or category.",
+      "embeddingContext": "Displays a badge or label Also known as: label, tag, chip, status indicator, pill, counter badge. Related concepts: label, tag, status, indicator. Primary use case: Labeling items with status or category."
     },
     {
       "name": "breadcrumb",
@@ -306,12 +344,13 @@
         "history",
         "links"
       ],
-      "useCase": "Showing current page location in hierarchy."
+      "useCase": "Showing current page location in hierarchy.",
+      "embeddingContext": "Displays the path to the current resource Also known as: path indicator, navigation trail, location breadcrumbs, page hierarchy. Related concepts: navigation, path, history, links. Primary use case: Showing current page location in hierarchy. Composed of parts: Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator, BreadcrumbEllipsis."
     },
     {
       "name": "button",
       "category": "forms",
-      "description": "Displays a button or component that looks like a button",
+      "description": "A clickable interactive element that triggers actions. Built on Radix Slot for composition. Supports multiple variants (default, destructive, outline, secondary, ghost, link) and sizes (default, sm, lg, icon, icon-sm, icon-lg). Fully accessible with keyboard navigation.",
       "dependencies": [
         "@radix-ui/react-slot"
       ],
@@ -380,9 +419,47 @@
         "action",
         "input",
         "click",
-        "submit"
+        "submit",
+        "cta",
+        "call-to-action",
+        "interactive",
+        "form-control",
+        "clickable",
+        "primary",
+        "secondary",
+        "danger"
       ],
-      "useCase": "Triggering actions or submitting forms."
+      "useCase": "Triggering actions or submitting forms.",
+      "embeddingContext": "A button is a fundamental interactive element that users click to trigger actions, submit forms, or navigate. Also known as: CTA, call-to-action, action button, submit button, clickable element. Supports variants for visual hierarchy (primary, secondary, destructive for danger actions, ghost for subtle, link for navigation). Sizes include default, small, large, and icon-only. Accessible via keyboard (Enter/Space). Built on Radix UI Slot for composition with asChild prop.",
+      "implementation": {
+        "importSpecifier": "import { Button } from '@/components/ui/button'",
+        "dependencies": [
+          "@radix-ui/react-slot",
+          "class-variance-authority"
+        ],
+        "keyProps": [
+          {
+            "name": "variant",
+            "type": "'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link'",
+            "description": "Visual style variant"
+          },
+          {
+            "name": "size",
+            "type": "'default' | 'sm' | 'lg' | 'icon' | 'icon-sm' | 'icon-lg'",
+            "description": "Button size"
+          },
+          {
+            "name": "asChild",
+            "type": "boolean",
+            "description": "Render as child component for composition"
+          },
+          {
+            "name": "disabled",
+            "type": "boolean",
+            "description": "Disable button interactions"
+          }
+        ]
+      }
     },
     {
       "name": "calendar",
@@ -435,12 +512,13 @@
         "time",
         "input"
       ],
-      "useCase": "Selecting dates from a monthly view."
+      "useCase": "Selecting dates from a monthly view.",
+      "embeddingContext": "Date picker component with calendar view Also known as: date picker, date selector, month view, date calendar. Related concepts: date, picker, time, input. Primary use case: Selecting dates from a monthly view."
     },
     {
       "name": "card",
       "category": "data-display",
-      "description": "Container for content with header, body, and footer",
+      "description": "A flexible container component for grouping related content with optional header, body, and footer sections. Commonly used for product displays, profiles, or information panels.",
       "dependencies": [],
       "files": [
         "components/ui/card.tsx"
@@ -464,9 +542,27 @@
         "container",
         "box",
         "panel",
-        "layout"
+        "layout",
+        "tile",
+        "grouping",
+        "content",
+        "product",
+        "profile",
+        "widget"
       ],
-      "useCase": "Grouping related content and actions in a container."
+      "useCase": "Grouping related content and actions in a container.",
+      "embeddingContext": "A card is a versatile container that groups related content and actions. Also known as: panel, box, tile, container, content card, info card. Typically composed of Header (with Title and Description), Content (main body), and Footer (actions). Used for product listings, user profiles, dashboard widgets, or any grouped information. Supports custom styling via className.",
+      "implementation": {
+        "importSpecifier": "import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'",
+        "dependencies": [],
+        "keyProps": [
+          {
+            "name": "className",
+            "type": "string",
+            "description": "Custom Tailwind classes"
+          }
+        ]
+      }
     },
     {
       "name": "carousel",
@@ -516,7 +612,8 @@
         "slides",
         "swipe"
       ],
-      "useCase": "Cycling through a set of content or images."
+      "useCase": "Cycling through a set of content or images.",
+      "embeddingContext": "Carousel with motion and swipe built using Embla Also known as: slider, image carousel, content slider, slideshow, image gallery. Related concepts: slider, gallery, slides, swipe. Primary use case: Cycling through a set of content or images. Composed of parts: Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext."
     },
     {
       "name": "chart",
@@ -548,7 +645,8 @@
         "visual",
         "statistics"
       ],
-      "useCase": "Visualizing data in bar, line, or pie charts."
+      "useCase": "Visualizing data in bar, line, or pie charts.",
+      "embeddingContext": "Beautiful charts built using Recharts Also known as: graph, visualization, data chart, bar chart, line chart. Related concepts: graph, data, visual, statistics. Primary use case: Visualizing data in bar, line, or pie charts. Composed of parts: ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent."
     },
     {
       "name": "checkbox",
@@ -591,7 +689,8 @@
         "select",
         "boolean"
       ],
-      "useCase": "Selecting one or more options from a list."
+      "useCase": "Selecting one or more options from a list.",
+      "embeddingContext": "Checkbox with text label Also known as: check box, tick box, boolean input, multi-select option. Related concepts: input, form, select, boolean. Primary use case: Selecting one or more options from a list."
     },
     {
       "name": "collapsible",
@@ -632,7 +731,8 @@
         "section",
         "disclosure"
       ],
-      "useCase": "Showing or hiding a section of content."
+      "useCase": "Showing or hiding a section of content.",
+      "embeddingContext": "Interactive component which expands/collapses a panel Also known as: expandable section, toggle content, show/hide, disclosure. Related concepts: expand, hide, section, disclosure. Primary use case: Showing or hiding a section of content. Composed of parts: Collapsible, CollapsibleTrigger, CollapsibleContent."
     },
     {
       "name": "combobox",
@@ -657,7 +757,8 @@
         "search",
         "autocomplete"
       ],
-      "useCase": "Selecting an item from a large list with search."
+      "useCase": "Selecting an item from a large list with search.",
+      "embeddingContext": "Autocomplete input and command palette with a list of suggestions Also known as: autocomplete, searchable select, typeahead, command palette select. Related concepts: input, select, search, autocomplete. Primary use case: Selecting an item from a large list with search."
     },
     {
       "name": "command",
@@ -692,7 +793,8 @@
         "palette",
         "dialog"
       ],
-      "useCase": "Global command palette for navigation or actions."
+      "useCase": "Global command palette for navigation or actions.",
+      "embeddingContext": "Fast, composable, unstyled command menu Also known as: command palette, quick actions, spotlight, search command, keyboard shortcuts. Related concepts: search, menu, palette, dialog. Primary use case: Global command palette for navigation or actions. Composed of parts: Command, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem, CommandSeparator, CommandShortcut."
     },
     {
       "name": "context-menu",
@@ -731,12 +833,13 @@
         "actions",
         "overlay"
       ],
-      "useCase": "Showing actions on right-click."
+      "useCase": "Showing actions on right-click.",
+      "embeddingContext": "Displays a menu located at the pointer, triggered by right-click Also known as: right-click menu, contextual actions, popup menu. Related concepts: menu, right-click, actions, overlay. Primary use case: Showing actions on right-click. Composed of parts: ContextMenu, ContextMenuTrigger, ContextMenuContent, ContextMenuItem, ContextMenuCheckboxItem, ContextMenuRadioItem, ContextMenuLabel, ContextMenuSeparator, ContextMenuShortcut, ContextMenuSub, ContextMenuSubContent, ContextMenuSubTrigger."
     },
     {
       "name": "dialog",
       "category": "overlay",
-      "description": "Window overlaid on primary window or another dialog",
+      "description": "A modal window that interrupts user workflow. Supports focus trapping, keyboard navigation (Escape to close), and accessible by default with ARIA attributes. Can be controlled or uncontrolled.",
       "dependencies": [
         "@radix-ui/react-dialog"
       ],
@@ -776,14 +879,43 @@
         "modal",
         "popup",
         "window",
-        "overlay"
+        "overlay",
+        "lightbox",
+        "interrupt",
+        "focus-trap",
+        "confirmation",
+        "form-dialog"
       ],
-      "useCase": "Focused task or content in a modal window."
+      "useCase": "Focused task or content in a modal window.",
+      "embeddingContext": "A dialog is a modal overlay window that interrupts the user to display critical information or request input. Also known as: modal, popup, lightbox, modal dialog, overlay window. Used for confirmations, form inputs, alerts, or focused tasks. Supports accessibility with focus trapping, Escape key to close, and screen reader announcements. Parts include Trigger, Content, Header, Footer, Title, Description, and Close button.",
+      "implementation": {
+        "importSpecifier": "import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from '@/components/ui/dialog'",
+        "dependencies": [
+          "@radix-ui/react-dialog"
+        ],
+        "keyProps": [
+          {
+            "name": "open",
+            "type": "boolean",
+            "description": "Controlled open state"
+          },
+          {
+            "name": "onOpenChange",
+            "type": "(open: boolean) => void",
+            "description": "Callback when open state changes"
+          },
+          {
+            "name": "modal",
+            "type": "boolean",
+            "description": "Whether to render as modal (blocks interaction outside)"
+          }
+        ]
+      }
     },
     {
       "name": "drawer",
       "category": "overlay",
-      "description": "Side panel that slides in from the edge of the screen",
+      "description": "A mobile-first slide-out panel with physics-based animations and gesture support. Built on Vaul library. Supports swipe-to-dismiss and drag-to-resize.",
       "dependencies": [
         "vaul"
       ],
@@ -826,12 +958,41 @@
         }
       ],
       "tags": [
-        "sheet",
+        "sidebar",
         "mobile",
-        "panel",
-        "overlay"
+        "bottom-sheet",
+        "gesture",
+        "swipe",
+        "off-canvas",
+        "slide-panel",
+        "touch",
+        "physics"
       ],
-      "useCase": "Pull-up panel, common on mobile devices."
+      "useCase": "Pull-up panel, common on mobile devices.",
+      "embeddingContext": "A drawer is a native app-style slide-out panel optimized for mobile with gesture support. Also known as: mobile sidebar, bottom sheet, sliding drawer, off-canvas menu. Features physics-based animations, swipe gestures to open/close, and drag-to-resize. Can combine with Dialog for responsive behavior (Drawer on mobile, Dialog on desktop). Ideal for quick actions, mobile navigation, or contextual content.",
+      "implementation": {
+        "importSpecifier": "import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle, DrawerTrigger, DrawerFooter, DrawerClose } from '@/components/ui/drawer'",
+        "dependencies": [
+          "vaul"
+        ],
+        "keyProps": [
+          {
+            "name": "open",
+            "type": "boolean",
+            "description": "Controlled open state"
+          },
+          {
+            "name": "onOpenChange",
+            "type": "(open: boolean) => void",
+            "description": "Callback when state changes"
+          },
+          {
+            "name": "direction",
+            "type": "'bottom' | 'top' | 'left' | 'right'",
+            "description": "Edge the drawer slides from"
+          }
+        ]
+      }
     },
     {
       "name": "dropdown-menu",
@@ -883,7 +1044,8 @@
         "list",
         "select"
       ],
-      "useCase": "Revealing a list of actions or links."
+      "useCase": "Revealing a list of actions or links.",
+      "embeddingContext": "Displays a menu to the user triggered by a button Also known as: dropdown, menu button, action menu, options menu. Related concepts: menu, actions, list, select. Primary use case: Revealing a list of actions or links. Composed of parts: DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuCheckboxItem, DropdownMenuRadioItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuGroup, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger."
     },
     {
       "name": "form",
@@ -919,7 +1081,8 @@
         "group",
         "data"
       ],
-      "useCase": "Building validated forms with multiple inputs."
+      "useCase": "Building validated forms with multiple inputs.",
+      "embeddingContext": "Building forms with React Hook Form and Zod validation Also known as: form wrapper, form validation, input form, data entry. Related concepts: input, validation, group, data. Primary use case: Building validated forms with multiple inputs. Composed of parts: Form, FormItem, FormLabel, FormControl, FormDescription, FormMessage, FormField."
     },
     {
       "name": "hover-card",
@@ -965,12 +1128,13 @@
         "overlay",
         "info"
       ],
-      "useCase": "Previewing more content on hover."
+      "useCase": "Previewing more content on hover.",
+      "embeddingContext": "For sighted users to preview content available behind a link Also known as: preview card, hover preview, info popup, quick view. Related concepts: preview, tooltip, overlay, info. Primary use case: Previewing more content on hover. Composed of parts: HoverCard, HoverCardTrigger, HoverCardContent."
     },
     {
       "name": "input",
       "category": "forms",
-      "description": "Displays a form input field or a component that looks like an input field",
+      "description": "Styled text input field matching the shadcn design system. Extends native HTML input with consistent styling.",
       "dependencies": [],
       "files": [
         "components/ui/input.tsx"
@@ -1008,12 +1172,42 @@
         }
       ],
       "tags": [
-        "field",
         "text",
+        "field",
         "form",
-        "entry"
+        "input",
+        "entry",
+        "data",
+        "textbox"
       ],
-      "useCase": "Basic text input field."
+      "useCase": "Basic text input field.",
+      "embeddingContext": "An input is a single-line text field for user data entry. Also known as: text field, text input, form field, input box. Provides consistent shadcn styling with focus states, disabled states, and error states via className. Accepts all native HTML input attributes including type, placeholder, disabled, and value.",
+      "implementation": {
+        "importSpecifier": "import { Input } from '@/components/ui/input'",
+        "dependencies": [],
+        "keyProps": [
+          {
+            "name": "type",
+            "type": "string",
+            "description": "Input type (text, email, password, etc.)"
+          },
+          {
+            "name": "placeholder",
+            "type": "string",
+            "description": "Placeholder text"
+          },
+          {
+            "name": "disabled",
+            "type": "boolean",
+            "description": "Disable input"
+          },
+          {
+            "name": "className",
+            "type": "string",
+            "description": "Custom Tailwind classes"
+          }
+        ]
+      }
     },
     {
       "name": "input-otp",
@@ -1053,7 +1247,8 @@
         "security",
         "digit"
       ],
-      "useCase": "Entering one-time passwords."
+      "useCase": "Entering one-time passwords.",
+      "embeddingContext": "Accessible one-time password component with copy paste functionality Also known as: one-time password, verification code, pin input, otp field. Related concepts: code, auth, security, digit. Primary use case: Entering one-time passwords. Composed of parts: InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator."
     },
     {
       "name": "label",
@@ -1084,7 +1279,8 @@
         "caption",
         "name"
       ],
-      "useCase": "Labeling form elements."
+      "useCase": "Labeling form elements.",
+      "embeddingContext": "Renders an accessible label associated with controls Also known as: input label, form label, field label. Related concepts: text, form, caption, name. Primary use case: Labeling form elements."
     },
     {
       "name": "menubar",
@@ -1125,7 +1321,8 @@
         "desktop",
         "top"
       ],
-      "useCase": "Desktop-style top menu bar."
+      "useCase": "Desktop-style top menu bar.",
+      "embeddingContext": "Visually persistent menu common in desktop applications Also known as: application menu, menu strip, toolbar menu. Related concepts: navigation, dropdown, desktop, top. Primary use case: Desktop-style top menu bar. Composed of parts: Menubar, MenubarMenu, MenubarTrigger, MenubarContent, MenubarItem, MenubarSeparator, MenubarLabel, MenubarCheckboxItem, MenubarRadioGroup, MenubarRadioItem, MenubarSub, MenubarSubContent, MenubarSubTrigger, MenubarShortcut."
     },
     {
       "name": "navigation-menu",
@@ -1160,7 +1357,8 @@
         "mega-menu",
         "nav"
       ],
-      "useCase": "Main site navigation with mega-menus."
+      "useCase": "Main site navigation with mega-menus.",
+      "embeddingContext": "Collection of links for navigating websites Also known as: nav bar, main navigation, header menu, site navigation. Related concepts: header, links, mega-menu, nav. Primary use case: Main site navigation with mega-menus. Composed of parts: NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuContent, NavigationMenuTrigger, NavigationMenuLink, NavigationMenuIndicator, NavigationMenuViewport."
     },
     {
       "name": "pagination",
@@ -1192,12 +1390,13 @@
         "list",
         "next"
       ],
-      "useCase": "Navigating between pages of data."
+      "useCase": "Navigating between pages of data.",
+      "embeddingContext": "Pagination with page navigation, next and previous links Also known as: page navigation, page selector, pager, page controls. Related concepts: navigation, pages, list, next. Primary use case: Navigating between pages of data. Composed of parts: Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious."
     },
     {
       "name": "popover",
       "category": "overlay",
-      "description": "Displays rich content in a portal, triggered by a button",
+      "description": "Floating panel that appears relative to a trigger element. Supports smart positioning to avoid viewport edges. More complex than tooltip, suitable for rich content.",
       "dependencies": [
         "@radix-ui/react-popover"
       ],
@@ -1230,12 +1429,44 @@
         }
       ],
       "tags": [
-        "overlay",
-        "bubble",
-        "content",
-        "popup"
+        "popup",
+        "floating",
+        "panel",
+        "dropdown",
+        "contextual",
+        "anchored",
+        "interactive"
       ],
-      "useCase": "Small overlay content triggered by click."
+      "useCase": "Small overlay content triggered by click.",
+      "embeddingContext": "A popover is a floating panel that appears anchored to a trigger element. Also known as: popup, floating content, info bubble, dropdown panel. Unlike tooltips, popovers can contain rich interactive content like forms or menus. Features smart positioning with collision avoidance, focus management, and accessibility. Parts include PopoverTrigger and PopoverContent.",
+      "implementation": {
+        "importSpecifier": "import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'",
+        "dependencies": [
+          "@radix-ui/react-popover"
+        ],
+        "keyProps": [
+          {
+            "name": "open",
+            "type": "boolean",
+            "description": "Controlled open state"
+          },
+          {
+            "name": "onOpenChange",
+            "type": "(open: boolean) => void",
+            "description": "Callback when state changes"
+          },
+          {
+            "name": "side",
+            "type": "'top' | 'right' | 'bottom' | 'left'",
+            "description": "Preferred side"
+          },
+          {
+            "name": "align",
+            "type": "'start' | 'center' | 'end'",
+            "description": "Alignment to trigger"
+          }
+        ]
+      }
     },
     {
       "name": "progress",
@@ -1274,7 +1505,8 @@
         "status",
         "indicator"
       ],
-      "useCase": "Showing completion percentage."
+      "useCase": "Showing completion percentage.",
+      "embeddingContext": "Displays an indicator showing the completion progress Also known as: progress bar, loading indicator, completion status, loading bar. Related concepts: loading, bar, status, indicator. Primary use case: Showing completion percentage."
     },
     {
       "name": "radio-group",
@@ -1314,7 +1546,8 @@
         "form",
         "list"
       ],
-      "useCase": "Selecting exactly one option from a list."
+      "useCase": "Selecting exactly one option from a list.",
+      "embeddingContext": "Set of checkable buttons where only one can be checked Also known as: radio buttons, single select, option group, mutually exclusive. Related concepts: select, option, form, list. Primary use case: Selecting exactly one option from a list. Composed of parts: RadioGroup, RadioGroupItem."
     },
     {
       "name": "resizable",
@@ -1360,7 +1593,8 @@
         "drag",
         "panels"
       ],
-      "useCase": "Resizable panel layouts."
+      "useCase": "Resizable panel layouts.",
+      "embeddingContext": "Accessible resizable panel groups and layouts Also known as: splitter, resize panel, adjustable layout, drag to resize. Related concepts: layout, split, drag, panels. Primary use case: Resizable panel layouts. Composed of parts: ResizablePanelGroup, ResizablePanel, ResizableHandle."
     },
     {
       "name": "scroll-area",
@@ -1401,12 +1635,13 @@
         "view",
         "list"
       ],
-      "useCase": "Custom scrollable container."
+      "useCase": "Custom scrollable container.",
+      "embeddingContext": "Augments native scroll functionality for custom, cross-browser styling Also known as: scrollable container, overflow container, scroll pane. Related concepts: container, overflow, view, list. Primary use case: Custom scrollable container. Composed of parts: ScrollArea, ScrollBar."
     },
     {
       "name": "select",
       "category": "forms",
-      "description": "Displays a list of options for the user to pick from",
+      "description": "Dropdown selection component with search optional. Built for accessibility with keyboard navigation and proper ARIA attributes.",
       "dependencies": [
         "@radix-ui/react-select"
       ],
@@ -1446,11 +1681,38 @@
       ],
       "tags": [
         "dropdown",
+        "picker",
         "input",
         "form",
-        "option"
+        "choice",
+        "options",
+        "selection"
       ],
-      "useCase": "Picking a value from a dropdown list."
+      "useCase": "Picking a value from a dropdown list.",
+      "embeddingContext": "A select is a dropdown picker for choosing from a list of options. Also known as: dropdown, picker, choice list, option selector, combobox. Features keyboard navigation, type-ahead search, and proper ARIA labels. Composed of Select, SelectTrigger, SelectValue, SelectContent, SelectItem, and optional SelectGroup/SelectLabel for organization.",
+      "implementation": {
+        "importSpecifier": "import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'",
+        "dependencies": [
+          "@radix-ui/react-select"
+        ],
+        "keyProps": [
+          {
+            "name": "value",
+            "type": "string",
+            "description": "Controlled selected value"
+          },
+          {
+            "name": "onValueChange",
+            "type": "(value: string) => void",
+            "description": "Callback when selection changes"
+          },
+          {
+            "name": "defaultValue",
+            "type": "string",
+            "description": "Default value for uncontrolled mode"
+          }
+        ]
+      }
     },
     {
       "name": "separator",
@@ -1493,12 +1755,13 @@
         "rule",
         "layout"
       ],
-      "useCase": "Visually separating content."
+      "useCase": "Visually separating content.",
+      "embeddingContext": "Visually or semantically separates content Also known as: divider, line, horizontal rule, section break. Related concepts: divider, line, rule, layout. Primary use case: Visually separating content."
     },
     {
       "name": "sheet",
       "category": "overlay",
-      "description": "Extends the Dialog component to display content that complements the main content",
+      "description": "A sliding panel that enters from the edge of the viewport (left, right, top, or bottom). Built on Radix Dialog primitives for accessibility. Ideal for mobile navigation, settings panels, or detailed filters.",
       "dependencies": [
         "@radix-ui/react-dialog"
       ],
@@ -1543,10 +1806,39 @@
       "tags": [
         "sidebar",
         "drawer",
-        "overlay",
-        "panel"
+        "slide-over",
+        "off-canvas",
+        "panel",
+        "modal-alternative",
+        "navigation",
+        "mobile-menu",
+        "sliding"
       ],
-      "useCase": "Side-panel for navigation or details."
+      "useCase": "Side-panel for navigation or details.",
+      "embeddingContext": "A sheet is a sidebar component that slides in from the left, right, top, or bottom edge of the screen. Also known as: drawer, sidebar, slide-over, off-canvas panel, sliding panel. Used for mobile hamburger menus, edit forms, configuration panels, or displaying details without leaving context. Provides native app-like smooth animations with focus management. Parts include Trigger, Content, Header, Title, Description, and Footer.",
+      "implementation": {
+        "importSpecifier": "import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger, SheetFooter, SheetClose } from '@/components/ui/sheet'",
+        "dependencies": [
+          "@radix-ui/react-dialog"
+        ],
+        "keyProps": [
+          {
+            "name": "side",
+            "type": "'top' | 'right' | 'bottom' | 'left'",
+            "description": "Edge the sheet slides in from"
+          },
+          {
+            "name": "open",
+            "type": "boolean",
+            "description": "Controlled open state"
+          },
+          {
+            "name": "onOpenChange",
+            "type": "(open: boolean) => void",
+            "description": "Callback when state changes"
+          }
+        ]
+      }
     },
     {
       "name": "sidebar",
@@ -1592,7 +1884,8 @@
         "shadcn",
         "navigation"
       ],
-      "useCase": "General purpose UI component."
+      "useCase": "General purpose UI component.",
+      "embeddingContext": "Composable, themeable and customizable sidebar component Also known as: side navigation, drawer menu, left panel, navigation sidebar. Related concepts: shadcn, navigation. Primary use case: General purpose UI component. Composed of parts: Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupAction, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarInset, SidebarInput, SidebarMenu, SidebarMenuAction, SidebarMenuBadge, SidebarMenuButton, SidebarMenuItem, SidebarMenuSkeleton, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem, SidebarProvider, SidebarRail, SidebarSeparator, SidebarTrigger."
     },
     {
       "name": "skeleton",
@@ -1615,7 +1908,8 @@
         "mockup",
         "state"
       ],
-      "useCase": "Placeholder state while data loads."
+      "useCase": "Placeholder state while data loads.",
+      "embeddingContext": "Use to show a placeholder while content is loading Also known as: loading placeholder, content skeleton, shimmer effect, loading state. Related concepts: loading, placeholder, mockup, state. Primary use case: Placeholder state while data loads."
     },
     {
       "name": "slider",
@@ -1667,12 +1961,13 @@
         "track",
         "control"
       ],
-      "useCase": "Selecting a value from a range."
+      "useCase": "Selecting a value from a range.",
+      "embeddingContext": "An input where the user selects a value from within a given range Also known as: range input, slider control, value slider, drag slider. Related concepts: input, range, track, control. Primary use case: Selecting a value from a range."
     },
     {
       "name": "sonner",
       "category": "feedback",
-      "description": "An opinionated toast component for React",
+      "description": "Modern toast/notification component that replaces the deprecated Toast. Shows non-blocking alerts with smooth animations. Supports promise integration for async operations.",
       "dependencies": [
         "sonner"
       ],
@@ -1697,10 +1992,44 @@
       "tags": [
         "toast",
         "notification",
+        "snackbar",
+        "message",
         "alert",
-        "message"
+        "popup",
+        "feedback",
+        "status",
+        "promise"
       ],
-      "useCase": "Stackable toast notifications."
+      "useCase": "Stackable toast notifications.",
+      "embeddingContext": "Sonner is the modern toast notification system that replaces the deprecated shadcn Toast component. Also known as: toast, snackbar, notification, popup message, status toast, alert toast. Provides non-blocking notifications with smooth animations. Features promise integration for automatic loading/success/error states, mobile-optimized swipe-to-dismiss, and customizable positioning. Uses lucide icons since October 2025.",
+      "implementation": {
+        "importSpecifier": "import { toast } from 'sonner';\nimport { Toaster } from '@/components/ui/sonner'",
+        "dependencies": [
+          "sonner"
+        ],
+        "keyProps": [
+          {
+            "name": "description",
+            "type": "string",
+            "description": "Additional descriptive text"
+          },
+          {
+            "name": "action",
+            "type": "{ label: string; onClick: () => void }",
+            "description": "Action button configuration"
+          },
+          {
+            "name": "duration",
+            "type": "number",
+            "description": "Auto-dismiss duration in ms"
+          },
+          {
+            "name": "position",
+            "type": "string",
+            "description": "Toast position (e.g., top-right, bottom-left)"
+          }
+        ]
+      }
     },
     {
       "name": "switch",
@@ -1736,7 +2065,8 @@
         "input",
         "form"
       ],
-      "useCase": "Toggling a setting on or off."
+      "useCase": "Toggling a setting on or off.",
+      "embeddingContext": "A control that allows the user to toggle between checked and not checked Also known as: toggle switch, on-off, boolean toggle, slider switch. Related concepts: toggle, boolean, input, form. Primary use case: Toggling a setting on or off."
     },
     {
       "name": "table",
@@ -1769,12 +2099,13 @@
         "rows",
         "list"
       ],
-      "useCase": "Displaying tabular data."
+      "useCase": "Displaying tabular data.",
+      "embeddingContext": "A responsive table component Also known as: data table, grid, spreadsheet, tabular data. Related concepts: data, grid, rows, list. Primary use case: Displaying tabular data. Composed of parts: Table, TableHeader, TableBody, TableFooter, TableHead, TableRow, TableCell, TableCaption."
     },
     {
       "name": "tabs",
       "category": "navigation",
-      "description": "A set of layered sections of content, one at a time",
+      "description": "Tabbed interface for switching between content panels. Built on Radix primitives for full accessibility including keyboard navigation and ARIA labels.",
       "dependencies": [
         "@radix-ui/react-tabs"
       ],
@@ -1809,9 +2140,42 @@
         "navigation",
         "switch",
         "panels",
-        "content"
+        "content",
+        "tabbed",
+        "segmented",
+        "organize",
+        "sections"
       ],
-      "useCase": "Switching between views in the same context."
+      "useCase": "Switching between views in the same context.",
+      "embeddingContext": "Tabs provide a tabbed interface for organizing content into switchable panels. Also known as: tab switcher, tab navigation, segmented control, tab panel. Supports controlled and uncontrolled modes. Accessible with keyboard navigation (arrow keys) and ARIA labels. Can be oriented horizontally or vertically. Parts include TabsList (container), TabsTrigger (clickable tabs), and TabsContent (panel content).",
+      "implementation": {
+        "importSpecifier": "import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'",
+        "dependencies": [
+          "@radix-ui/react-tabs"
+        ],
+        "keyProps": [
+          {
+            "name": "value",
+            "type": "string",
+            "description": "Controlled active tab value"
+          },
+          {
+            "name": "defaultValue",
+            "type": "string",
+            "description": "Default tab for uncontrolled mode"
+          },
+          {
+            "name": "onValueChange",
+            "type": "(value: string) => void",
+            "description": "Callback when active tab changes"
+          },
+          {
+            "name": "orientation",
+            "type": "'horizontal' | 'vertical'",
+            "description": "Tab layout orientation"
+          }
+        ]
+      }
     },
     {
       "name": "textarea",
@@ -1849,12 +2213,13 @@
         "multiline",
         "form"
       ],
-      "useCase": "Multi-line text input."
+      "useCase": "Multi-line text input.",
+      "embeddingContext": "Displays a form textarea or a component that looks like a textarea Also known as: multiline input, text area, large text input, comment box. Related concepts: input, text, multiline, form. Primary use case: Multi-line text input."
     },
     {
       "name": "toast",
       "category": "feedback",
-      "description": "A succinct message that is displayed temporarily",
+      "description": "DEPRECATED: Use Sonner component instead. Legacy toast notification system.",
       "dependencies": [
         "@radix-ui/react-toast"
       ],
@@ -1885,12 +2250,18 @@
         }
       ],
       "tags": [
+        "deprecated",
         "notification",
-        "message",
-        "alert",
-        "popup"
+        "use-sonner",
+        "legacy"
       ],
-      "useCase": "Brief status message."
+      "useCase": "Brief status message.",
+      "embeddingContext": "The Toast component is DEPRECATED in shadcn/ui. Use Sonner instead for toast notifications. Sonner provides better animations, promise integration, and mobile gesture support. Legacy Toast was built on Radix Toast primitive.",
+      "implementation": {
+        "importSpecifier": "// DEPRECATED - Use Sonner instead\nimport { toast } from 'sonner'",
+        "dependencies": [],
+        "keyProps": []
+      }
     },
     {
       "name": "toggle",
@@ -1947,7 +2318,8 @@
         "state",
         "icon"
       ],
-      "useCase": "Two-state button."
+      "useCase": "Two-state button.",
+      "embeddingContext": "A two-state button that can be either on or off Also known as: toggle button, pressed button, stateful button. Related concepts: button, switch, state, icon. Primary use case: Two-state button."
     },
     {
       "name": "toggle-group",
@@ -2047,12 +2419,13 @@
         "options",
         "set"
       ],
-      "useCase": "Set of toggle buttons."
+      "useCase": "Set of toggle buttons.",
+      "embeddingContext": "A set of two-state buttons that can be toggled on or off Also known as: button group, segmented buttons, choice buttons. Related concepts: buttons, select, options, set. Primary use case: Set of toggle buttons. Composed of parts: ToggleGroup, ToggleGroupItem."
     },
     {
       "name": "tooltip",
       "category": "overlay",
-      "description": "Popup that displays information related to an element when the element receives keyboard focus or the mouse hovers over it",
+      "description": "Popup that displays contextual information on hover or focus. Accessible with keyboard focus support. Requires TooltipProvider wrapper.",
       "dependencies": [
         "@radix-ui/react-tooltip"
       ],
@@ -2088,9 +2461,37 @@
         "hint",
         "hover",
         "info",
-        "label"
+        "label",
+        "help",
+        "contextual",
+        "popup",
+        "helper"
       ],
-      "useCase": "Small hint on hover."
+      "useCase": "Small hint on hover.",
+      "embeddingContext": "A tooltip shows informative text when hovering over or focusing on an element. Also known as: hint, hover tip, info tooltip, helper text, title popup. Requires TooltipProvider wrapper for proper state management. Features configurable delay, positioning (side/align), and optional arrow. Accessible via keyboard focus with proper ARIA attributes.",
+      "implementation": {
+        "importSpecifier": "import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'",
+        "dependencies": [
+          "@radix-ui/react-tooltip"
+        ],
+        "keyProps": [
+          {
+            "name": "delayDuration",
+            "type": "number",
+            "description": "Delay before showing (default 700ms)"
+          },
+          {
+            "name": "side",
+            "type": "'top' | 'right' | 'bottom' | 'left'",
+            "description": "Preferred side for tooltip"
+          },
+          {
+            "name": "align",
+            "type": "'start' | 'center' | 'end'",
+            "description": "Alignment relative to trigger"
+          }
+        ]
+      }
     }
   ]
 }

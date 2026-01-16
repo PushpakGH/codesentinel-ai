@@ -24,7 +24,7 @@
     {
       "name": "animated-beam",
       "category": "animations",
-      "description": "Animated connection lines between elements with smooth transitions.",
+      "description": "Animated light beam that travels along SVG paths. Used to visualize connections or integrations between UI elements.",
       "dependencies": [
         "framer-motion"
       ],
@@ -52,11 +52,40 @@
       ],
       "tags": [
         "beam",
-        "connector",
         "line",
-        "flow"
+        "connection",
+        "animation",
+        "path",
+        "svg",
+        "integration",
+        "flow",
+        "light"
       ],
-      "useCase": "Connecting two elements with a moving beam, good for explaining data flow."
+      "useCase": "Connecting two elements with a moving beam, good for explaining data flow.",
+      "embeddingContext": "Animated Beam creates a light beam animation traveling along an SVG path between elements. Also known as: connection line, integration beam, flow animation, path animation. Used to showcase integrations, data flow, or connections between icons/logos. Features customizable gradient colors and animation speed. Common in landing pages showing service integrations.",
+      "implementation": {
+        "importSpecifier": "import { AnimatedBeam } from '@/components/ui/animated-beam'",
+        "dependencies": [
+          "framer-motion"
+        ],
+        "keyProps": [
+          {
+            "name": "containerRef",
+            "type": "RefObject<HTMLElement>",
+            "description": "Reference to container element"
+          },
+          {
+            "name": "fromRef",
+            "type": "RefObject<HTMLElement>",
+            "description": "Starting element reference"
+          },
+          {
+            "name": "toRef",
+            "type": "RefObject<HTMLElement>",
+            "description": "Ending element reference"
+          }
+        ]
+      }
     },
     {
       "name": "animated-list",
@@ -90,12 +119,13 @@
         "feed",
         "stagger"
       ],
-      "useCase": "A list where new items animate in, perfect for activity feeds."
+      "useCase": "A list where new items animate in, perfect for activity feeds.",
+      "embeddingContext": "List with staggered entrance animations for each item. Related concepts: list, notification, feed, stagger. Primary use case: A list where new items animate in, perfect for activity feeds."
     },
     {
       "name": "bento-grid",
       "category": "layout",
-      "description": "Masonry-style bento grid layout with smooth hover effects.",
+      "description": "Grid layout component for creating visually interesting feature sections with varying cell sizes.",
       "dependencies": [
         "framer-motion"
       ],
@@ -116,10 +146,31 @@
       "tags": [
         "grid",
         "layout",
-        "masonry",
-        "cards"
+        "bento",
+        "cards",
+        "features",
+        "mosaic",
+        "dashboard",
+        "responsive"
       ],
-      "useCase": "A bento-style grid for featuring multiple items of varying importance."
+      "useCase": "A bento-style grid for featuring multiple items of varying importance.",
+      "embeddingContext": "Bento Grid creates a modern layout with cards of varying sizes, similar to the Apple iOS bento design. Also known as: feature grid, mosaic layout, dashboard grid, card grid. Allows flexible arrangements with some cells spanning multiple rows or columns. Perfect for showcasing features, stats, or portfolio items in a visually engaging way.",
+      "implementation": {
+        "importSpecifier": "import { BentoGrid, BentoGridItem } from '@/components/ui/bento-grid'",
+        "dependencies": [],
+        "keyProps": [
+          {
+            "name": "className",
+            "type": "string",
+            "description": "Grid container styling"
+          },
+          {
+            "name": "children",
+            "type": "ReactNode",
+            "description": "BentoGridItem children"
+          }
+        ]
+      }
     },
     {
       "name": "blur-in",
@@ -151,7 +202,8 @@
         "blur",
         "animation"
       ],
-      "useCase": "Text that reveals itself by unblurring."
+      "useCase": "Text that reveals itself by unblurring.",
+      "embeddingContext": "Text that blurs in on mount or when scrolled into view. Related concepts: text, reveal, blur, animation. Primary use case: Text that reveals itself by unblurring."
     },
     {
       "name": "border-beam",
@@ -179,7 +231,8 @@
         "glow",
         "card"
       ],
-      "useCase": "A beam of light traveling around a container's border."
+      "useCase": "A beam of light traveling around a container's border.",
+      "embeddingContext": "Animated border beam that moves around the edges of a container. Related concepts: border, light, glow, card. Primary use case: A beam of light traveling around a container's border."
     },
     {
       "name": "box-reveal",
@@ -213,7 +266,8 @@
         "text",
         "animation"
       ],
-      "useCase": "Revealing content with a sliding box mask effect."
+      "useCase": "Revealing content with a sliding box mask effect.",
+      "embeddingContext": "Content reveals from inside a box with a masking animation. Related concepts: reveal, mask, text, animation. Primary use case: Revealing content with a sliding box mask effect."
     },
     {
       "name": "confetti",
@@ -241,12 +295,13 @@
         "success",
         "effect"
       ],
-      "useCase": "Firing confetti on success states or celebrations."
+      "useCase": "Firing confetti on success states or celebrations.",
+      "embeddingContext": "Celebratory confetti animation triggered by an event. Related concepts: celebration, particles, success, effect. Primary use case: Firing confetti on success states or celebrations."
     },
     {
       "name": "dock",
       "category": "navigation",
-      "description": "macOS-style dock navigation with hover magnification.",
+      "description": "macOS-inspired dock component with magnification and smooth spring animations. Similar to Aceternity floating dock.",
       "dependencies": [
         "framer-motion"
       ],
@@ -264,12 +319,35 @@
         }
       ],
       "tags": [
+        "dock",
         "navigation",
-        "menu",
-        "macos",
-        "icon"
+        "mac",
+        "magnify",
+        "icons",
+        "spring",
+        "physics",
+        "floating"
       ],
-      "useCase": "An icon dock that expands on hover, like macOS."
+      "useCase": "An icon dock that expands on hover, like macOS.",
+      "embeddingContext": "Dock is a macOS-inspired navigation component with magnification effects. Also known as: app dock, icon bar, mac dock, floating navigation. Features smooth spring physics and hover magnification for a native desktop feel. Icons scale up organically when hovered. Used for app launchers, quick navigation, or action bars.",
+      "implementation": {
+        "importSpecifier": "import { Dock, DockIcon } from '@/components/ui/dock'",
+        "dependencies": [
+          "framer-motion"
+        ],
+        "keyProps": [
+          {
+            "name": "magnification",
+            "type": "number",
+            "description": "Scale factor on hover"
+          },
+          {
+            "name": "distance",
+            "type": "number",
+            "description": "Magnification effect radius"
+          }
+        ]
+      }
     },
     {
       "name": "dot-pattern",
@@ -294,7 +372,8 @@
         "dots",
         "svg"
       ],
-      "useCase": "A subtle dot grid background pattern."
+      "useCase": "A subtle dot grid background pattern.",
+      "embeddingContext": "Animated dot pattern background. Related concepts: background, pattern, dots, svg. Primary use case: A subtle dot grid background pattern."
     },
     {
       "name": "fade-text",
@@ -326,7 +405,8 @@
         "reveal",
         "animation"
       ],
-      "useCase": "Simple fade-in animation for text."
+      "useCase": "Simple fade-in animation for text.",
+      "embeddingContext": "Text that fades in character by character. Related concepts: text, fade, reveal, animation. Primary use case: Simple fade-in animation for text."
     },
     {
       "name": "globe",
@@ -354,7 +434,8 @@
         "earth",
         "interactive"
       ],
-      "useCase": "Interactive 3D globe."
+      "useCase": "Interactive 3D globe.",
+      "embeddingContext": "Interactive 3D rotating globe with markers. Related concepts: globe, 3d, earth, interactive. Primary use case: Interactive 3D globe."
     },
     {
       "name": "grid-pattern",
@@ -379,7 +460,8 @@
         "lines",
         "pattern"
       ],
-      "useCase": "A simple line grid background."
+      "useCase": "A simple line grid background.",
+      "embeddingContext": "Animated grid background pattern. Related concepts: background, grid, lines, pattern. Primary use case: A simple line grid background."
     },
     {
       "name": "hyper-text",
@@ -405,7 +487,8 @@
         "random",
         "scramble"
       ],
-      "useCase": "Text that cycles through random characters before settling."
+      "useCase": "Text that cycles through random characters before settling.",
+      "embeddingContext": "Text with glitch/scramble animation effect. Related concepts: text, glitch, random, scramble. Primary use case: Text that cycles through random characters before settling."
     },
     {
       "name": "icon-cloud",
@@ -434,12 +517,13 @@
         "icons",
         "3d"
       ],
-      "useCase": "A rotating cloud of tech stack icons."
+      "useCase": "A rotating cloud of tech stack icons.",
+      "embeddingContext": "3D rotating cloud of icons. Related concepts: cloud, sphere, icons, 3d. Primary use case: A rotating cloud of tech stack icons."
     },
     {
       "name": "marquee",
       "category": "animations",
-      "description": "Infinite scrolling marquee for text, logos, or cards.",
+      "description": "Infinite horizontal or vertical scrolling component for content like logos, testimonials, or news tickers.",
       "dependencies": [],
       "props": {
         "children": {
@@ -481,11 +565,38 @@
       ],
       "tags": [
         "scroll",
-        "loop",
+        "ticker",
         "infinite",
-        "brand"
+        "loop",
+        "carousel",
+        "logos",
+        "animation",
+        "horizontal",
+        "vertical"
       ],
-      "useCase": "Infinite scrolling strip for logos or text."
+      "useCase": "Infinite scrolling strip for logos or text.",
+      "embeddingContext": "Marquee creates an infinite scrolling effect for content. Also known as: ticker, carousel, infinite scroll, logo scroll, news ticker. Scrolls content horizontally or vertically in a loop. Features customizable speed, direction, and pause-on-hover. Common uses: client logos, testimonials, news headlines, or social proof sections.",
+      "implementation": {
+        "importSpecifier": "import { Marquee } from '@/components/ui/marquee'",
+        "dependencies": [],
+        "keyProps": [
+          {
+            "name": "pauseOnHover",
+            "type": "boolean",
+            "description": "Pause scrolling on mouse hover"
+          },
+          {
+            "name": "reverse",
+            "type": "boolean",
+            "description": "Reverse scroll direction"
+          },
+          {
+            "name": "className",
+            "type": "string",
+            "description": "Custom styles"
+          }
+        ]
+      }
     },
     {
       "name": "meteors",
@@ -511,7 +622,8 @@
         "particles",
         "star"
       ],
-      "useCase": "Meteor shower animation for backgrounds."
+      "useCase": "Meteor shower animation for backgrounds.",
+      "embeddingContext": "Falling meteor animation effect. Related concepts: background, space, particles, star. Primary use case: Meteor shower animation for backgrounds."
     },
     {
       "name": "number-ticker",
@@ -543,7 +655,8 @@
         "stats",
         "animate"
       ],
-      "useCase": "Animate numbers counting up to a value."
+      "useCase": "Animate numbers counting up to a value.",
+      "embeddingContext": "Animated number counter. Related concepts: counter, numbers, stats, animate. Primary use case: Animate numbers counting up to a value."
     },
     {
       "name": "orbiting-circles",
@@ -564,7 +677,8 @@
         "orbit",
         "planet"
       ],
-      "useCase": "Elements orbiting in circles around a center."
+      "useCase": "Elements orbiting in circles around a center.",
+      "embeddingContext": "Circles that orbit around a center point. Related concepts: animation, circle, orbit, planet. Primary use case: Elements orbiting in circles around a center."
     },
     {
       "name": "particles",
@@ -591,7 +705,8 @@
         "interactive",
         "web"
       ],
-      "useCase": "Interactive particles that respond to mouse movement."
+      "useCase": "Interactive particles that respond to mouse movement.",
+      "embeddingContext": "Animated particle background. Related concepts: background, dots, interactive, web. Primary use case: Interactive particles that respond to mouse movement."
     },
     {
       "name": "pulsating-button",
@@ -612,7 +727,8 @@
         "cta",
         "glow"
       ],
-      "useCase": "A primary call-to-action button that pulses to attract attention."
+      "useCase": "A primary call-to-action button that pulses to attract attention.",
+      "embeddingContext": "Button with pulsating animation. Related concepts: button, pulse, cta, glow. Primary use case: A primary call-to-action button that pulses to attract attention."
     },
     {
       "name": "retro-grid",
@@ -633,7 +749,8 @@
         "perspective",
         "grid"
       ],
-      "useCase": "A retro 80s style perspective grid background."
+      "useCase": "A retro 80s style perspective grid background.",
+      "embeddingContext": "Retro-style animated grid background. Related concepts: background, retro, perspective, grid. Primary use case: A retro 80s style perspective grid background."
     },
     {
       "name": "ripple",
@@ -654,7 +771,8 @@
         "click",
         "wave"
       ],
-      "useCase": "Expanding ripple circles, useful for emphasis."
+      "useCase": "Expanding ripple circles, useful for emphasis.",
+      "embeddingContext": "Ripple effect on click. Related concepts: effect, circle, click, wave. Primary use case: Expanding ripple circles, useful for emphasis."
     },
     {
       "name": "scroll-progress",
@@ -677,12 +795,13 @@
         "bar",
         "indicator"
       ],
-      "useCase": "Reading progress bar fixed to the top of the screen."
+      "useCase": "Reading progress bar fixed to the top of the screen.",
+      "embeddingContext": "Progress bar showing scroll position. Related concepts: progress, scroll, bar, indicator. Primary use case: Reading progress bar fixed to the top of the screen."
     },
     {
       "name": "shimmer-button",
       "category": "interactive",
-      "description": "Button with shimmer animation effect.",
+      "description": "Button with an animated shimmer effect around its border. Eye-catching call-to-action button.",
       "dependencies": [],
       "props": {},
       "usage": "import { ShimmerButton } from \"@/components/magicui/shimmer-button\"",
@@ -695,10 +814,38 @@
       "tags": [
         "button",
         "shimmer",
-        "shine",
-        "premium"
+        "glow",
+        "cta",
+        "animated",
+        "highlight",
+        "sparkle",
+        "action"
       ],
-      "useCase": "A shiny, premium-looking button."
+      "useCase": "A shiny, premium-looking button.",
+      "embeddingContext": "Shimmer Button features an animated shimmering light effect around its perimeter. Also known as: glowing button, animated CTA, sparkle button, highlight button. Creates an eye-catching effect that draws user attention. The shimmer travels around the border like liquid metal. Perfect for primary CTAs, sign-up buttons, or featured actions.",
+      "implementation": {
+        "importSpecifier": "import { ShimmerButton } from '@/components/ui/shimmer-button'",
+        "dependencies": [
+          "framer-motion"
+        ],
+        "keyProps": [
+          {
+            "name": "shimmerColor",
+            "type": "string",
+            "description": "Color of the shimmer effect"
+          },
+          {
+            "name": "shimmerDuration",
+            "type": "string",
+            "description": "Animation duration"
+          },
+          {
+            "name": "className",
+            "type": "string",
+            "description": "Button styling"
+          }
+        ]
+      }
     },
     {
       "name": "shine-border",
@@ -719,7 +866,8 @@
         "glow",
         "card"
       ],
-      "useCase": "A border with a rotating shine effect."
+      "useCase": "A border with a rotating shine effect.",
+      "embeddingContext": "Animated shining border effect. Related concepts: border, shine, glow, card. Primary use case: A border with a rotating shine effect."
     },
     {
       "name": "sparkles",
@@ -739,7 +887,8 @@
         "sparkle",
         "highlight"
       ],
-      "useCase": "Text revealed or highlighted with sparkles."
+      "useCase": "Text revealed or highlighted with sparkles.",
+      "embeddingContext": "Sparkle animation effect. Related concepts: text, sparkle, highlight. Primary use case: Text revealed or highlighted with sparkles."
     },
     {
       "name": "text-reveal",
@@ -767,7 +916,8 @@
         "fade",
         "read"
       ],
-      "useCase": "Text that lights up as you scroll."
+      "useCase": "Text that lights up as you scroll.",
+      "embeddingContext": "Text reveals on scroll with mask effect. Related concepts: text, scroll, fade, read. Primary use case: Text that lights up as you scroll."
     },
     {
       "name": "typing-animation",
@@ -792,7 +942,8 @@
         "typewriter",
         "code"
       ],
-      "useCase": "Text appearing as if being typed."
+      "useCase": "Text appearing as if being typed.",
+      "embeddingContext": "Typewriter text animation. Related concepts: text, typewriter, code. Primary use case: Text appearing as if being typed."
     },
     {
       "name": "word-pull-up",
@@ -819,7 +970,8 @@
         "animation",
         "entrance"
       ],
-      "useCase": "Words sliding up into view."
+      "useCase": "Words sliding up into view.",
+      "embeddingContext": "Words pull up into view animation. Related concepts: text, animation, entrance. Primary use case: Words sliding up into view."
     },
     {
       "name": "word-rotate",
@@ -846,7 +998,8 @@
         "cycle",
         "substitution"
       ],
-      "useCase": "Cycling through a list of words in a sentence."
+      "useCase": "Cycling through a list of words in a sentence.",
+      "embeddingContext": "Rotating words animation. Related concepts: text, cycle, substitution. Primary use case: Cycling through a list of words in a sentence."
     }
   ]
 }
