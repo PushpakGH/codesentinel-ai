@@ -97,7 +97,11 @@ class StateManager {
     try {
       this.state.updatedAt = new Date().toISOString();
       
-      // 1. Save to Disk
+      // 1. Ensure directory exists before saving to disk
+      const dir = path.dirname(this.manifestPath);
+      await fs.mkdir(dir, { recursive: true });
+      
+      // 2. Save to Disk
       await fs.writeFile(this.manifestPath, JSON.stringify(this.state, null, 2));
       
       // 2. Save to Global State (Persistence across reloads)

@@ -1,9 +1,23 @@
-/**
+﻿/**
  * Project Builder Agent - SERVICE ORIENTED ARCHITECTURE
- * ✅ Refactored: Split into micro-services (Planner, Discovery, Generator)
+ * âœ… Refactored: Split into micro-services (Planner, Discovery, Generator)
  */
 
-const vscode = require('vscode');
+let vscode;
+try {
+  vscode = require('vscode');
+} catch (e) {
+  vscode = {
+    window: { 
+        showInformationMessage: async () => 'Proceed with Build', 
+        showErrorMessage: async (msg) => console.error('VSCODE ERROR MSG:', msg),
+        withProgress: async (opts, fn) => await fn({ report: () => {} }),
+        createOutputChannel: () => ({ appendLine: console.log, show: () => {}, clear: () => {} })
+    },
+    workspace: { workspaceFolders: [], getConfiguration: () => ({ get: () => '' }) },
+    ProgressLocation: { Notification: 15 }
+  };
+}
 const path = require('path');
 const fs = require('fs').promises;
 const { promisify } = require('util');
@@ -65,17 +79,32 @@ class ProjectBuilderAgent {
     this.stateManager = new StateManager(projectPath); // New instance handles restoration internally
     await this.stateManager.initialize();
     
+    // CRITICAL FIX: Validate that scaffold truly completed by checking physical files
+    // This prevents stale state from Global Storage causing skipped scaffolding
+    if (this.stateManager.state.buildSteps?.scaffold === true) {
+        const hasPackageJson = await this.hasPackageJson(projectPath);
+        const hasGlobalsCss = await this.fileExists(path.join(projectPath, 'app', 'globals.css'));
+        
+        if (!hasPackageJson || !hasGlobalsCss) {
+            logger.warn('âš ï¸ Stale state detected: Scaffold marked complete but files missing. Resetting scaffold step.');
+            this.stateManager.state.buildSteps.scaffold = false;
+            this.stateManager.state.buildSteps.components = false;
+            this.stateManager.state.buildSteps.theme = false;
+            await this.stateManager.save();
+        }
+    }
+    
     // Resume Logic: Restore internal state from persisted manifest if available
     if (this.stateManager.state.projectPlan) {
-        logger.info('🔄 Resuming from existing project plan...');
+        logger.info('ðŸ”„ Resuming from existing project plan...');
     }
     
     // Init services dependent on state
     this.discovery = new DiscoveryService(this.stateManager);
     this.generator = new GeneratorService(this.stateManager);
 
-    logger.info(`🚀 Starting Project Build at: ${projectPath}`);
-    logger.info(`📝 User Request: ${userPrompt}`);
+    logger.info(`ðŸš€ Starting Project Build at: ${projectPath}`);
+    logger.info(`ðŸ“ User Request: ${userPrompt}`);
 
     const progressOptions = {
       location: vscode.ProgressLocation.Notification,
@@ -139,7 +168,7 @@ class ProjectBuilderAgent {
 
         // 2b. Define Discovery Task
         const discoveryTask = async () => {
-             logger.info('🔍 Starting parallel component discovery...');
+             logger.info('ðŸ” Starting parallel component discovery...');
              return await this.discovery.discoverComponents(this.projectPlan.componentNeeds, this.projectPlan);
         };
 
@@ -161,7 +190,7 @@ class ProjectBuilderAgent {
                this.projectPlan.styleIntent || 'minimal'
              );
              
-             logger.info(`🎨 Design Intent: ${designIntent.industry} (${designIntent.mood}) - ${designIntent.primaryColor}`);
+             logger.info(`ðŸŽ¨ Design Intent: ${designIntent.industry} (${designIntent.mood}) - ${designIntent.primaryColor}`);
              
              const themeGen = new ThemeGenerator();
              await themeGen.applyTheme(this.projectPath, designIntent);
@@ -181,13 +210,21 @@ class ProjectBuilderAgent {
         const ComponentCatalog = require('../services/componentCatalog');
         const catalog = new ComponentCatalog(this.projectPath);
         this.componentCatalog = await catalog.buildCatalog(this.installedComponents);
-        logger.info(`📚 Component catalog built: ${Object.keys(this.componentCatalog).length} components`);
+        logger.info(`ðŸ“š Component catalog built: ${Object.keys(this.componentCatalog).length} components`);
 
         // PHASE 4: CODE GENERATION
-        progress.report({ message: 'Generating pages...', increment: 40 });
+        progress.report({ message: 'Generating Layouts & Pages...', increment: 40 });
         const buildStartTime = Date.now();
+        
+        // 4a. Layouts (Context Aware)
+        await this.generateLayouts();
+        
+        // 4a.5. PHASE 12 FIX: Generate Landing Page (MANDATORY)
+        // This prevents the default Next.js boilerplate from being left at app/page.tsx
+        await this.generateLandingPage();
+        
+        // 4b. Pages (Surgical Context)
         await this.generatePages();
-        await this.createRootLayout();
 
         // PHASE 5: POST-GENERATION VALIDATION
         progress.report({ message: 'Validating generated code...', increment: 5 });
@@ -196,7 +233,7 @@ class ProjectBuilderAgent {
         const validationResult = await validator.validateProject();
         
         if (!validationResult.success) {
-          logger.warn('⚠️  Post-generation validation found issues:');
+          logger.warn('âš ï¸  Post-generation validation found issues:');
           validationResult.errors.forEach(err => logger.warn(err));
         }
 
@@ -206,22 +243,22 @@ class ProjectBuilderAgent {
         const componentsInstalled = Object.keys(this.componentCatalog).length;
         
         logger.info(`\n${'='.repeat(60)}`);
-        logger.info(`✨ PROJECT BUILD COMPLETE! ✨`);
+        logger.info(`âœ¨ PROJECT BUILD COMPLETE! âœ¨`);
         logger.info(`${'='.repeat(60)}`);
-        logger.info(`📦 Project: ${this.projectPlan.projectName}`);
-        logger.info(`📁 Location: ${this.projectPath}`);
-        logger.info(`⏱️  Total Time: ${totalDuration} minutes`);
-        logger.info(`📄 Pages Generated: ${pagesGenerated}`);
-        logger.info(`🧩 Components Installed: ${componentsInstalled}`);
-        logger.info(`✅ Validation: ${validationResult.success ? 'PASSED' : 'PASSED WITH WARNINGS'}`);
+        logger.info(`ðŸ“¦ Project: ${this.projectPlan.projectName}`);
+        logger.info(`ðŸ“ Location: ${this.projectPath}`);
+        logger.info(`â±ï¸  Total Time: ${totalDuration} minutes`);
+        logger.info(`ðŸ“„ Pages Generated: ${pagesGenerated}`);
+        logger.info(`ðŸ§© Components Installed: ${componentsInstalled}`);
+        logger.info(`âœ… Validation: ${validationResult.success ? 'PASSED' : 'PASSED WITH WARNINGS'}`);
         logger.info(`${'='.repeat(60)}\n`);
 
-        // ✅ Save to Project History for Resume Feature
+        // âœ… Save to Project History for Resume Feature
         try {
           const historyProvider = global.projectHistoryProvider;
           if (historyProvider) {
             await historyProvider.addProject(this.projectPath, this.stateManager.state);
-            logger.info('📚 Saved to project history');
+            logger.info('ðŸ“š Saved to project history');
           }
         } catch (historyError) {
           logger.warn('Could not save to project history:', historyError.message);
@@ -248,46 +285,104 @@ class ProjectBuilderAgent {
   }
 
   // Wrappers for Service Calls
+  // Wrappers for Service Calls
+  
+  async generateLayouts() {
+    if (this.stateManager.isStepComplete('layouts')) return;
+    
+    // Default to root layout if none exist (backward compatibility)
+    const layouts = this.projectPlan.layouts || [
+        { path: 'app/layout.tsx', description: 'Root layout with Navbar/Footer', type: 'root' }
+    ];
+
+    logger.info(`\nðŸ—ï¸  Starting Layout Generation (${layouts.length} layouts)...\n`);
+
+    for (const layout of layouts) {
+        if (this.stateManager.isPageGenerated(layout.path)) continue;
+
+        // Surgical Context for Layout
+        // Layouts need global design system but less specific feature context than pages
+        const context = {
+            path: layout.path,
+            description: layout.description,
+            type: layout.type || 'nested',
+            designSystem: this.projectPlan.designSystem
+        };
+        
+        // Inject Project Identity for Root Layout Branding
+        if (layout.type === 'root') {
+            context.projectName = this.projectPlan.projectName;
+            context.projectDescription = this.projectPlan.description;
+        }
+
+
+        const success = await this.generator.generateLayoutCode(context, this.projectPath);
+        if (success) {
+            await this.stateManager.markPageGenerated(layout.path);
+        }
+    }
+    
+    await this.stateManager.markStepComplete('layouts');
+  }
+
   async generatePages() {
     if (this.stateManager.isStepComplete('pages')) return;
 
-    // Create navigation component first
+    // Create navigation component first (Dynamic based on pages)
     await this.createNavigationComponent(this.projectPlan.pages);
 
-    logger.info(`\n📄 Starting page generation (${this.projectPlan.pages.length} pages)...\n`);
+    logger.info(`\nðŸ“„ Starting page generation (${this.projectPlan.pages.length} pages)...\n`);
 
     for (let i = 0; i < this.projectPlan.pages.length; i++) {
        const page = this.projectPlan.pages[i];
+       
+       // Skip if done
+       if (this.stateManager.isPageGenerated(page.name)) continue;
+
        const pageStartTime = Date.now();
        
-       logger.info(`${'─'.repeat(60)}`);
-       logger.info(`📄 [${i + 1}/${this.projectPlan.pages.length}] ${page.name}`);
-       logger.info(`📍 Route: ${page.route}`);
-       logger.info(`📝 Features: ${page.features?.join(', ') || 'None specified'}`);
+       logger.info(`${'â”€'.repeat(60)}`);
+       logger.info(`ðŸ“„ [${i + 1}/${this.projectPlan.pages.length}] ${page.name}`);
+       logger.info(`ðŸ“ Route: ${page.route}`);
+       logger.info(`ðŸ“ Features: ${page.features?.join(', ') || 'None specified'}`);
        
        try {
          // Determine project type from analysis
          const projectType = this.projectAnalysis?.type || 
                             (this.projectPlan.description?.toLowerCase().includes('code') ? 'ide' : 'web-app');
          
+         // SURGICAL CONTEXT SLICING ðŸ”ª
+         // 1. Find semantic matches for THIS page only
+         const pageSpecificNeeds = await this.discovery.discoverComponents(
+             { ...this.projectPlan.componentNeeds, pageSpecific: page.features }, 
+             { ...this.projectPlan, styleIntent: this.projectPlan.styleIntent } 
+         );
+         
+         // 2. Pass context to Generator
+         // Fix: Use the page-specific catalog found by discovery service!
          const code = await this.generator.generatePageCode(
             page.name, 
             page.description, 
             this.installedComponents,
             this.projectAnalysis,
             this.projectPath,
-            this.componentCatalog,
+            pageSpecificNeeds.catalog || this.componentCatalog, // Use sliced catalog
             this.projectPlan.designSystem,
-            page.features || [], // ✅ Pass page features
-            projectType          // ✅ Pass project type
+            page.features || [], 
+            projectType,
+            { 
+              sitemap: this.projectPlan.pages,
+              projectName: this.projectPlan.projectName,
+              projectDescription: this.projectPlan.description 
+            } // 10. Pass Sitemap & Identity Context
          );
          
          await this.generator.writePageFile(this.projectPath, page.route, code);
          
-         // AUTO-FIX: Scan for missing imports and create them on the fly
+         // AUTO-FIX: Scan for missing imports
          await this.verifyAndFixImports(code, this.projectPath);
          
-         // VALIDATION: Ensure code is complete and syntactically valid
+         // VALIDATION
          if (!code || code.length < 500) {
             throw new Error(`Generated code is too short (${code?.length || 0} chars). AI likely failed to complete.`);
          }
@@ -302,16 +397,16 @@ class ProjectBuilderAgent {
          await this.stateManager.markPageGenerated(page.name);
          
          const duration = ((Date.now() - pageStartTime) / 1000).toFixed(2);
-         logger.info(`✅ Generated successfully (${duration}s, ${code?.length || 0} chars)`);
+         logger.info(`âœ… Generated successfully (${duration}s, ${code?.length || 0} chars)`);
          
        } catch (error) {
          const duration = ((Date.now() - pageStartTime) / 1000).toFixed(2);
-         logger.error(`❌ Generation failed (${duration}s): ${error.message}`);
+         logger.error(`âŒ Generation failed (${duration}s): ${error.message}`);
          throw error;
        }
     }
     
-    logger.info(`${'─'.repeat(60)}\n`);
+    logger.info(`${'â”€'.repeat(60)}\n`);
     await this.stateManager.markStepComplete('pages');
   }
 
@@ -406,7 +501,7 @@ const config = {
 export default config;`;
 
       await fs.writeFile(path.join(this.projectPath, 'tailwind.config.ts'), config);
-      logger.info('✅ Generated robust tailwind.config.ts');
+      logger.info('âœ… Generated robust tailwind.config.ts');
   }
 
   // --- Infrastructure Methods ---
@@ -414,6 +509,15 @@ export default config;`;
   async hasPackageJson(folderPath) {
     try {
       await fs.access(path.join(folderPath, 'package.json'));
+      return true;
+    } catch {
+      return false;
+    }
+  }
+  
+  async fileExists(filePath) {
+    try {
+      await fs.access(filePath);
       return true;
     } catch {
       return false;
@@ -492,6 +596,13 @@ export default config;`;
         
         // Use registry tools for installing Shadcn/Aceternity/etc
         const result = await registryTools.installComponents(registryId, components, this.projectPath);
+
+        // EXTRA SAFETY: If installing 'resizable' component, ensure we have the latest react-resizable-panels
+        // to match our AI's v4+ code generation patterns.
+        if (components.includes('resizable') || components.includes('react-resizable-panels')) {
+             await runCommand('npm install react-resizable-panels@latest', this.projectPath, 'Enforcing latest react-resizable-panels');
+        }
+
         if (this.stateManager && result.installed && result.installed.length > 0) {
             // Update state with RICH details
             try {
@@ -537,11 +648,11 @@ export default config;`;
     const missing = await validator.validateConfigFiles();
     
     if (missing.length > 0) {
-      logger.info(`📦 Installing missing config dependencies: ${missing.join(', ')}`);
+      logger.info(`ðŸ“¦ Installing missing config dependencies: ${missing.join(', ')}`);
       const cmd = validator.getInstallCommand(missing);
       await runCommand(cmd, this.projectPath, 'Installing missing deps');
     } else {
-      logger.info('✅ All config dependencies are installed');
+      logger.info('âœ… All config dependencies are installed');
     }
   }
 
@@ -553,8 +664,8 @@ export default config;`;
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
-import { Navbar } from '@/components/ui/navbar';
-import { ThemeProvider } from '@/components/theme-provider';
+import { Navbar } from '@/components/navbar';
+import { ThemeProvider } from '@/components/providers/theme-provider';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -590,18 +701,19 @@ export default function RootLayout({
      
      // 2. Write Layout File
      await fs.writeFile(layoutPath, metadataCode);
-     logger.info('✅ Created Root Layout with ThemeProvider');
+     logger.info('âœ… Created Root Layout with ThemeProvider');
      
      // 3. Generate ThemeProvider Component
      await this.createThemeProvider();
   }
   
   async createThemeProvider() {
-    const themeProviderDir = path.join(this.projectPath, 'components');
-    const themeProviderPath = path.join(themeProviderDir, 'theme-provider.tsx');
+    // Path must match: @/components/providers/theme-provider
+    const providersDir = path.join(this.projectPath, 'components', 'providers');
+    const themeProviderPath = path.join(providersDir, 'theme-provider.tsx');
     
     // Ensure directory exists
-    await fs.mkdir(themeProviderDir, { recursive: true });
+    await fs.mkdir(providersDir, { recursive: true });
     
     const themeProviderCode = `"use client";
 
@@ -617,14 +729,66 @@ export function ThemeProvider({
 `;
     
     await fs.writeFile(themeProviderPath, themeProviderCode);
-    logger.info('✅ Created ThemeProvider for persistent dark mode');
-    
-    // Install next-themes if not already
-    await runCommand('npm install next-themes', this.projectPath, 'Installing next-themes');
+    logger.info('âœ… Created ThemeProvider at components/providers/theme-provider.tsx');
   }
   
   async createNavigationComponent(pages) {
     const aiClient = require('../services/aiClient');
+    
+    // 1. Create ModeToggle component at components/mode-toggle.tsx
+    const modeToggleDir = path.join(this.projectPath, 'components');
+    const modeTogglePath = path.join(modeToggleDir, 'mode-toggle.tsx');
+    
+    // Check if mode-toggle exists (or we create it manually as it's a "cookbook" component)
+    const modeToggleCode = `"use client"
+
+import * as React from "react"
+import { Moon, Sun } from "lucide-react"
+import { useTheme } from "next-themes"
+
+import { Button } from "@/components/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+
+export function ModeToggle() {
+  const { setTheme } = useTheme()
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon">
+          <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+          <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+          <span className="sr-only">Toggle theme</span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem onClick={() => setTheme("light")}>
+          Light
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setTheme("dark")}>
+          Dark
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setTheme("system")}>
+          System
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
+`;
+    
+    try {
+        await fs.mkdir(modeToggleDir, { recursive: true });
+        await fs.writeFile(modeTogglePath, modeToggleCode);
+        logger.info('âœ… Created ModeToggle component');
+    } catch (err) {
+        logger.warn('Failed to create ModeToggle:', err.message);
+    }
     
     // Build page list for navbar
     const navLinks = pages.map(p => ({
@@ -640,13 +804,15 @@ PAGES: ${JSON.stringify(navLinks)}
 REQUIREMENTS:
 1. Use "use client" directive
 2. Import Link from "next/link" and usePathname from "next/navigation"
-3. Include all pages as nav links
-4. Highlight active page using pathname
-5. Use glassmorphism: bg-background/95 backdrop-blur
-6. Add responsive design with mobile menu
-7. Include project name as logo
-8. Use shadcn-compatible Tailwind classes
-9. Export named function "Navbar"
+3. Import { ModeToggle } from "@/components/mode-toggle"
+4. Include all pages as nav links
+5. Highlight active page using pathname
+6. Use glassmorphism: bg-background/95 backdrop-blur
+7. Add responsive design with mobile menu
+8. Include project name as logo
+9. PLACE <ModeToggle /> COMPONENT ON THE RIGHT SIDE (next to mobile menu)
+10. Use shadcn-compatible Tailwind classes
+11. Export named function "Navbar"
 
 Return ONLY the complete TypeScript code, no explanations.`;
 
@@ -660,10 +826,10 @@ Return ONLY the complete TypeScript code, no explanations.`;
       // Clean the code
       const cleanCode = navCode.replace(/```[a-z]*\n?/g, '').replace(/```/g, '').trim();
       
-      const compDir = path.join(this.projectPath, 'components', 'ui');
+      const compDir = path.join(this.projectPath, 'components');
       await fileSystem.createDirectory(compDir, '');
       await fileSystem.writeFile(compDir, 'navbar.tsx', cleanCode);
-      logger.info('✅ Generated dynamic Navbar component');
+      logger.info('âœ… Generated dynamic Navbar component');
     } catch (error) {
       logger.warn('Navbar generation failed, using fallback:', error.message);
       // Fallback to simple nav
@@ -671,6 +837,7 @@ Return ONLY the complete TypeScript code, no explanations.`;
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { ModeToggle } from '@/components/mode-toggle';
 
 export function Navbar() {
   const pathname = usePathname();
@@ -678,10 +845,11 @@ export function Navbar() {
   return (
     <nav className="flex h-16 items-center justify-between px-6 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="font-bold text-lg">${this.projectPlan.projectName || 'App'}</div>
-      <div className="flex gap-6">
+      <div className="flex items-center gap-6">
        ${navLinks.map(link => 
          `<Link href="${link.href}" className={\`text-sm font-medium transition-colors hover:text-primary \${pathname === '${link.href}' ? 'text-foreground' : 'text-muted-foreground'}\`}>${link.label}</Link>`
        ).join('\n       ')}
+        <ModeToggle />
       </div>
     </nav>
   );
@@ -691,25 +859,253 @@ export function Navbar() {
       await fileSystem.createDirectory(compDir, '');
       await fileSystem.writeFile(compDir, 'navbar.tsx', fallbackNav);
     }
+    
+    // PHASE 12 FIX: MANDATORY FOOTER GENERATION
+    await this.createFooterComponent();
+    await this.createThemeProvider();
+  }
+  
+  /**
+   * Creates the ThemeProvider component (Mandatory for dark mode).
+   */
+  async createThemeProvider() {
+    const fs = require('fs').promises;
+    const providerPath = require('path').join(this.projectPath, 'components', 'providers');
+    await fs.mkdir(providerPath, { recursive: true });
+    
+    const code = `"use client"
+
+import * as React from "react"
+import { ThemeProvider as NextThemesProvider } from "next-themes"
+import { type ThemeProviderProps } from "next-themes/dist/types"
+
+export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
+  return <NextThemesProvider {...props}>{children}</NextThemesProvider>
+}
+`;
+
+    await fs.writeFile(require('path').join(providerPath, 'theme-provider.tsx'), code);
+  }
+  
+  /**
+   * Creates a Footer component (MANDATORY for all projects).
+   * Phase 12: Addresses missing footer issue.
+   */
+  async createFooterComponent() {
+    const fs = require('fs').promises;
+    
+    const footerCode = `"use client";
+
+import Link from "next/link";
+
+export function Footer() {
+  const currentYear = new Date().getFullYear();
+  
+  return (
+    <footer className="w-full mt-auto border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {/* Brand */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-bold">${this.projectPlan.projectName || 'App'}</h3>
+            <p className="text-sm text-muted-foreground">
+              ${this.projectPlan.description?.substring(0, 100) || 'Building the future of software.'}
+            </p>
+          </div>
+          
+          {/* Quick Links */}
+          <div className="space-y-4">
+            <h4 className="text-sm font-semibold">Quick Links</h4>
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              <li><Link href="/" className="hover:text-foreground transition-colors">Home</Link></li>
+              <li><Link href="/dashboard" className="hover:text-foreground transition-colors">Dashboard</Link></li>
+            </ul>
+          </div>
+          
+          {/* Legal */}
+          <div className="space-y-4">
+            <h4 className="text-sm font-semibold">Legal</h4>
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              <li><Link href="#" className="hover:text-foreground transition-colors">Privacy Policy</Link></li>
+              <li><Link href="#" className="hover:text-foreground transition-colors">Terms of Service</Link></li>
+            </ul>
+          </div>
+        </div>
+        
+        <div className="mt-8 pt-8 border-t text-center text-sm text-muted-foreground">
+          <p>&copy; {currentYear} ${this.projectPlan.projectName || 'App'}. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+  );
+}
+`;
+
+
+    try {
+      const compDir = path.join(this.projectPath, 'components');
+      await fs.mkdir(compDir, { recursive: true });
+      await fs.writeFile(path.join(compDir, 'footer.tsx'), footerCode);
+      logger.info('âœ… Created Footer component');
+    } catch (err) {
+      logger.warn('Failed to create Footer:', err.message);
+    }
+  }
+
+  /**
+   * Generates a proper landing page to replace the default Next.js boilerplate.
+   * Phase 12: Addresses missing landing page issue.
+   */
+  async generateLandingPage() {
+    const fs = require('fs').promises;
+    const aiClient = require('../services/aiClient');
+    
+    // Check if a "/" page already exists in the plan (skip if user defined it)
+    const hasRootPage = this.projectPlan.pages?.some(p => p.route === '/' || p.route === '');
+    if (hasRootPage) {
+      logger.info('â„¹ï¸ Root page already in plan, skipping landing page generation');
+      return;
+    }
+    
+    const prompt = `Generate a STUNNING landing page for "${this.projectPlan.projectName || 'App'}" - a ${this.projectPlan.description || 'modern web application'}.
+
+REQUIREMENTS (MANDATORY):
+1. "use client" directive
+2. Import Navbar from "@/components/navbar" and Footer from "@/components/footer"
+3. Hero section with:
+   - Gradient background (bg-gradient-to-br from-primary/10 via-background to-accent/10)
+   - Large headline with the project name
+   - Subheadline describing the value proposition
+   - Two CTA buttons (primary: "Get Started", ghost: "Learn More")
+4. Features section with:
+   - 3-4 feature cards using glassmorphism (backdrop-blur-xl bg-card/50 border)
+   - Each card MUST have a Lucide icon (import from "lucide-react")
+   - Hover effects (hover:scale-[1.02] transition-all)
+5. Stats or social proof section
+6. Include <Navbar /> at top and <Footer /> at bottom
+7. Use dark mode compatible colors (bg-background, text-foreground, etc.)
+8. Mobile responsive (use grid-cols-1 md:grid-cols-3)
+
+STYLE: ${this.projectPlan.styleIntent || 'modern, premium, glassmorphism'}
+
+Return ONLY the complete TypeScript/TSX code.`;
+
+    try {
+      const landingCode = await aiClient.generate(prompt, {
+        systemPrompt: 'You are an expert UI developer creating premium, visually stunning landing pages. Always include icons, gradients, and hover effects.',
+        maxTokens: 8000,
+        temperature: 0.4
+      });
+      
+      const cleanCode = landingCode.replace(/```[a-z]*\\n?/g, '').replace(/```/g, '').trim();
+      
+      const appDir = path.join(this.projectPath, 'app');
+      await fs.mkdir(appDir, { recursive: true });
+      await fs.writeFile(path.join(appDir, 'page.tsx'), cleanCode);
+      logger.info('âœ… Generated Landing Page (app/page.tsx)');
+    } catch (error) {
+      logger.warn('Landing page generation failed, using fallback:', error.message);
+      
+      // Fallback static landing page
+      const fallbackLanding = `"use client";
+
+import Link from "next/link";
+import { Navbar } from "@/components/navbar";
+import { Footer } from "@/components/footer";
+import { ArrowRight, Zap, Shield, BarChart3 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+
+export default function LandingPage() {
+  return (
+    <div className="min-h-screen flex flex-col">
+      <Navbar />
+      
+      {/* Hero */}
+      <section className="flex-1 flex items-center justify-center bg-gradient-to-br from-primary/10 via-background to-accent/10 px-4 py-20">
+        <div className="container mx-auto text-center space-y-8">
+          <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
+            Welcome to ${this.projectPlan.projectName || 'Our Platform'}
+          </h1>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            ${this.projectPlan.description?.substring(0, 150) || 'Build something amazing with our powerful platform.'}
+          </p>
+          <div className="flex gap-4 justify-center">
+            <Link href="/dashboard">
+              <Button size="lg" className="gap-2">
+                Get Started <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
+            <Link href="/login">
+              <Button size="lg" variant="outline">
+                Sign In
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+      
+      {/* Features */}
+      <section className="py-20 px-4 bg-background">
+        <div className="container mx-auto">
+          <h2 className="text-3xl font-bold text-center mb-12">Features</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              { icon: Zap, title: "Lightning Fast", desc: "Built for speed and performance" },
+              { icon: Shield, title: "Secure", desc: "Enterprise-grade security built in" },
+              { icon: BarChart3, title: "Analytics", desc: "Powerful insights at your fingertips" },
+            ].map((feature, i) => (
+              <div key={i} className="p-6 rounded-xl border bg-card/50 backdrop-blur-xl hover:scale-[1.02] transition-all shadow-lg">
+                <feature.icon className="h-10 w-10 text-primary mb-4" />
+                <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
+                <p className="text-muted-foreground">{feature.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+      
+      <Footer />
+    </div>
+  );
+}
+`;
+      const appDir = path.join(this.projectPath, 'app');
+      await fs.mkdir(appDir, { recursive: true });
+      await fs.writeFile(path.join(appDir, 'page.tsx'), fallbackLanding);
+      logger.info('âœ… Created fallback Landing Page');
+    }
   }
 
   /**
    * Scans generated code for UI component imports and ensures they exist.
-   * If a component is missing, it generates a placeholder to prevent build errors.
+   * Installs REAL Shadcn components when possible, falls back to placeholder for custom components.
    */
   async verifyAndFixImports(code, projectPath) {
     const fs = require('fs').promises;
     const path = require('path');
+    const { execAsync } = require('../utils/execAsync');
+    
+    // Known Shadcn components that can be installed via CLI
+    const SHADCN_COMPONENTS = new Set([
+      'accordion', 'alert', 'alert-dialog', 'aspect-ratio', 'avatar', 'badge', 'breadcrumb',
+      'button', 'calendar', 'card', 'carousel', 'chart', 'checkbox', 'collapsible', 'combobox',
+      'command', 'context-menu', 'dialog', 'drawer', 'dropdown-menu', 'form', 'hover-card',
+      'input', 'input-otp', 'label', 'menubar', 'navigation-menu', 'pagination', 'popover',
+      'progress', 'radio-group', 'resizable', 'scroll-area', 'select', 'separator', 'sheet',
+      'sidebar', 'skeleton', 'slider', 'sonner', 'switch', 'table', 'tabs', 'textarea',
+      'toast', 'toggle', 'toggle-group', 'tooltip'
+    ]);
     
     // Regex to find imports from @/components/ui/NAME
-    // capturing group 1: component names (e.g. "ProductCard, Button")
-    // capturing group 2: file path (e.g. "product-card")
     const importRegex = /import\s+{([^}]+)}\s+from\s+['"]@\/components\/ui\/([^'"]+)['"]/g;
+    
+    const componentsToInstall = new Set();
+    const customComponents = [];
     
     let match;
     while ((match = importRegex.exec(code)) !== null) {
       const componentNames = match[1].split(',').map(n => n.trim());
-      const fileName = match[2]; // e.g., "product-card" or "icons"
+      const fileName = match[2]; // e.g., "card" or "custom-widget"
       
       const componentPath = path.join(projectPath, 'components', 'ui', `${fileName}.tsx`);
       
@@ -717,46 +1113,105 @@ export function Navbar() {
         await fs.access(componentPath);
         // Exists, all good
       } catch (err) {
-        // Missing! Create it.
-        logger.warn(`🛠️  Auto-fixing missing component: ${fileName}`);
-        
-        let fileContent = '';
-        
-        // Strategy: Check if it's likely an icon
-        const isIcon = fileName.includes('icon');
-        
-        if (isIcon) {
-             // Generate Lucide facade
-             const exports = componentNames.map(name => {
-                 // Remove 'Icon' suffix if present for Lucide mapping: ShoppingCartIcon -> ShoppingCart
-                 const lucideName = name.replace(/Icon$/, '');
-                 return `export { ${lucideName} as ${name} } from 'lucide-react';`;
-             }).join('\n');
-             fileContent = `import 'lucide-react';\n${exports}\n\n// Fallback for missing icons\nexport function ${componentNames[0]}Fallback() { return null; }`;
+        // Missing! Check if it's a known Shadcn component
+        if (SHADCN_COMPONENTS.has(fileName)) {
+          componentsToInstall.add(fileName);
+          logger.info(`ðŸ“¦ Will install Shadcn component: ${fileName}`);
         } else {
-             // Generate simple functional component for each exported name
-             const exports = componentNames.map(name => {
-                return `export function ${name}({ children, className, ...props }: any) {
-       return (
-         <div className={\`p-4 border border-dashed border-yellow-400 rounded bg-yellow-50/10 text-yellow-500 \${className}\`} {...props}>
-           <span className="text-xs font-mono block mb-1">Missing: ${name}</span>
-           {children}
-         </div>
-       );
-     }`;
-             }).join('\n\n');
-             fileContent = `import React from 'react';\n\n${exports}`;
-        }
-        
-        try {
-           const dir = path.dirname(componentPath);
-           await fs.mkdir(dir, { recursive: true });
-           await fs.writeFile(componentPath, fileContent);
-           logger.info(`✅ Created ${isIcon ? 'icon wrapper' : 'placeholder'} for ${fileName}`);
-        } catch (writeErr) {
-           logger.error(`Failed to create placeholder for ${fileName}:`, writeErr);
+          customComponents.push({ fileName, componentNames });
         }
       }
+    }
+    
+    // 1. Batch install all Shadcn components (much faster than one-by-one)
+    if (componentsToInstall.size > 0) {
+      const componentList = [...componentsToInstall].join(' ');
+      logger.info(`ðŸ“¦ Installing ${componentsToInstall.size} Shadcn components: ${componentList}`);
+      
+      try {
+        await execAsync(`npx shadcn@latest add ${componentList} --yes`, {
+          cwd: projectPath,
+          timeout: 120000
+        });
+        logger.info(`âœ… Installed ${componentsToInstall.size} Shadcn components successfully`);
+      } catch (installErr) {
+        logger.error(`Failed to install Shadcn components:`, installErr.message);
+        // Fallback: Create placeholders for failed components
+        for (const fileName of componentsToInstall) {
+          await this._createPlaceholderComponent(fileName, projectPath);
+        }
+      }
+    }
+    
+    // 2. Create placeholders for truly custom components
+    for (const { fileName, componentNames } of customComponents) {
+      logger.warn(`ðŸ› ï¸  Creating placeholder for custom component: ${fileName}`);
+      await this._createPlaceholderComponent(fileName, projectPath, componentNames);
+    }
+  }
+
+  /**
+   * Create a placeholder component file (only for non-Shadcn components)
+   */
+  async _createPlaceholderComponent(fileName, projectPath, componentNames = []) {
+    const fs = require('fs').promises;
+    const path = require('path');
+    
+    const componentPath = path.join(projectPath, 'components', 'ui', `${fileName}.tsx`);
+    
+    const isIcon = fileName.includes('icon');
+    
+    let fileContent = '';
+    
+    if (isIcon) {
+      // Lucide facade
+      const exports = componentNames.map(name => {
+        let lucideName = name.replace(/Icon$/, '');
+        
+        // Handle edge case: "Icon" -> "" (invalid export)
+        // Handle edge case: "BoxIcon" -> "Box" (valid)
+        if (!lucideName || lucideName === '') {
+          lucideName = 'Image'; // Fallback to a generic icon
+        }
+        
+        // Ensure first char is uppercase
+        lucideName = lucideName.charAt(0).toUpperCase() + lucideName.slice(1);
+        
+        return `export { ${lucideName} as ${name} } from 'lucide-react';`;
+      }).join('\n');
+      
+      fileContent = `import 'lucide-react';\n${exports}\n\n// Fallback\nexport function IconPlaceholder() { return null; }`;
+    } else {
+      // Generic placeholder with clear visual indicator
+      const exportName = componentNames[0] || fileName.split('-').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join('');
+      fileContent = `import React from 'react';
+
+// TODO: Implement this component or install via: npx shadcn@latest add ${fileName}
+export function ${exportName}({ children, className, ...props }: any) {
+  return (
+    <div className={\`p-4 border-2 border-dashed border-amber-400 rounded-lg bg-amber-50/10 \\${className}\`} {...props}>
+      <span className="text-xs font-mono text-amber-500 block mb-2">âš ï¸ Placeholder: ${exportName}</span>
+      {children}
+    </div>
+  );
+}
+
+// Re-export as commonly expected names
+export const ${exportName}Content = ${exportName};
+export const ${exportName}Header = ${exportName};
+export const ${exportName}Title = ${exportName};
+export const ${exportName}Description = ${exportName};
+export const ${exportName}Footer = ${exportName};
+`;
+    }
+    
+    try {
+      const dir = path.dirname(componentPath);
+      await fs.mkdir(dir, { recursive: true });
+      await fs.writeFile(componentPath, fileContent);
+      logger.info(`âœ… Created placeholder for ${fileName}`);
+    } catch (writeErr) {
+      logger.error(`Failed to create placeholder for ${fileName}:`, writeErr);
     }
   }
 
@@ -786,7 +1241,7 @@ export function Navbar() {
             tsconfig.compilerOptions.paths = { ...tsconfig.compilerOptions.paths, "@/*": ["./*"] };
             
             await fs.writeFile(tsconfigPath, JSON.stringify(tsconfig, null, 2));
-            logger.info('✅ Updated tsconfig.json with baseUrl: "."');
+            logger.info('âœ… Updated tsconfig.json with baseUrl: "."');
          }
        } catch (err) {
          logger.warn('Could not update tsconfig.json:', err.message);
@@ -794,7 +1249,7 @@ export function Navbar() {
        
        // 3. Fix globals.css for Tailwind v4
        // MOVED TO ThemeGenerator to avoid conflict/overwrite issues
-       logger.info('ℹ️  Skipping direct globals.css write (ThemeGenerator handles this)');
+       logger.info('â„¹ï¸  Skipping direct globals.css write (ThemeGenerator handles this)');
   } 
   
   async createTailwindConfig() {}
@@ -802,3 +1257,5 @@ export function Navbar() {
 }
 
 module.exports = ProjectBuilderAgent;
+
+

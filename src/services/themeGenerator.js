@@ -25,7 +25,7 @@ class ThemeGenerator {
     return `import type { Config } from "tailwindcss";
 
 const config: Config = {
-  darkMode: ["class"],
+  darkMode: "class",
   content: [
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -77,7 +77,7 @@ const config: Config = {
       animation: ${JSON.stringify(animations.animation, null, 8)},
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")],
 };
 
 export default config;
@@ -132,7 +132,7 @@ export default config;
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
     --primary: ${primaryHSL.h} ${primaryHSL.s}% ${Math.min(primaryHSL.l + 10, 70)}%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary-foreground: 222.2 84% 4.9%; 
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
     --muted: 217.2 32.6% 17.5%;
@@ -214,11 +214,16 @@ body {
         "slide-in": {
           "0%": { transform: "translateY(10px)", opacity: "0" },
           "100%": { transform: "translateY(0)", opacity: "1" }
+        },
+        "float": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-10px)" }
         }
       },
       animation: {
         "fade-in": "fade-in 0.3s ease-in-out",
-        "slide-in": "slide-in 0.4s ease-out"
+        "slide-in": "slide-in 0.4s ease-out",
+        "float": "float 3s ease-in-out infinite"
       }
     };
   }
@@ -242,13 +247,18 @@ body {
         "shimmer": {
           "0%": { backgroundPosition: "-200% 0" },
           "100%": { backgroundPosition: "200% 0" }
+        },
+        "float": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-10px)" }
         }
       },
       animation: {
         "fade-in": "fade-in 0.5s ease-in-out",
         "slide-in": "slide-in 0.6s ease-out",
         "bounce-in": "bounce-in 0.7s cubic-bezier(0.68, -0.55, 0.265, 1.55)",
-        "shimmer": "shimmer 2s linear infinite"
+        "shimmer": "shimmer 2s linear infinite",
+        "float": "float 3s ease-in-out infinite"
       }
     };
   }

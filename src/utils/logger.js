@@ -3,11 +3,18 @@
  * Supports debug mode and severity levels
  */
 
-const vscode = require('vscode');
+let vscode;
+try {
+  vscode = require('vscode');
+} catch (e) {
+  vscode = null;
+}
 
 class Logger {
   constructor() {
-    this.outputChannel = vscode.window.createOutputChannel('CodeSentinel AI');
+    if (vscode) {
+      this.outputChannel = vscode.window.createOutputChannel('CodeSentinel AI');
+    }
     this.debugMode = false;
   }
 
@@ -77,14 +84,14 @@ class Logger {
    * Show output channel to user
    */
   show() {
-    this.outputChannel.show();
+    if (this.outputChannel) this.outputChannel.show();
   }
 
   /**
    * Clear all logs
    */
   clear() {
-    this.outputChannel.clear();
+    if (this.outputChannel) this.outputChannel.clear();
   }
 
   /**
@@ -99,7 +106,12 @@ class Logger {
       logLine += `\n${JSON.stringify(data, null, 2)}`;
     }
 
-    this.outputChannel.appendLine(logLine);
+    if (this.outputChannel) {
+      this.outputChannel.appendLine(logLine);
+    } else {
+        // Fallback for CLI/Standalone
+        console.log(logLine);
+    }
   }
 }
 

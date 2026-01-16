@@ -286,6 +286,39 @@ class AIClient {
       console.log(`[AIClient ${level.toUpperCase()}] ${timestamp}: ${message}`);
     }
   }
+
+  /**
+   * Generate vector embedding for text
+   * @param {string} text - Text to embed
+   * @returns {Promise<number[]>} Array of floating point numbers
+   */
+  async embed(text) {
+    if (!text || typeof text !== 'string') return [];
+
+    try {
+      // 1. Try Gemini Embedding
+      if (this.geminiClient) {
+        const model = this.geminiClient.getGenerativeModel({ model: "text-embedding-004" });
+        const result = await model.embedContent(text);
+        return result.embedding.values;
+      }
+      
+      // 2. Try Ollama Embedding
+      if (this.ollamaClient) {
+        const response = await this.ollamaClient.embeddings({
+          model: 'all-minilm', // Standard lightweight model
+          prompt: text
+        });
+        return response.embedding;
+      }
+      
+      throw new Error('No embedding provider available');
+    } catch (error) {
+      this._log(`⚠️ Embedding failed: ${error.message}`, 'error');
+      // Return zero vector or empty as fallback
+      return [];
+    }
+  }
 }
 
 // Export singleton instance

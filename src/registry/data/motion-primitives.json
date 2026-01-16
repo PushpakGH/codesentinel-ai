@@ -73,7 +73,8 @@
         "div",
         "primitive"
       ],
-      "useCase": "Generic animated container."
+      "useCase": "Generic animated container.",
+      "embeddingContext": "Convenience wrapper around motion.div with sensible defaults that works with any Tailwind layout. Related concepts: animation, container, div, primitive. Primary use case: Generic animated container."
     },
     {
       "name": "draggable",
@@ -118,7 +119,8 @@
         "interaction",
         "move"
       ],
-      "useCase": "Making an element draggable."
+      "useCase": "Making an element draggable.",
+      "embeddingContext": "Makes any child draggable with optional axis and constraints, using Framer Motion drag. Related concepts: gesture, drag, interaction, move. Primary use case: Making an element draggable."
     },
     {
       "name": "hover-lift",
@@ -159,7 +161,8 @@
         "card",
         "scale"
       ],
-      "useCase": "Subtle lift effect on hover."
+      "useCase": "Subtle lift effect on hover.",
+      "embeddingContext": "Adds a subtle scale, translate and shadow on hover using whileHover under the hood. Related concepts: hover, effect, card, scale. Primary use case: Subtle lift effect on hover."
     },
     {
       "name": "pressable",
@@ -195,7 +198,8 @@
         "scale",
         "tap"
       ],
-      "useCase": "Scale down effect on click/tap."
+      "useCase": "Scale down effect on click/tap.",
+      "embeddingContext": "Adds press/tap feedback via scale animation using whileTap. Related concepts: click, button, scale, tap. Primary use case: Scale down effect on click/tap."
     },
     {
       "name": "scroll-reveal",
@@ -242,7 +246,8 @@
         "enter",
         "view"
       ],
-      "useCase": "Revealing element when scrolled into view."
+      "useCase": "Revealing element when scrolled into view.",
+      "embeddingContext": "Reveals content when it scrolls into view using whileInView and viewport options. Related concepts: scroll, fade, enter, view. Primary use case: Revealing element when scrolled into view."
     },
     {
       "name": "parallax-layer",
@@ -278,7 +283,8 @@
         "move",
         "depth"
       ],
-      "useCase": "Layer moving at different speed for parallax."
+      "useCase": "Layer moving at different speed for parallax.",
+      "embeddingContext": "Parallax layer that moves at a different speed than scroll, ideal for hero backgrounds. Related concepts: scroll, background, move, depth. Primary use case: Layer moving at different speed for parallax."
     },
     {
       "name": "stagger-container",
@@ -320,7 +326,8 @@
         "children",
         "animate"
       ],
-      "useCase": "Staggering animations of child elements."
+      "useCase": "Staggering animations of child elements.",
+      "embeddingContext": "Parent container that staggers children animations using Framer Motion variants. Related concepts: list, sequence, children, animate. Primary use case: Staggering animations of child elements."
     },
     {
       "name": "presence",
@@ -357,7 +364,8 @@
         "conditional",
         "mount"
       ],
-      "useCase": "Handling exit animations for unmounting components."
+      "useCase": "Handling exit animations for unmounting components.",
+      "embeddingContext": "Thin wrapper around AnimatePresence for handling exit animations of conditional content. Related concepts: exit, enter, conditional, mount. Primary use case: Handling exit animations for unmounting components."
     },
     {
       "name": "cursor-follow",
@@ -398,7 +406,8 @@
         "track",
         "effect"
       ],
-      "useCase": "Element tracking mouse position."
+      "useCase": "Element tracking mouse position.",
+      "embeddingContext": "Element that smoothly follows the cursor with spring physics for custom cursors or highlights. Related concepts: mouse, pointer, track, effect. Primary use case: Element tracking mouse position."
     },
     {
       "name": "motion-stack",
@@ -435,7 +444,8 @@
         "toast",
         "vertical"
       ],
-      "useCase": "Stack of items with entrance/exit animations."
+      "useCase": "Stack of items with entrance/exit animations.",
+      "embeddingContext": "Stacked list with enter/exit animations built on AnimatePresence; ideal for toasts or notifications. Related concepts: list, stack, toast, vertical. Primary use case: Stack of items with entrance/exit animations."
     }
   ]
 }

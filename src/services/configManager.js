@@ -1,4 +1,11 @@
-const vscode = require('vscode');
+let vscode;
+try {
+  vscode = require('vscode');
+} catch (e) {
+  vscode = {
+     workspace: { getConfiguration: () => ({ get: () => '' }) }
+  };
+}
 const fs = require('fs').promises;
 const path = require('path');
 const { logger } = require('../utils/logger');
