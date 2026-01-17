@@ -96,11 +96,19 @@ RULE #4: TAILWIND CSS V4 COMPLIANCE
    - Responsive prefixes (sm:, md:, lg:, xl:)
    - Modern color opacity (bg-primary/80)
 
+✅ BEST PRACTICE:
+   - When initializing Tailwind CSS v4, ensure the @plugin directive is used for plugins like tailwindcss-animate inside the CSS file.
+   - Example: @import "tailwindcss"; @plugin "tailwindcss-animate";
+
+❌ NEGATIVE CONSTRAINTS (CRITICAL):
+   - DO NOT generate a tailwind.config.ts or tailwind.config.js file when using Tailwind CSS v4.
+   - Instead, DO define all theme customizations (colors, fonts, animations) directly in the generated CSS file (e.g., globals.css) using the @theme directive. 
+   - DO NOT use @apply with CSS variables (e.g. @apply border-border). Use standard CSS: border-color: hsl(var(--border))
+
 ❌ AVOID:
    - Arbitrary values unless necessary [color: #123456]
    - Custom colors not defined in theme
    - @apply in component files (use in globals.css only)
-   - ❌ NEVER use @apply with CSS variables (e.g. @apply border-border). Use standard CSS: border-color: hsl(var(--border))
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 RULE #22: PROJECT BRANDING ENFORCEMENT (CRITICAL - PREVENT TEMPLATE BLEED-THROUGH)
@@ -529,9 +537,16 @@ RULE #13: LIBRARY IMPORT & CONFIG CONSTRAINTS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 1. DO NOT use library-specific imports (like \`lucide-react\`) without valid exports.
    - Lucide does NOT export a generic \`Icon\` component. Import specific icons: \`import { Camera } from 'lucide-react'\`
-2. DO NOT assume standard HTML attributes (like \`title\`) work on third-party React components.
+
+2. NEGATIVE CONSTRAINT (INTERNAL PATHS):
+   - DO NOT import types or components from internal library paths (e.g., package/dist/types or package/lib/utils) unless strictly necessary and verified.
+   - DO import named exports from the package root (e.g., import { type Props } from 'package').
+   - Specific Ban: \`next-themes/dist/types\` (Use \`import { type ThemeProviderProps } from "next-themes"\`)
+
+3. DO NOT assume standard HTML attributes (like \`title\`) work on third-party React components.
    - Custom components often don't forward all props.
-3. Tailwind Config: Use string syntax for darkMode, NOT array.
+
+4. Tailwind Config (Legacy v3 only): Use string syntax for darkMode, NOT array.
    - ✅ darkMode: "class"
    - ❌ darkMode: ["class"]
 
