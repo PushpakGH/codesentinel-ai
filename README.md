@@ -2,9 +2,10 @@
 
 # CodeSentinel AI – Multi‑Agent Code Review for VS Code
 
-CodeSentinel AI is a **production-grade code review assistant** for VS Code that combines multi‑agent analysis, security scanning, smart auto‑fix, and an integrated AI chat interface. Designed for real-world teams, it supports both **cloud (Gemini)** and **local (Ollama)** models with BYOK security.
+CodeSentinel AI is a **code review assistant** for VS Code that combines multi‑agent analysis, security scanning, smart auto‑fix, and an integrated AI chat interface. Designed for real-world teams, it supports both **cloud (Gemini)** and **local (Ollama)** models with BYOK security.
 
 ***
+**Its vibecoded!!!**
 
 ## Key Features
 
